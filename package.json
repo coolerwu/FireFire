@@ -33,7 +33,7 @@
     "estart": "electron .",
     "all": "cnpm run build && cnpm run estart",
     "estart-dev": "electron . dev",
-    "package": "electron-packager . bleak-electron-app --platform=mas --overwrite --electron-version=19.0.9"
+    "package-mac": "electron-packager . firefire --platform=mas --overwrite --electron-version=19.0.9"
   },
   "eslintConfig": {
     "extends": [
