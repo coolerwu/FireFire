@@ -1,6 +1,6 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require("path");
-const {init, findJsonList, readFile, writeFileAsync, mv, del, writeFile} = require("./electron/file");
+const {init, findJsonList, readFile, writeFileAsync, mv, del, writeFile, getSettingJsonData, writeSettingJsonData} = require("./electron/file");
 
 //浏览器引用
 let window;
@@ -12,8 +12,8 @@ let mode = process.argv[2];
 let createWindow = () => {
     //创建浏览器窗口
     window = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1200,
+        height: 900,
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, './preload.js')
@@ -35,7 +35,7 @@ let createWindow = () => {
 
     init();
 
-    ipcMain.handle('opFile', (event, type, path, text) => {
+    const opFileFunc = (type, path, text) => {
         if (!type) {
             return null;
         }
@@ -61,8 +61,23 @@ let createWindow = () => {
             case 5:
                 del(path);
                 return 'success';
+            //读取设置
+            case 7:
+                return getSettingJsonData();
+            //写设置
+            case 8:
+                writeSettingJsonData(text);
+                return 'success';
             default:
                 return null;
+        }
+    }
+
+    ipcMain.handle('opFile', (event, type, path, text) => {
+        if (type instanceof Array) {
+            return type.map(f => opFileFunc(f.type, f.path, f.text));
+        } else {
+            return opFileFunc(type, path, text);
         }
     });
 };

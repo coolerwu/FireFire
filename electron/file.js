@@ -1,10 +1,9 @@
 const fs = require('fs');
 const pa = require('path');
-const {confPath, settingJsonName, defaultSettingJson, notebookDirPath} = require("./env");
-const path = require("path");
+const {confPath, settingJsonName, defaultSettingJson, notebookDirPath, tagPath} = require("./env");
 
 let failure = true;
-let notebookDirFullPath = null;
+let settingJsonData = null;
 
 const init = () => {
     try {
@@ -17,19 +16,43 @@ const init = () => {
             fs.writeFileSync(settingJsonFullPath, JSON.stringify(defaultSettingJson));
         }
 
-        let settingJsonData = fs.readFileSync(settingJsonFullPath)
+        settingJsonData = fs.readFileSync(settingJsonFullPath);
         settingJsonData = settingJsonData ? settingJsonData.toString() : JSON.stringify(defaultSettingJson);
         settingJsonData = JSON.parse(settingJsonData);
 
-        const notebookDirFullPathTmp = settingJsonData.notebookPath ? settingJsonData.notebookPath : notebookDirPath;
-        if (fs.existsSync(notebookDirFullPathTmp)) {
-            notebookDirFullPath = notebookDirFullPathTmp;
-            failure = false;
+        if (!settingJsonData.notebookPath) {
+            settingJsonData.notebookPath = notebookDirPath;
         }
+        if (!settingJsonData.tagPath) {
+            settingJsonData.tagPath = tagPath;
+        }
+
+        fs.writeFileSync(settingJsonFullPath, JSON.stringify(settingJsonData));
+
+        if (!fs.existsSync(settingJsonData.notebookPath)) {
+            fs.mkdirSync(settingJsonData.notebookPath);
+        }
+        if (!fs.existsSync(settingJsonData.tagPath)) {
+            fs.mkdirSync(settingJsonData.tagPath);
+        }
+        failure = false;
     } catch (err) {
         console.error(err);
     }
 };
+
+//读取设置文件
+const getSettingJsonData = () => {
+    return settingJsonData;
+}
+
+//写入设置文件
+const writeSettingJsonData = (values) => {
+    const settingJsonFullPath = pa.join(confPath, settingJsonName);
+    fs.writeFileSync(settingJsonFullPath, JSON.stringify(values));
+    failure = true;
+    init();
+}
 
 const findJsonList = (path) => {
     if (failure) {
@@ -37,7 +60,7 @@ const findJsonList = (path) => {
     }
 
     if (!path) {
-        path = notebookDirFullPath;
+        path = settingJsonData.notebookPath;
     }
 
     const fileList = fs.readdirSync(path);
@@ -51,12 +74,15 @@ const findJsonList = (path) => {
                 name: replaceSuffix(item),
                 value: item,
                 directory: true,
+                files: findJsonList(fullPath),
+                fullPath: fullPath,
             });
         } else {
             fileJsonList.push({
                 name: replaceSuffix(item),
                 value: item,
                 directory: false,
+                fullPath: fullPath,
             });
         }
     });
@@ -72,7 +98,7 @@ const getSuffix = path => {
 }
 
 const readFile = path => {
-    const filePath = pa.join(notebookDirFullPath, path);
+    const filePath = pa.join(settingJsonData.notebookPath, path);
     if (!fs.existsSync(filePath)) {
         return null;
     }
@@ -81,7 +107,7 @@ const readFile = path => {
 }
 
 const writeFileAsync = (path, text) => {
-    const filePath = pa.join(notebookDirFullPath, path);
+    const filePath = pa.join(settingJsonData.notebookPath, path);
     if (!fs.existsSync(filePath)) {
         fs.writeFileSync(filePath, '');
     }
@@ -94,7 +120,7 @@ const writeFileAsync = (path, text) => {
 }
 
 const writeFile = (path, text) => {
-    const filePath = pa.join(notebookDirFullPath, path);
+    const filePath = pa.join(settingJsonData.notebookPath, path);
     if (!fs.existsSync(filePath)) {
         fs.writeFileSync(filePath, '');
     }
@@ -104,8 +130,8 @@ const writeFile = (path, text) => {
 }
 
 const mv = (path, text) => {
-    const oldPath = pa.join(notebookDirFullPath, path);
-    const newPath = pa.join(notebookDirFullPath, text + getSuffix(oldPath));
+    const oldPath = pa.join(settingJsonData.notebookPath, path);
+    const newPath = pa.join(settingJsonData.notebookPath, text + getSuffix(oldPath));
     if (fs.existsSync(newPath)) {
         console.log('文件存在')
         return
@@ -115,12 +141,17 @@ const mv = (path, text) => {
 }
 
 const del = path => {
-    const filePath = pa.join(notebookDirFullPath, path);
+    const filePath = pa.join(settingJsonData.notebookPath, path);
     if (fs.existsSync(filePath)) {
-        fs.rmSync(filePath);
+        const stat = fs.statSync(filePath);
+        if (stat.isDirectory()) {
+            fs.rmdirSync(filePath);
+        } else {
+            fs.rmSync(filePath);
+        }
     }
 }
 
 module.exports = {
-    init, findJsonList, readFile, writeFileAsync, mv, del, writeFile
+    init, findJsonList, readFile, writeFileAsync, mv, del, writeFile, getSettingJsonData, writeSettingJsonData
 };

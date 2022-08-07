@@ -9,7 +9,7 @@ import MdList from "./pages/mdList";
 import TagList from "./pages/tagList/tagList";
 import Setting from "./pages/setting/setting";
 import ReactDOM from "react-dom";
-import {setFileList, SUCCESS} from "./common/global";
+import {setFileList, setSetting, setTagList, SUCCESS} from "./common/global";
 
 moment.locale('zh-cn');
 
@@ -29,11 +29,12 @@ const App = () => {
     const [activeKey, setActiveKey] = useState('列表');
     const [chooseFile, setChooseFile] = useState(null);
 
+    //项目初始化
     useEffect(() => {
-        window.electronAPI.opFile(1).then(res => {
-            if (res && res instanceof Array) {
-                setFileList(res);
-            }
+        window.electronAPI.opFile([{type: 1}, {type: 7}]).then(res => {
+            console.log(res)
+            setFileList(res[0]);
+            setSetting(res[1]);
             setLoad(false);
         })
     }, [needLoad]);
@@ -41,11 +42,18 @@ const App = () => {
     const jumpFunc = (file) => {
     }
 
-    const needLoadFunc = (filename) => {
+    //刷新文章页面
+    const needLoadArticleFunc = (filename) => {
         setChooseFile(filename);
         setLoad(true);
         setNeedLoad(!needLoad);
         setActiveKey('列表');
+    }
+
+    //刷新整个应用
+    const needLoadAppFunc = () => {
+        setLoad(true);
+        setNeedLoad(!needLoad);
     }
 
     const tabClickFunc = key => {
@@ -58,7 +66,7 @@ const App = () => {
             setLoad(true);
             window.electronAPI.opFile(6, file.value).then(res => {
                 if (SUCCESS === res) {
-                    needLoadFunc(file.name);
+                    needLoadArticleFunc(file.name);
                 }
             })
             return
@@ -83,7 +91,7 @@ const App = () => {
                         default:
                             return (
                                 <TabPane tab={`${i}`} key={i}>
-                                    <MdList jumpFunc={jumpFunc} needLoad={needLoadFunc} chooseFile={chooseFile}/>
+                                    <MdList jumpFunc={jumpFunc} needLoad={needLoadArticleFunc} chooseFile={chooseFile}/>
                                 </TabPane>
                             );
                         case '标签':
@@ -95,7 +103,7 @@ const App = () => {
                         case '设置':
                             return (
                                 <TabPane tab={`${i}`} key={i}>
-                                    <Setting jumpFunc={jumpFunc}/>
+                                    <Setting jumpFunc={jumpFunc} needLoadApp={needLoadAppFunc}/>
                                 </TabPane>
                             );
                     }

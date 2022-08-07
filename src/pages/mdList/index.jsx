@@ -1,9 +1,9 @@
-import {getFileList} from "../../common/global";
-import {Button, Col, List, Row} from "antd";
+import {getFileList, getSetting} from "../../common/global";
+import {Avatar, Breadcrumb, Button, Card, Col, List, Row, Tooltip} from "antd";
 import './index.less';
 import {useEffect, useState} from "react";
 import Markdown from "../markdown";
-import {DeleteOutlined} from "@ant-design/icons";
+import {DeleteOutlined, FileOutlined, FolderOutlined, HomeOutlined} from "@ant-design/icons";
 
 const MdList = ({jumpFunc, needLoad, chooseFile}) => {
     //左span
@@ -14,6 +14,18 @@ const MdList = ({jumpFunc, needLoad, chooseFile}) => {
     const [file, setFile] = useState(null);
     //文件内容
     const [fileContent, setFileContent] = useState(null);
+    //文件列表
+    const [fileList, setFileList] = useState(getFileList());
+    //文件路径
+    const [filePathList, setFilePathList] = useState([
+        {
+            value: getSetting().notebookPath,
+            label: <HomeOutlined/>,
+            file: {
+                files: getFileList()
+            },
+        }
+    ]);
 
     const loadMore =
         (
@@ -48,6 +60,21 @@ const MdList = ({jumpFunc, needLoad, chooseFile}) => {
         })
     };
 
+    const jumpDirectoryFunc = fileLocal => {
+        // fileLocal
+        setFileList(fileLocal?.files);
+
+        if (fileLocal === filePathList[0].file) {
+            return
+        }
+
+        setFilePathList([...filePathList, {
+            label: fileLocal.name,
+            value: fileLocal.fullPath,
+            file: fileLocal,
+        }]);
+    }
+
     const deleteFileFunc = file => {
         window.electronAPI.opFile(5, file.value).then(res => {
             setRightSpan(0);
@@ -66,20 +93,59 @@ const MdList = ({jumpFunc, needLoad, chooseFile}) => {
         }
     }, [chooseFile]);
 
+    const jumpDirectoryLevelFunc = (value) => {
+        let target = filePathList[0];
+
+        while (filePathList.length !== 1) {
+            const pop = filePathList.pop();
+            if (pop.value === value) {
+                target = pop;
+            }
+        }
+
+        if (target === filePathList[0]) {
+            jumpDirectoryFunc(target.file);
+            return
+        }
+
+        setFilePathList(filePathList);
+        jumpDirectoryFunc(target.file);
+    }
+
     return (
         <>
             <Row>
+                <Col span={24}>
+                    <Card className={'header'} bordered={false}>
+                        <Breadcrumb>
+                            {
+                                filePathList.map((filePath, index) => {
+                                    return (
+                                        <Breadcrumb.Item key={index} onClick={() => jumpDirectoryLevelFunc(filePath.value)}><Tooltip
+                                            title={filePath.value}>{filePath.label}</Tooltip></Breadcrumb.Item>
+                                    );
+                                })
+                            }
+                        </Breadcrumb>
+                    </Card>
+                </Col>
+            </Row>
+            <Row>
                 <Col span={leftSpan}>
                     <List
-                        // className="demo-loadmore-list"
                         itemLayout="horizontal"
                         loadMore={loadMore}
-                        dataSource={getFileList()}
+                        dataSource={fileList}
                         renderItem={item => (
                             <List.Item className={file?.name === item?.name ? 'listItem listItemHover' : 'listItem'}
-                                       onClick={() => jumpEditFileFunc(item)}
-                                       actions={[<Button type={'text'} onClick={() => deleteFileFunc(item)}><DeleteOutlined/></Button>]}>
+                                       onClick={() => item.directory ? jumpDirectoryFunc(item) : jumpEditFileFunc(item)}
+                                       actions={[(!item.directory || !item.files || item.files.length === 0) && <Button type={'text'} onClick={(e) => {
+                                           deleteFileFunc(item);
+                                           e.stopPropagation();
+                                       }}><DeleteOutlined/></Button>]}>
                                 <List.Item.Meta
+                                    avatar={item.directory ? <Avatar style={{backgroundColor: 'rgb(193,210,240)'}}><FolderOutlined/></Avatar> :
+                                        <Avatar style={{backgroundColor: 'gray', color: 'black'}}><FileOutlined/></Avatar>}
                                     title={item.name}
                                 />
                             </List.Item>
