@@ -22,11 +22,11 @@ let createWindow = () => {
 
     if (mode === 'dev') {
         window.loadURL('http://localhost:3000');
+        window.webContents.openDevTools();
     } else {
         //加载应用中的index.html文件
         window.loadFile('./build/index.html');
     }
-    window.webContents.openDevTools();
 
     //当window被关闭时，除掉window的引用
     window.on('closed', () => {

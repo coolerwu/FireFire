@@ -32,7 +32,6 @@ const App = () => {
     //项目初始化
     useEffect(() => {
         window.electronAPI.opFile([{type: 1}, {type: 7}]).then(res => {
-            console.log(res)
             setFileList(res[0]);
             setSetting(res[1]);
             setLoad(false);
@@ -55,6 +54,8 @@ const App = () => {
         setLoad(true);
         setNeedLoad(!needLoad);
     }
+
+    const fileReader = new FileReader();
 
     const tabClickFunc = key => {
         if (key === '新建') {
