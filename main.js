@@ -1,6 +1,6 @@
-const {app, BrowserWindow, ipcMain} = require('electron');
+const {app, BrowserWindow} = require('electron');
 const path = require("path");
-const {init, findJsonList, readFile, writeFileAsync, mv, del, writeFile, getSettingJsonData, writeSettingJsonData} = require("./electron/file");
+const {init} = require("./electron");
 
 //浏览器引用
 let window;
@@ -33,54 +33,12 @@ let createWindow = () => {
         window = null;
     });
 
-    init();
-
-    const opFileFunc = (type, path, text) => {
-        if (!type) {
-            return null;
-        }
-
-        switch (type) {
-            //读取所有文件
-            case 1:
-                return findJsonList();
-            //读取指定文件
-            case 2:
-                return readFile(path);
-            //异步写文件
-            case 3:
-                writeFileAsync(path, text);
-                return 'success';
-            //同步写文件
-            case 6:
-                writeFile(path, text);
-                return 'success';
-            case 4:
-                mv(path, text);
-                return 'success';
-            case 5:
-                del(path);
-                return 'success';
-            //读取设置
-            case 7:
-                return getSettingJsonData();
-            //写设置
-            case 8:
-                writeSettingJsonData(text);
-                return 'success';
-            default:
-                return null;
-        }
-    }
-
-    ipcMain.handle('opFile', (event, type, path, text) => {
-        if (type instanceof Array) {
-            return type.map(f => opFileFunc(f.type, f.path, f.text));
-        } else {
-            return opFileFunc(type, path, text);
-        }
-    });
+    afterCreated();
 };
+
+const afterCreated = () => {
+    init(window);
+}
 
 //当app准备就绪时候开启窗口
 app.on('ready', createWindow);

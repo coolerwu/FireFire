@@ -5,7 +5,6 @@ import React, {useRef} from 'react';
 import MenuBar from "./menuBar";
 import {Divider, Input, message} from "antd";
 import {SUCCESS} from "../../common/global";
-import AddTag from "../tagList/addTag";
 
 const Markdown = ({file, fileContent, needLoad}) => {
     const titleRef = useRef(null);
@@ -52,7 +51,6 @@ const Markdown = ({file, fileContent, needLoad}) => {
                 <Divider/>
                 <EditorContent editor={editor}/>
                 <Divider/>
-                <AddTag/>
             </div>
         </>
     );
