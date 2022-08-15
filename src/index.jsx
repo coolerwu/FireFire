@@ -6,8 +6,9 @@ import moment from "moment";
 import 'antd/dist/antd.variable.min.css';
 import './index.less';
 import ReactDOM from "react-dom";
-import File from "./pages/file";
-import {FileSearchOutlined} from "@ant-design/icons";
+import {FileAddOutlined, FileSearchOutlined} from "@ant-design/icons";
+import File from "./pages/file/file";
+import CreateFile from "./pages/file/createFile";
 
 moment.locale('zh-cn');
 
@@ -19,13 +20,15 @@ ConfigProvider.config({
 
 const {TabPane} = Tabs;
 
+const commonStyle = {
+    padding: 0,
+}
+
 const App = () => {
-    //key
-    let key = moment.now();
     //加载loading
     const [load, setLoad] = useState(true);
     //当前激活的key
-    const [activeKey, setActiveKey] = useState('1');
+    const [activeKey, setActiveKey] = useState('2');
     //文件列表
     const [cwjsonList, setCwjsonList] = useState([]);
 
@@ -37,10 +40,17 @@ const App = () => {
                 setLoad(false);
             }, 500);
         })
-    }, [key]);
+    }, [load]);
 
-    const tabClickFunc = (activeKey) => {
+    //切换tab事件
+    const tabClick = (activeKey) => {
         setActiveKey(activeKey);
+    }
+
+    //创建文件回调函数
+    const createFileCallback = () => {
+        setActiveKey('2');
+        setLoad(true);
     }
 
     return (
@@ -48,8 +58,11 @@ const App = () => {
             {load && <Spin style={{marginLeft: '50%', marginTop: '50%'}}/>}
             {!load && (
                 <Tabs activeKey={activeKey} tabPosition={'left'} className={'slider'}
-                      destroyInactiveTabPane={true} onTabClick={tabClickFunc}>
-                    <TabPane key={'1'} tab={<span><FileSearchOutlined/>文件列表</span>}>
+                      destroyInactiveTabPane={true} onTabClick={tabClick}>
+                    <TabPane key={'1'} tab={<span><FileAddOutlined/>创建文章</span>} style={commonStyle}>
+                        <CreateFile callback={createFileCallback}/>
+                    </TabPane>
+                    <TabPane key={'2'} tab={<span><FileSearchOutlined/>文章列表</span>} style={commonStyle}>
                         <File cwjsonList={cwjsonList}/>
                     </TabPane>
                 </Tabs>

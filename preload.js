@@ -16,10 +16,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     readSettingFile: () => ipcRenderer.invoke('readSettingFile'),
     //write setting file
     writeSettingFile: (content) => ipcRenderer.invoke('writeSettingFile', content),
-    //read files only in first notebook path
+    //read files only in notebook path
     readNotebookFileList: () => ipcRenderer.invoke('readNotebookFileList'),
+    //create file only in notebook path
+    createNotebookFile: (absPath) => ipcRenderer.invoke('createNotebookFile', absPath),
     //read file only in notebook path
     readNotebookFile: (absPath) => ipcRenderer.invoke('readNotebookFile', absPath),
     //write file only in notebook path
-    writeNotebookFile: (absPath, content) => ipcRenderer.invoke('writeNotebookFile', content),
+    writeNotebookFile: (absPath, content) => ipcRenderer.invoke('writeNotebookFile', absPath, content),
 })
