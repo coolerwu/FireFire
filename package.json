@@ -32,8 +32,8 @@
     "estart": "electron .",
     "all": "cnpm run build && cnpm run estart",
     "estart-dev": "electron . dev",
-    "package-mac": "electron-packager . ~/Desktop/firefire-max --platform=mas --overwrite --arch=x64 --electron-version=20.0.2",
-    "package-windows": "electron-packager . ~/Desktop/firefire-windows --platform=win32 --overwrite --arch=x64 --electron-version=20.0.2"
+    "package-mac": "electron-packager . firefire-max --platform=mas --overwrite --arch=x64 --electron-version=20.0.2",
+    "package-windows": "electron-packager . firefire --platform=win32 --overwrite --arch=x64 --electron-version=20.0.2"
   },
   "eslintConfig": {
     "extends": [
