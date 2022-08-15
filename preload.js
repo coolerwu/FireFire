@@ -12,5 +12,14 @@ window.addEventListener('DOMContentLoaded', () => {
 const {contextBridge, ipcRenderer} = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    opFile: (type, path, text) => ipcRenderer.invoke('opFile', type, path, text),
+    //read setting file
+    readSettingFile: () => ipcRenderer.invoke('readSettingFile'),
+    //write setting file
+    writeSettingFile: (content) => ipcRenderer.invoke('writeSettingFile', content),
+    //read files only in first notebook path
+    readNotebookFileList: () => ipcRenderer.invoke('readNotebookFileList'),
+    //read file only in notebook path
+    readNotebookFile: (absPath) => ipcRenderer.invoke('readNotebookFile', absPath),
+    //write file only in notebook path
+    writeNotebookFile: (absPath, content) => ipcRenderer.invoke('writeNotebookFile', content),
 })
