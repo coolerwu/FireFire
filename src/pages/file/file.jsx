@@ -25,6 +25,9 @@ const File = ({cwjsonList}) => {
                     {
                         curCwjson && <Markdown cwjson={curCwjson}/>
                     }
+                    {
+                        !curCwjson && <Empty/>
+                    }
                 </Col>
             </Row>
         </>

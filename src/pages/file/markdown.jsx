@@ -5,7 +5,7 @@ import React from 'react';
 import MenuBar from "./menuBar";
 import {Divider} from "antd";
 
-const Markdown = ({cwjson, content}) => {
+const Markdown = ({cwjson}) => {
     const editor = useEditor({
         onUpdate: ({editor}) => {
             window.electronAPI.writeNotebookFile(cwjson.filename, JSON.stringify(editor.getJSON()));
@@ -24,7 +24,7 @@ const Markdown = ({cwjson, content}) => {
                 editor.commands.setContent(content ? JSON.parse(content) : null);
             })
         },
-    });
+    }, [cwjson]);
 
     return (
         <>
