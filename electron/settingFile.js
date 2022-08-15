@@ -44,6 +44,10 @@ exports.init = () => {
         curSettingConfig = JSON.parse(content);
     }
 
+    if (!curSettingConfig.notebookSuffix) {
+        curSettingConfig.notebookSuffix = defaultSettingConfig.notebookSuffix;
+    }
+
     ipcMain.handle('readSettingFile', (event) => {
         return curSettingConfig;
     });
