@@ -13,7 +13,20 @@ jobs:
   compile-cli: 
     runs-on: ubuntu-latest
     
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm install
+    - run: npm run build --if-present
     - name: 读取当前版本号
       id: version
       uses: ashley-taylor/read-json-property-action@v1.0
@@ -53,8 +66,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm install
-    - run: npm run build --if-present
+#     - run: npm install
+#     - run: npm run build --if-present
     - run: sudo apt install -y wine64
     - run: npm run package-windows
     - name: 读取当前版本号
@@ -109,8 +122,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm install
-    - run: npm run build --if-present
+#     - run: npm install
+#     - run: npm run build --if-present
     - run: npm run package-mac
     - name: Save Artifact
       run: |
