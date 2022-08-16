@@ -32,7 +32,7 @@ jobs:
     - name: Save Artifact
       run: |
         mkdir -p firefire-mac
-        mv /home/runner/work/FireFire/FireFire/firefire-mac ./firefire-mac/
+        mv /home/runner/work/FireFire/FireFire/firefire-max-mas-x64 ./firefire-mac/
         zip -q -r firefire-mac.zip ./firefire-mac
     - name: 创建GitHub Release
       id: create_release
