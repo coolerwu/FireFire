@@ -2,6 +2,7 @@ const fs = require('fs');
 const {ipcMain} = require("electron");
 const {getCurSettingConfig} = require("./settingFile");
 const path = require("path");
+const uuid = require("uuid");
 
 /**
  * 获取当前notebook完整path
@@ -86,4 +87,38 @@ exports.init = () => {
         }
         fs.writeFileSync(fileFullPath, content)
     });
+    ipcMain.handle('renameNotebookFile', (event, oldPath, newPath) => {
+        const curNotebookFullPath = getCurNotebookFullPath();
+        const curNotebookSuffix = getCurNotebookSuffix();
+        const newFileFullPath = path.join(curNotebookFullPath, newPath) + curNotebookSuffix;
+        const oldFileFullPath = path.join(curNotebookFullPath, oldPath) + curNotebookSuffix;
+        if (fs.existsSync(oldFileFullPath) && !fs.existsSync(newFileFullPath)) {
+            fs.renameSync(oldFileFullPath, newFileFullPath);
+            return true;
+        } else {
+            return false;
+        }
+    })
+    ipcMain.handle('deleteNotebookFile', (event, absPath) => {
+        const curNotebookFullPath = getCurNotebookFullPath();
+        const curNotebookSuffix = getCurNotebookSuffix();
+        const fileFullPath = path.join(curNotebookFullPath, absPath) + curNotebookSuffix;
+        if (fs.existsSync(fileFullPath)) {
+            fs.rmSync(fileFullPath);
+            return true;
+        } else {
+            return false;
+        }
+    })
+    ipcMain.handle('copyToNotebookDir', (event, pid, fromPath) => {
+        const curNotebookFullPath = getCurNotebookFullPath();
+        const fileDirFullPath = path.join(curNotebookFullPath, pid);
+        if (!fs.existsSync(fileDirFullPath)) {
+            fs.mkdirSync(fileDirFullPath);
+        }
+        const picSuffix = fromPath.substring(fromPath.lastIndexOf('.'));
+        const srcUrl = path.join(fileDirFullPath, uuid.v4()) + picSuffix;
+        fs.cpSync(fromPath, srcUrl);
+        return srcUrl;
+    })
 };

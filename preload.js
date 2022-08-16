@@ -24,4 +24,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     readNotebookFile: (absPath) => ipcRenderer.invoke('readNotebookFile', absPath),
     //write file only in notebook path
     writeNotebookFile: (absPath, content) => ipcRenderer.invoke('writeNotebookFile', absPath, content),
+    //rename filename only in notebook path
+    renameNotebookFile: (oldPath, newPath) => ipcRenderer.invoke('renameNotebookFile', oldPath, newPath),
+    //delete filename only in notebook path
+    deleteNotebookFile: (absPath) => ipcRenderer.invoke('deleteNotebookFile', absPath),
+    //copy picture to notebook[pid] path
+    copyToNotebookDir: (pid, fromPath) => ipcRenderer.invoke('copyToNotebookDir', pid, fromPath),
 })
