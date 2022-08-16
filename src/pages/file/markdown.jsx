@@ -3,15 +3,62 @@ import {EditorContent, useEditor} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import React from 'react';
 import MenuBar from "./menuBar";
-import {Divider} from "antd";
+import {Divider, message} from "antd";
+import {CharacterCount} from "@tiptap/extension-character-count";
+import {FloatingMenu} from "@tiptap/extension-floating-menu";
+import {Image} from "@tiptap/extension-image";
 
 const Markdown = ({cwjson}) => {
     const editor = useEditor({
         onUpdate: ({editor}) => {
             window.electronAPI.writeNotebookFile(cwjson.filename, JSON.stringify(editor.getJSON()));
         },
+        editorProps: {
+            handlePaste: (view, event, slice) => {
+                //支持拷贝图片
+                if (event?.clipboardData?.items) {
+                    const items = event.clipboardData.items;
+                    for (let i = 0; i < items.length; i++) {
+                        const item = items[i];
+                        if (item.kind === 'file' && item.type.startsWith('image')) {
+                            // console.log(item.getAsFile());
+                            // const reader = new FileReader();
+                            // reader.readAsBinaryString(item.getAsFile());
+                            // reader.onload = function (e) {
+                            //     window.electronAPI.writePicInNotebookDir(cwjson.id, `${uuid()}.png`, e.target.result).then(srcUrl => {
+                            //         console.log(srcUrl);
+                            //         const node = view.state.schema.nodes.image.create({src: `file://${srcUrl}`});
+                            //         const transaction = view.state.tr.replaceSelectionWith(node);
+                            //         view.dispatch(transaction);
+                            //     })
+                            // }
+
+                            const file = item.getAsFile();
+                            if (!file.path) {
+                                message.error('暂不支持截图');
+                                return;
+                            }
+
+                            window.electronAPI.copyToNotebookDir(cwjson.id, file.path).then(srcUrl => {
+                                const node = view.state.schema.nodes.image.create({src: `file://${srcUrl}`});
+                                const transaction = view.state.tr.replaceSelectionWith(node);
+                                view.dispatch(transaction);
+                            });
+                        }
+                    }
+                }
+            }
+        },
         extensions: [
             StarterKit,
+            CharacterCount,
+            FloatingMenu.configure({
+                shouldShow: () => false,
+            }),
+            Image.configure({
+                inline: true,
+                // allowBase64: true,
+            })
             // Paragraph.configure({
             //     // HTMLAttributes: {
             //     //     style: 'margin: 100px',
@@ -32,6 +79,10 @@ const Markdown = ({cwjson}) => {
                 <MenuBar editor={editor}/>
                 <Divider/>
                 <EditorContent editor={editor}/>
+                <Divider/>
+                <div className={'footer'}>
+                    总字数：{editor?.storage?.characterCount?.words?.() || '-'}
+                </div>
             </div>
         </>
     );

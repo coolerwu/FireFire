@@ -1,5 +1,4 @@
 import {Button} from "antd";
-import TurndownService from 'turndown';
 import {
     BlockOutlined,
     BoldOutlined,
@@ -7,7 +6,6 @@ import {
     CodeOutlined,
     DashOutlined,
     EnterOutlined,
-    FileMarkdownOutlined,
     HighlightOutlined,
     ItalicOutlined,
     OrderedListOutlined,
@@ -136,13 +134,6 @@ const MenuBar = ({editor}) => {
                 </Button>
                 <Button type="text" onClick={() => editor.chain().focus().redo().run()}>
                     <RedoOutlined/>
-                </Button>
-                <Button type="text" onClick={() => {
-                    const turndownService = new TurndownService();
-                    const markdown = turndownService.turndown(editor.getHTML())
-                    console.log(markdown)
-                }}>
-                    <FileMarkdownOutlined/>
                 </Button>
             </div>
         </>
