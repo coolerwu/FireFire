@@ -26,7 +26,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-
+    - run: npm install
+    - run: npm run build --if-present
+    - run: npm run package-mac
     - name: 读取当前版本号
       id: version
       uses: ashley-taylor/read-json-property-action@v1.0
@@ -34,9 +36,6 @@ jobs:
         # 读取dist/package.json的，而不是根路径下的package.json
         path: ./dist/package.json
         property: version
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm run package-mac
     - name: Save Artifact
       run: |
         mkdir -p firefire-mac
