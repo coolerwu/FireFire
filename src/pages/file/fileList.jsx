@@ -2,7 +2,7 @@ import React, {useContext, useRef, useState} from "react";
 import {Button, Input, List, message, Modal} from "antd";
 import './fileList.less';
 import moment from "moment";
-import {DeleteFilled, EditFilled, ExclamationCircleOutlined} from "@ant-design/icons";
+import {DeleteFilled, EditFilled} from "@ant-design/icons";
 import {Context} from "../../index";
 
 /**
