@@ -29,7 +29,10 @@ jobs:
     - run: npm install
     - run: npm run build --if-present
     - run: npm run package-mac
-    - 
+    - name: Save Artifact
+      run: |
+        mkdir -p builds
+        mv /home/runner/work/FireFire/FireFire/firefire-max-mas-x64 ./builds/
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
