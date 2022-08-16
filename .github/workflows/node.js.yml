@@ -31,10 +31,30 @@ jobs:
     - run: npm run package-mac
     - name: Save Artifact
       run: |
-        mkdir -p builds
-        mv /home/runner/work/FireFire/FireFire/firefire-max-mas-x64 ./builds/
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
+        mkdir -p firefire-mac
+        mv /home/runner/work/FireFire/FireFire/firefire-mac ./firefire-mac/
+        zip -q -r firefire-mac.zip ./firefire-mac
+    - name: 创建GitHub Release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        # 配置github token （这个无需去github配置，默认存在的）
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: firefire-mac
-        path: builds
+        # 标签名
+        tag_name: v${{steps.version.outputs.value}}
+        # release名
+        release_name: v${{steps.version.outputs.value}}
+        # 是否为草稿
+        draft: false
+        # 是否为预发布
+        prerelease: false
+      - name: Upload Release mac
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./firefire-mac.zip
+          asset_name: firefire-mac.zip
+          asset_content_type: application/zip
