@@ -29,3 +29,9 @@ jobs:
     - run: npm install
     - run: npm run build --if-present
     - run: npm run package-mac
+    - 
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: firefire-mac
+        path: builds
