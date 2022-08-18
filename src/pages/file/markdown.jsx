@@ -1,9 +1,9 @@
 import './markdown.less'
-import {BubbleMenu, EditorContent, Extension, ReactNodeViewRenderer, useEditor} from '@tiptap/react';
+import {BubbleMenu, EditorContent, ReactNodeViewRenderer, useEditor} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import React from 'react';
 import MenuBar from "./menuBar";
-import {Divider, message} from "antd";
+import {Divider} from "antd";
 import {CharacterCount} from "@tiptap/extension-character-count";
 import {FloatingMenu} from "@tiptap/extension-floating-menu";
 import {Image} from "@tiptap/extension-image";
