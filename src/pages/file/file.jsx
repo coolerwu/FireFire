@@ -22,6 +22,7 @@ const File = ({cwjsonList}) => {
                     <FileList cwjsonList={cwjsonList} chooseCwjsonCallback={chooseCwjsonCallback}/>
                 </Col>
                 <Col span={16}>
+                    {/*{curCwjson && <CwEditor cwjson={curCwjson}/>}*/}
                     {
                         curCwjson && <Markdown cwjson={curCwjson}/>
                     }
