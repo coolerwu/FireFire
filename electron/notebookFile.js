@@ -103,8 +103,12 @@ exports.init = () => {
         const curNotebookFullPath = getCurNotebookFullPath();
         const curNotebookSuffix = getCurNotebookSuffix();
         const fileFullPath = path.join(curNotebookFullPath, absPath) + curNotebookSuffix;
+        const dirFullPath = path.join(curNotebookFullPath, absPath);
         if (fs.existsSync(fileFullPath)) {
             fs.rmSync(fileFullPath);
+            if (fs.existsSync(dirFullPath)) {
+                fs.rmSync(dirFullPath, {recursive: true, force: true});
+            }
             return true;
         } else {
             return false;
