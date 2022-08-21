@@ -1,7 +1,7 @@
 import './markdown.less'
-import {BubbleMenu, EditorContent, ReactNodeViewRenderer, useEditor} from '@tiptap/react';
+import {EditorContent, ReactNodeViewRenderer, useEditor} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import React from 'react';
+import React, {useState} from 'react';
 import MenuBar from "./menuBar";
 import {Divider} from "antd";
 import {CharacterCount} from "@tiptap/extension-character-count";
@@ -19,7 +19,7 @@ import Dropcursor from '@tiptap/extension-dropcursor';
 import Highlight from '@tiptap/extension-highlight';
 import Typography from '@tiptap/extension-typography';
 import BiliBiliNode from "../../common/Node/BiliBiliNode";
-import {NodeSelection} from "prosemirror-state";
+import Bubble from "./bubble";
 
 const CustomTableCell = TableCell.extend({
     addAttributes() {
@@ -46,6 +46,8 @@ const Markdown = ({cwjson}) => {
     const persist = (editor) => {
         window.electronAPI.writeNotebookFile(cwjson.filename, JSON.stringify(editor.getJSON()));
     }
+
+    const [showBubbleMenu, setShowBubbleMenu] = useState(false);
 
     const editor = useEditor({
         onUpdate: ({editor}) => {
@@ -97,7 +99,7 @@ const Markdown = ({cwjson}) => {
             }),
             Image.configure({
                 inline: true,
-                // allowBase64: true,
+                allowBase64: true,
             }),
             Highlight.configure({
                 multicolor: true
@@ -132,45 +134,7 @@ const Markdown = ({cwjson}) => {
 
     return (
         <>
-            {editor && <BubbleMenu className="bubble-menu" tippyOptions={{ duration: 100 }} editor={editor}>
-                <button onClick={() => editor.chain().focus().toggleHighlight().run()} className={editor.isActive('highlight') ? 'is-active' : ''}>
-                    高亮
-                </button>
-                <button onClick={() => {
-                    const tr = editor.state.tr;
-                    const selection = editor.state.selection
-                    if (!(selection instanceof NodeSelection)) {
-                        return
-                    }
-                    console.log(selection);
-                    editor.state.selection.replace(tr);
-                    const newState = editor.view.state.apply(tr);
-                    editor.view.updateState(newState);
-                    editor.commands.setContent(' ');
-                    persist(editor);
-                    // editor.get
-                }}>
-                    删除
-                </button>
-                {/*<button onClick={() => editor.chain().focus().setTextAlign('left').run()} className={editor.isActive({ textAlign: 'left' }) ? 'is-active' : ''}>*/}
-                {/*    left*/}
-                {/*</button>*/}
-                {/*<button onClick={() => editor.chain().focus().setTextAlign('center').run()} className={editor.isActive({ textAlign: 'center' }) ? 'is-active' : ''}>*/}
-                {/*    center*/}
-                {/*</button>*/}
-                {/*<button onClick={() => editor.chain().focus().setTextAlign('right').run()} className={editor.isActive({ textAlign: 'right' }) ? 'is-active' : ''}>*/}
-                {/*    right*/}
-                {/*</button>*/}
-                {/*<button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}>*/}
-                {/*    h1*/}
-                {/*</button>*/}
-                {/*<button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}>*/}
-                {/*    h2*/}
-                {/*</button>*/}
-                {/*<button onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}>*/}
-                {/*    h3*/}
-                {/*</button>*/}
-            </BubbleMenu>}
+            {editor && <Bubble editor={editor} persist={persist}/>}
             <div className={'markdown'}>
                 <MenuBar editor={editor}/>
                 <Divider/>

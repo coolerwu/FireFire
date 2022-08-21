@@ -1,7 +1,7 @@
-import { mergeAttributes, Node, nodePasteRule } from '@tiptap/core'
+import {Node, nodePasteRule} from '@tiptap/core'
 
 const BiliBiliNode = Node.create({
-    name: 'BiliBili',
+    name: 'url',
 
     addOptions() {
         return {
@@ -46,14 +46,14 @@ const BiliBiliNode = Node.create({
     parseHTML() {
         return [
             {
-                tag: 'div[data-bilibili-video] iframe',
+                tag: 'div[data-url] iframe',
             },
         ]
     },
 
     addCommands() {
         return {
-            setBiliBiliVideo: options => ({ commands }) => {
+            setBiliBiliVideo: options => ({commands}) => {
                 return commands.insertContent({
                     type: this.name,
                     attrs: options,
@@ -69,36 +69,24 @@ const BiliBiliNode = Node.create({
 
         return [
             nodePasteRule({
-                find: /^(https?:\/\/)?(www\.|player\.)?(bilibili\.com\/video\/)(BV[0-9a-zA-Z]*)[?/](.+)?$/g,
+                find: /^(https?:\/\/)?(.+)?$/g,
                 type: this.type,
                 getAttributes: match => {
-                    return { src: match[4] }
+                    return { src: match.input }
                 },
             }),
         ]
     },
 
-    renderHTML({HTMLAttributes}) {
-        const vid = HTMLAttributes.src;
-        HTMLAttributes.src = `//player.bilibili.com/player.html?bvid=${vid}&page=1`
-
+    renderHTML({node, HTMLAttributes}) {
+        console.log({node, HTMLAttributes})
         return [
             'div',
             {
-                'data-bilibili-video': vid,
+                'data-url': HTMLAttributes.src,
+                'style': "border: 1px solid gray"
             },
-            [
-                'iframe',
-                mergeAttributes(
-                    this.options.HTMLAttributes,
-                    {
-                        width: this.options.width,
-                        height: this.options.height,
-                        allowfullscreen: this.options.allowFullscreen,
-                    },
-                    HTMLAttributes,
-                ),
-            ],
+            HTMLAttributes.src + '11111111'
         ];
     },
 });
