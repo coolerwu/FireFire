@@ -2,7 +2,7 @@ import React, {useContext, useRef, useState} from "react";
 import {Button, Input, List, message, Modal} from "antd";
 import './fileList.less';
 import moment from "moment";
-import {DeleteFilled, EditFilled} from "@ant-design/icons";
+import {DeleteFilled, EditFilled, SearchOutlined} from "@ant-design/icons";
 import {Context} from "../../index";
 
 /**
@@ -14,7 +14,11 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
     const [chooseFileHover, setChooseFileHover] = useState(null);
     //重命名文件ref
     const renameFileRef = useRef(null);
-    const {setLoad} = useContext(Context)
+    //刷新页面
+    const {setLoad} = useContext(Context);
+    //展示文件
+    const [displayCwjsonList, setDisplayCwjsonList] = useState(cwjsonList);
+
 
     //重命名文件
     const renameFunc = (item, e) => {
@@ -55,6 +59,7 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
         });
     }
 
+    //单条文件展示
     const renderItem = (item) => {
         //详情按钮
         const detailFunc = () => {
@@ -80,15 +85,26 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
         );
     }
 
+    //搜索符合规则的文件
+    const searchFunc = (e) => {
+        const searchValue = e.target.value;
+        if (searchValue) {
+            setDisplayCwjsonList(cwjsonList.filter(cwjson => cwjson.id.indexOf(searchValue) !== -1));
+        } else {
+            setDisplayCwjsonList(cwjsonList);
+        }
+    };
+
     return (
         <>
             <List
                 size="large"
+                id={'fileList'}
                 style={{height: '100vh'}}
-                // header={<div>文章列表</div>}
+                header={<Input prefix={<SearchOutlined/>} allowClear onChange={searchFunc} onClick={searchFunc}/>}
                 // footer={<div>Footer</div>}
                 bordered
-                dataSource={cwjsonList}
+                dataSource={displayCwjsonList}
                 renderItem={renderItem}
             />
         </>
