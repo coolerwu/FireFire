@@ -63,6 +63,7 @@ const Bubble = ({editor, persist}) => {
         }
     }
 
+
     return (
         <>
             <BubbleMenu className="bubble-menu" tippyOptions={{duration: 100}} editor={editor}>
