@@ -4,7 +4,8 @@ import {
     AlignLeftOutlined,
     AlignRightOutlined,
     DeleteOutlined,
-    HighlightOutlined
+    HighlightOutlined,
+    StrikethroughOutlined
 } from "@ant-design/icons";
 import {NodeSelection, TextSelection} from "prosemirror-state";
 import {BubbleMenu} from "@tiptap/react";
@@ -18,17 +19,19 @@ const Bubble = ({editor, persist}) => {
     //是否展示文本
     const [showText, setShowText] = useState(false);
     //是否展示BiliBili
-    const [showBiliBili, setShowBiliBili] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
 
     useEffect(() => {
         if (!editor?.state?.selection) {
             setShowText(false);
-            setShowBiliBili(false);
+            setShowDelete(false);
             return;
         }
 
+        let showDelete = false;
         let showText = false;
         if (editor.state.selection instanceof TextSelection && editor.state.selection?.content()?.content?.size) {
+            showDelete = true;
             const node = editor.state.selection.content().content.firstChild;
             const nodeType = node.type;
             if (nodeType?.name !== "codeBlock") {
@@ -37,11 +40,10 @@ const Bubble = ({editor, persist}) => {
         }
         setShowText(showText);
 
-        let showBiliBili = false;
         if (editor.state.selection instanceof NodeSelection) {
-            showBiliBili = true;
+            showDelete = true;
         }
-        setShowBiliBili(showBiliBili);
+        setShowDelete(showDelete);
 
 
     }, [editor?.state?.selection])
@@ -75,26 +77,40 @@ const Bubble = ({editor, persist}) => {
                                         onClick={() => editor.chain().focus().toggleHighlight().run()}
                                         className={editor.isActive('highlight') ? 'is-active' : ''}/>
                             </Tooltip>
-                            <Tooltip>
+                            <Tooltip title={'居左'}>
                                 <Button type={'link'} icon={<AlignLeftOutlined/>}
                                         onClick={() => editor.chain().focus().setTextAlign('left').run()}
                                         className={editor.isActive({textAlign: 'left'}) ? 'is-active' : ''}/>
                             </Tooltip>
-                            <Tooltip title={'局中'}>
-                                <Button icon={<AlignCenterOutlined/>}
+                            <Tooltip title={'居中'}>
+                                <Button type={'link'} icon={<AlignCenterOutlined/>}
                                         onClick={() => editor.chain().focus().setTextAlign('center').run()}
                                         className={editor.isActive({textAlign: 'center'}) ? 'is-active' : ''}/>
                             </Tooltip>
-                            <Tooltip title={'局右'}>
-                                <Button icon={<AlignRightOutlined/>}
+                            <Tooltip title={'居右'}>
+                                <Button type={'link'} icon={<AlignRightOutlined/>}
                                         onClick={() => editor.chain().focus().setTextAlign('right').run()}
                                         className={editor.isActive({textAlign: 'right'}) ? 'is-active' : ''}/>
+                            </Tooltip>
+                            <Tooltip title={'删除线'}>
+                                <Button
+                                    onClick={() => editor.chain().focus().toggleStrike().run()}
+                                    className={editor.isActive('strike') ? 'is-active' : ''}
+                                    type={'link'}
+                                    icon={<StrikethroughOutlined/>}/>
+                            </Tooltip>
+                            <Tooltip title={'Red'}>
+                                <Button
+                                    onClick={() => editor.isActive('textStyle') ? editor.chain().focus().unsetColor().run() : editor.chain().focus().setColor('#F98181').run()}
+                                    className={editor.isActive('textStyle', {color: '#F98181'}) ? 'is-active' : ''}
+                                    type={'link'}
+                                    icon={'Red'}/>
                             </Tooltip>
                         </>
                     )
                 }
                 {
-                    showBiliBili && (
+                    showDelete && (
                         <>
                             <Tooltip title={'删除'}>
                                 <Button type={'link'} icon={<DeleteOutlined/>} onClick={deleteFunc}/>

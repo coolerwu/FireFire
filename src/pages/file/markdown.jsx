@@ -1,7 +1,7 @@
 import './markdown.less'
 import {EditorContent, ReactNodeViewRenderer, useEditor} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import React, {useState} from 'react';
+import React from 'react';
 import MenuBar from "./menuBar";
 import {Divider} from "antd";
 import {CharacterCount} from "@tiptap/extension-character-count";
@@ -19,7 +19,10 @@ import Dropcursor from '@tiptap/extension-dropcursor';
 import Highlight from '@tiptap/extension-highlight';
 import Typography from '@tiptap/extension-typography';
 import BiliBiliNode from "../../common/Node/BiliBiliNode";
+import {Color} from '@tiptap/extension-color';
+import TextStyle from '@tiptap/extension-text-style';
 import Bubble from "./bubble";
+import {Link} from "@tiptap/extension-link";
 
 const CustomTableCell = TableCell.extend({
     addAttributes() {
@@ -46,8 +49,6 @@ const Markdown = ({cwjson}) => {
     const persist = (editor) => {
         window.electronAPI.writeNotebookFile(cwjson.filename, JSON.stringify(editor.getJSON()));
     }
-
-    const [showBubbleMenu, setShowBubbleMenu] = useState(false);
 
     const editor = useEditor({
         onUpdate: ({editor}) => {
@@ -122,7 +123,7 @@ const Markdown = ({cwjson}) => {
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),
-            BiliBiliNode,
+            BiliBiliNode, Link, Color, TextStyle
         ],
         autofocus: 'start',
         onBeforeCreate: ({editor}) => {
