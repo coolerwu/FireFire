@@ -1,4 +1,4 @@
-import { mergeAttributes, Node, nodePasteRule } from '@tiptap/core'
+import {mergeAttributes, Node, nodePasteRule} from '@tiptap/core'
 
 const BiliBiliNode = Node.create({
     name: 'BiliBili',
@@ -53,7 +53,7 @@ const BiliBiliNode = Node.create({
 
     addCommands() {
         return {
-            setBiliBiliVideo: options => ({ commands }) => {
+            setBiliBiliVideo: options => ({commands}) => {
                 return commands.insertContent({
                     type: this.name,
                     attrs: options,
@@ -72,7 +72,7 @@ const BiliBiliNode = Node.create({
                 find: /^(https?:\/\/)?(www\.|player\.)?(bilibili\.com\/video\/)(BV[0-9a-zA-Z]*)[?/](.+)?$/g,
                 type: this.type,
                 getAttributes: match => {
-                    return { src: match[4] }
+                    return {src: match[4]}
                 },
             }),
         ]
