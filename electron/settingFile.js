@@ -1,6 +1,6 @@
 const {confPath} = require("./env");
 const fs = require("fs");
-const {ipcMain} = require("electron");
+const {ipcMain, nativeTheme} = require("electron");
 const path = require("path");
 
 /**
@@ -17,6 +17,7 @@ const settingFullPath = path.join(confPath, settingJsonName);
 const defaultSettingConfig = {
     notebookPath: path.join(confPath, 'notebook'),
     notebookSuffix: '.cwjson',
+    themeSource: 'system',
 };
 /**
  * 当前setting文件配置
@@ -29,6 +30,13 @@ let curSettingConfig = defaultSettingConfig;
 exports.getCurSettingConfig = () => {
     return curSettingConfig;
 }
+
+/**
+ * 设置暗黑模式或者明亮模式
+ */
+const setThemeSource = () => {
+    nativeTheme.themeSource = curSettingConfig.themeSource;
+};
 
 /**
  * 配置文件初始化
@@ -48,6 +56,12 @@ exports.init = () => {
         curSettingConfig.notebookSuffix = defaultSettingConfig.notebookSuffix;
     }
 
+    if (curSettingConfig.themeSource === undefined) {
+        curSettingConfig.themeSource = 'system'
+    }
+
+    setThemeSource();
+
     ipcMain.handle('readSettingFile', (event) => {
         return curSettingConfig;
     });
@@ -55,6 +69,7 @@ exports.init = () => {
         if (content) {
             curSettingConfig = content;
             fs.writeFileSync(settingFullPath, JSON.stringify(content));
+            setThemeSource();
         }
     });
 };

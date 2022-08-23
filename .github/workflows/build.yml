@@ -68,7 +68,7 @@ jobs:
     - name: Save Artifact mac
       run: |
         mkdir -p firefire-mac
-        mv /home/runner/work/FireFire/FireFire/firefire-max-mas-x64 ./firefire-mac/
+        mv /home/runner/work/FireFire/FireFire/firefire-mas-x64 ./firefire-mac/
         zip -q -r firefire-mac.zip ./firefire-mac
     - name: Upload Release mac
       uses: actions/upload-release-asset@v1.0.1
@@ -83,7 +83,7 @@ jobs:
     - name: Save Artifact linux
       run: |
         mkdir -p firefire-linux
-        mv /home/runner/work/FireFire/FireFire/firefire-linux-linux-x64 ./firefire-linux/
+        mv /home/runner/work/FireFire/FireFire/firefire-linux-x64 ./firefire-linux/
         zip -q -r firefire-linux.zip ./firefire-linux
     - name: Upload Release linux
       uses: actions/upload-release-asset@v1.0.1

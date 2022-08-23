@@ -23,9 +23,12 @@
     "@tiptap/extension-table-cell": "^2.0.0-beta.23",
     "@tiptap/extension-table-header": "^2.0.0-beta.25",
     "@tiptap/extension-table-row": "^2.0.0-beta.22",
+    "@tiptap/extension-task-item": "^2.0.0-beta.37",
+    "@tiptap/extension-task-list": "^2.0.0-beta.29",
     "@tiptap/extension-text-align": "^2.0.0-beta.31",
     "@tiptap/extension-text-style": "^2.0.0-beta.26",
     "@tiptap/extension-typography": "^2.0.0-beta.22",
+    "@tiptap/extension-underline": "^2.0.0-beta.25",
     "@tiptap/react": "^2.0.0-beta.114",
     "@tiptap/starter-kit": "^2.0.0-beta.191",
     "antd": "^4.22.1",
@@ -61,9 +64,9 @@
     "estart": "electron .",
     "all": "cnpm run build && cnpm run estart",
     "estart-dev": "electron . dev",
-    "package-mac": "electron-packager . firefire-max --platform=mas --overwrite --arch=x64 --electron-version=20.0.2",
+    "package-mac": "electron-packager . firefire --platform=mas --overwrite --arch=x64 --electron-version=20.0.2",
     "package-windows": "electron-packager . firefire --platform=win32 --overwrite --arch=x64 --electron-version=20.0.2",
-    "package-linux": "electron-packager . firefire-linux --platform=linux --overwrite --arch=x64 --electron-version=20.0.2"
+    "package-linux": "electron-packager . firefire --platform=linux --overwrite --arch=x64 --electron-version=20.0.2"
   },
   "eslintConfig": {
     "extends": [
