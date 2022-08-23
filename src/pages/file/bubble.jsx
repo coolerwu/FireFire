@@ -5,7 +5,7 @@ import {
     AlignRightOutlined,
     DeleteOutlined,
     HighlightOutlined,
-    StrikethroughOutlined
+    StrikethroughOutlined, UnderlineOutlined
 } from "@ant-design/icons";
 import {NodeSelection, TextSelection} from "prosemirror-state";
 import {BubbleMenu} from "@tiptap/react";
@@ -72,6 +72,11 @@ const Bubble = ({editor, persist}) => {
                 {
                     showText && (
                         <>
+                            <Tooltip title={'下划线'}>
+                                <Button type={'link'} icon={<UnderlineOutlined/>}
+                                        onClick={() => editor.chain().focus().toggleUnderline().run()}
+                                        className={editor.isActive('underline') ? 'is-active' : ''}/>
+                            </Tooltip>
                             <Tooltip title={'高亮'}>
                                 <Button type={'link'} icon={<HighlightOutlined/>}
                                         onClick={() => editor.chain().focus().toggleHighlight().run()}
@@ -103,8 +108,13 @@ const Bubble = ({editor, persist}) => {
                                 <Button
                                     onClick={() => editor.isActive('textStyle') ? editor.chain().focus().unsetColor().run() : editor.chain().focus().setColor('#F98181').run()}
                                     className={editor.isActive('textStyle', {color: '#F98181'}) ? 'is-active' : ''}
-                                    type={'link'}
-                                    icon={'Red'}/>
+                                    type={'link'}>Red</Button>
+                            </Tooltip>
+                            <Tooltip title={'Yellow'}>
+                                <Button
+                                    onClick={() => editor.isActive('textStyle') ? editor.chain().focus().unsetColor().run() : editor.chain().focus().setColor('#ffe700').run()}
+                                    className={editor.isActive('textStyle', {color: '#ffe700'}) ? 'is-active' : ''}
+                                    type={'link'}>Yellow</Button>
                             </Tooltip>
                         </>
                     )
