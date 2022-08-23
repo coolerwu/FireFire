@@ -70,17 +70,20 @@ const MenuBar = ({editor}) => {
                 <Tooltip title={'h1'}>
                     <Button
                         type={'link'} onClick={() => editor.chain().focus().toggleHeading({level: 1}).run()}
-                        className={editor.isActive('heading', {level: 1}) ? 'is-active' : ''} icon={'h1'}/>
+                        style={{paddingBottom: 0, paddingTop: 0}}
+                        className={editor.isActive('heading', {level: 1}) ? 'is-active' : ''}>H1</Button>
                 </Tooltip>
                 <Tooltip title={'h2'}>
                     <Button
                         type={'link'} onClick={() => editor.chain().focus().toggleHeading({level: 2}).run()}
-                        className={editor.isActive('heading', {level: 2}) ? 'is-active' : ''} icon={'h2'}/>
+                        style={{paddingBottom: 0, paddingTop: 0}}
+                        className={editor.isActive('heading', {level: 2}) ? 'is-active' : ''}>H2</Button>
                 </Tooltip>
                 <Tooltip title={'h3'}>
                     <Button
                         type={'link'} onClick={() => editor.chain().focus().toggleHeading({level: 3}).run()}
-                        className={editor.isActive('heading', {level: 3}) ? 'is-active' : ''} icon={'h3'}/>
+                        style={{paddingBottom: 0, paddingTop: 0}}
+                        className={editor.isActive('heading', {level: 3}) ? 'is-active' : ''}>H3</Button>
                 </Tooltip>
                 <Tooltip title={'无序列表'}>
                     <Button
@@ -107,10 +110,12 @@ const MenuBar = ({editor}) => {
                         icon={<BlockOutlined/>}/>
                 </Tooltip>
                 <Tooltip title={'分割线'}>
-                    <Button type={'link'} icon={<DashOutlined/>} onClick={() => editor.chain().focus().setHorizontalRule().run()}/>
+                    <Button type={'link'} icon={<DashOutlined/>}
+                            onClick={() => editor.chain().focus().setHorizontalRule().run()}/>
                 </Tooltip>
                 <Tooltip title={'换行'}>
-                    <Button type={'link'} onClick={() => editor.chain().focus().setHardBreak().run()} icon={<EnterOutlined/>}/>
+                    <Button type={'link'} onClick={() => editor.chain().focus().setHardBreak().run()}
+                            icon={<EnterOutlined/>}/>
                 </Tooltip>
                 <Tooltip title={'撤销'}>
                     <Button type={'link'} onClick={() => editor.chain().focus().undo().run()} icon={<UndoOutlined/>}/>

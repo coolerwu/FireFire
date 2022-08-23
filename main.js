@@ -1,12 +1,9 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, Menu} = require('electron');
 const path = require("path");
 const {init} = require("./electron");
 
 //浏览器引用
 let window;
-
-//环境
-let mode = process.argv[2];
 
 //创建浏览器窗口函数
 let createWindow = () => {
@@ -21,7 +18,7 @@ let createWindow = () => {
         }
     });
 
-    if (mode === 'dev') {
+    if (process.argv[2] === 'dev') {
         window.loadURL('http://localhost:3000');
         window.webContents.openDevTools();
     } else {
@@ -41,8 +38,37 @@ const afterCreated = () => {
     init(window);
 }
 
+const buildMenu = () => {
+    // const menuTemplateArr = [{
+    //     label: '关于',
+    //     submenu: [{
+    //         label: `Version ${app.getVersion()}`,
+    //         enabled: false
+    //     }]
+    // }];
+    // if (process.platform === 'darwin') {
+    //     menuTemplateArr.unshift({
+    //         label: app.getName(),
+    //         submenu: [
+    //             {
+    //                 label: 'Quit',
+    //                 accelerator: 'CmdOrCtrl+Q',
+    //                 click() {
+    //                     app.quit();
+    //                 }
+    //             }
+    //         ]
+    //     });
+    // }
+    //
+    // Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplateArr));
+};
+
 //当app准备就绪时候开启窗口
-app.on('ready', createWindow);
+app.on('ready', () => {
+    buildMenu();
+    createWindow();
+});
 
 //当全部窗口都被关闭之后推出
 app.on('window-all-closed', () => {

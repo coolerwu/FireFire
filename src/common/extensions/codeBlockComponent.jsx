@@ -1,4 +1,4 @@
-import './index.less';
+import './codeBlockComponent.less';
 
 import {NodeViewContent, NodeViewWrapper} from '@tiptap/react';
 import React from 'react';
