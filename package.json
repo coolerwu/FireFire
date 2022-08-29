@@ -74,9 +74,6 @@
     "directories": {
       "output": "target"
     },
-    "maintainer": "CoolerWu",
-    "vendor": "CoolerWu",
-    "description": "firefire",
     "files": [
       "build/**/*",
       "electron/**/*",
@@ -94,7 +91,10 @@
       "target": "nsis"
     },
     "linux": {
-      "target": "deb"
+      "target": "deb",
+      "maintainer": "CoolerWu",
+      "vendor": "CoolerWu",
+      "description": "firefire"
     }
   },
   "eslintConfig": {
