@@ -33,10 +33,12 @@ jobs:
         && sudo apt install nginx-light
         && sudo apt install nginx-extras
         && sudo apt install libodbc1:i386
+        && sudo apt install libgd3:i386
         && sudo apt install libgphoto2-6:i386 
         && sudo apt install libsane:i386 
         && sudo apt install gstreamer1.0-plugins-good:i386 
-        && sudo apt install libwine:i386 && sudo apt install wine32
+        && sudo apt install libwine:i386 
+        && sudo apt install wine32
     - name: 读取当前版本号
       id: version
       uses: ashley-taylor/read-json-property-action@v1.0
