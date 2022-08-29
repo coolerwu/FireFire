@@ -32,7 +32,7 @@ jobs:
         path: ./package.json
         property: version
     - run: npm run package-mac
-    - name: Upload output file
+    - name: Upload
       uses: actions/upload-artifact@v3
       with:
         name: firefire-${{steps.version.outputs.value}}.dmg
