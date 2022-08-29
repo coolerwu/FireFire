@@ -29,6 +29,7 @@ jobs:
     - run: npm install
     - run: npm run build --if-present
     - run: sudo apt install -y wine64
+    - run: sudo apt-get build-dep wine
 #    - run: sudo dpkg --add-architecture i386 && sudo apt-get update
 #        && sudo apt install nginx-core
 #        && sudo apt install nginx-full
