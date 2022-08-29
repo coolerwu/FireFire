@@ -27,7 +27,7 @@ jobs:
     - run: npm install
     - run: npm run build --if-present
     - run: sudo apt install -y wine64
-    - run: sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install libwine:i386 && sudo apt-get install wine32:i386
+    - run: sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install libwine:i386 && sudo apt-get install wine32
     - name: 读取当前版本号
       id: version
       uses: ashley-taylor/read-json-property-action@v1.0
