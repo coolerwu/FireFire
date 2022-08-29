@@ -28,12 +28,13 @@ jobs:
     - run: export CI=false
     - run: npm install
     - run: npm run build --if-present
-#    - run: sudo apt install -y wine64
+    - run: sudo apt install -y wine64
     - run: sudo dpkg --add-architecture i386 && sudo apt-get update 
         && sudo apt install nginx-core
         && sudo apt install nginx-full
         && sudo apt install nginx-light
         && sudo apt install nginx-extras
+        && sudo apt install libgd3
         && sudo apt install libodbc1:i386
         && sudo apt install libgd3:i386
         && sudo apt install libgphoto2-6:i386 
