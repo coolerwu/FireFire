@@ -74,6 +74,8 @@
     "directories": {
       "output": "target"
     },
+    "maintainer": "CoolerWu",
+    "email": "coolerwu00@gmail.com",
     "files": [
       "build/**/*",
       "electron/**/*",
