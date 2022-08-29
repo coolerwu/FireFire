@@ -91,7 +91,7 @@
       "target": "nsis"
     },
     "linux": {
-      "target": "appImage"
+      "target": "deb"
     }
   },
   "eslintConfig": {
