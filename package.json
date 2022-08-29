@@ -64,7 +64,7 @@
     "all": "cnpm run build && cnpm run estart",
     "estart-dev": "electron . dev",
     "package-mac": "electron-builder --mac --x64",
-    "package-win": "electron-builder --win --x64",
+    "package-win": "electron-builder --win",
     "package-linux": "electron-builder --linux --x64"
   },
   "build": {
