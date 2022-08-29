@@ -30,7 +30,10 @@ jobs:
     - run: npm run build --if-present
 #    - run: sudo apt install -y wine64
     - run: sudo dpkg --add-architecture i386
-    - run: sudo apt update && sudo apt install wine32
+    - run: sudo apt install wine-stable wine64 wine32:i386 wine64
+#    - run: wget -nc https://dl.winehq.org/wine-builds/winehq.key
+#    - run: sudo apt-key add winehq.key
+#    - run: sudo apt-key add winehq.key
 #    - run: sudo dpkg --add-architecture i386 && sudo apt-get update
 #        && sudo apt install nginx-core
 #        && sudo apt install nginx-full
