@@ -63,9 +63,9 @@
     "estart": "electron .",
     "all": "cnpm run build && cnpm run estart",
     "estart-dev": "electron . dev",
-    "package-mac": "electron-builder --mac --x64",
-    "package-win": "electron-builder --win --x64",
-    "package-linux": "electron-builder --linux --x64"
+    "package-mac": "electron-builder --mac --x64 --publish=never",
+    "package-win": "electron-builder --win --x64 --publish=never",
+    "package-linux": "electron-builder --linux --x64 --publish=never"
   },
   "build": {
     "appId": "org.firefire.app",
@@ -91,7 +91,10 @@
       "target": "nsis"
     },
     "linux": {
-      "target": "appImage"
+      "target": "deb",
+      "maintainer": "CoolerWu",
+      "vendor": "CoolerWu",
+      "description": "firefire"
     }
   },
   "eslintConfig": {
