@@ -27,7 +27,16 @@ jobs:
     - run: npm install
     - run: npm run build --if-present
 #    - run: sudo apt install -y wine64
-    - run: sudo dpkg --add-architecture i386 && sudo apt update && sudo apt install libodbc1:i386 && sudo apt install libgphoto2-6:i386 && sudo apt install libsane:i386 && sudo apt install gstreamer1.0-plugins-good:i386 && sudo apt install libwine:i386 && sudo apt install wine32
+    - run: sudo dpkg --add-architecture i386 && sudo apt-get update 
+        && sudo apt install nginx-core
+        && sudo apt install nginx-full
+        && sudo apt install nginx-light
+        && sudo apt install nginx-extras
+        && sudo apt install libodbc1:i386
+        && sudo apt install libgphoto2-6:i386 
+        && sudo apt install libsane:i386 
+        && sudo apt install gstreamer1.0-plugins-good:i386 
+        && sudo apt install libwine:i386 && sudo apt install wine32
     - name: 读取当前版本号
       id: version
       uses: ashley-taylor/read-json-property-action@v1.0
