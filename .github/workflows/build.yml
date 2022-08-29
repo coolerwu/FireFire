@@ -60,7 +60,7 @@ jobs:
           path: ./package.json
           property: version
       - run: npm run package-win
-      - run: ren ./target/firefire Setup ${{steps.version.outputs.value}}.exe ./target/firefire-${{steps.version.outputs.value}}.exe
+      - run: ren `./target/firefire Setup ${{steps.version.outputs.value}}.exe` ./target/firefire-${{steps.version.outputs.value}}.exe
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
