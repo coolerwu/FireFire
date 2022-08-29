@@ -75,7 +75,8 @@
       "output": "target"
     },
     "maintainer": "CoolerWu",
-    "email": "coolerwu00@gmail.com",
+    "vendor": "CoolerWu",
+    "description": "firefire",
     "files": [
       "build/**/*",
       "electron/**/*",
