@@ -32,11 +32,12 @@ jobs:
           path: ./package.json
           property: version
       - run: npm run package-linux
+      - run: mv ./target/firefire_${{steps.version.outputs.value}}_amd64.deb ./target/firefire-${{steps.version.outputs.value}}.deb
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
           name: firefire-${{steps.version.outputs.value}}.deb
-          path: ./target/firefire_${{steps.version.outputs.value}}_amd64.deb
+          path: ./target/firefire-${{steps.version.outputs.value}}.deb
   build-win:
     runs-on: windows-latest
     strategy:
@@ -59,11 +60,12 @@ jobs:
           path: ./package.json
           property: version
       - run: npm run package-win
+      - run: rename ./target/firefire Setup ${{steps.version.outputs.value}}.exe ./target/firefire-${{steps.version.outputs.value}}.exe
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
           name: firefire-${{steps.version.outputs.value}}.exe
-          path: ./target/firefire Setup ${{steps.version.outputs.value}}.exe
+          path: ./target/firefire-${{steps.version.outputs.value}}.exe
   build-mac:
     runs-on: macos-latest
     strategy:
@@ -147,7 +149,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.create_release.outputs.upload_url}}
-          asset_path: firefire-${{steps.version.outputs.value}}.exe
+          asset_path: ./firefire-${{steps.version.outputs.value}}.exe
           asset_name: firefire-${{steps.version.outputs.value}}.exe
           asset_content_type: application/octet-stream
       - name: Download linux
