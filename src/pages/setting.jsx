@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useRef} from "react";
-import {Button, Col, Form, Radio, Row} from "antd";
+import {Button, Col, Form, InputNumber, Radio, Row} from "antd";
 import './setting.less';
 import {Context} from "../index";
 
@@ -19,6 +19,7 @@ const Setting = () => {
 
     const onFinish = (values) => {
         setting.themeSource = values.themeSource
+        setting.autoSave = values.autoSave
         window.electronAPI.writeSettingFile(setting);
         setLoad(true);
         setActiveKey('100');
@@ -35,6 +36,13 @@ const Setting = () => {
                                 <Radio value="dark">暗黑模式</Radio>
                                 <Radio value="system">跟随系统</Radio>
                             </Radio.Group>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col span={18} offset={3}>
+                        <Form.Item name="autoSave" label="自动保存时间间隔">
+                            <InputNumber addonAfter={'s'} min={1} max={60}/>
                         </Form.Item>
                     </Col>
                 </Row>

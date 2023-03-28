@@ -34,13 +34,30 @@ exports.init = () => {
             fs.mkdirSync(curNotebookFullPath);
         }
 
-        const fileList = fs.readdirSync(curNotebookFullPath)
+        let fileFullPath;
+        if (absPath === undefined) {
+            fileFullPath = curNotebookFullPath;
+        } else {
+            fileFullPath = path.join(curNotebookFullPath, absPath);
+        }
+
+        const fileList = fs.readdirSync(fileFullPath);
         if (fileList) {
-            return fileList.filter(file => file.endsWith(curNotebookSuffix)).map(file => {
-                const fileStat = fs.statSync(path.join(curNotebookFullPath, file));
+            return fileList.filter(file => {
+                if (file.endsWith(curNotebookSuffix)) {
+                    return true;
+                } else if (file.includes('.')) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }).map(file => {
+                let curFilePath = path.join(fileFullPath, file);
+                const fileStat = fs.statSync(curFilePath);
                 const cwjsonFile = {
                     filename: file,
-                    id: file.substring(0, file.lastIndexOf(curNotebookSuffix)),
+                    isDirectory: fileStat.isDirectory(),
+                    id: fileStat.isDirectory() ? file : file.substring(0, file.lastIndexOf(curNotebookSuffix)),
                     updateTime: fileStat.mtimeMs,
                 };
                 cwjsonFileMap[cwjsonFile.id] = cwjsonFile;
@@ -60,6 +77,13 @@ exports.init = () => {
         }
         if (!fs.existsSync(fileFullPath)) {
             fs.writeFileSync(fileFullPath, '');
+        }
+    });
+    ipcMain.handle('createNotebookDir', (event, absPath) => {
+        const curNotebookFullPath = getCurNotebookFullPath();
+        let fileFullPath = path.join(curNotebookFullPath, absPath);
+        if (!fs.existsSync(fileFullPath)) {
+            fs.mkdirSync(fileFullPath);
         }
     });
     ipcMain.handle('readNotebookFile', (event, absPath) => {

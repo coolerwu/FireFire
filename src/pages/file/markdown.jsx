@@ -1,15 +1,25 @@
 import './markdown.less'
 import {EditorContent, useEditor} from '@tiptap/react';
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import MenuBar from "./menuBar";
 import {Divider, message} from "antd";
 import Bubble from "./bubble";
 import {persist} from "../../utils/cwjsonFileOp";
 import plugins from "../../common/extensions";
+import {Context} from "../../index";
 
 const Markdown = ({cwjson}) => {
+    const {setLoad, setActiveKey, setting, curDir} = useContext(Context);
+    // const {wordCache, setWordCache} = useState(null);
+    // console.log(setting.autoSave);
+
+    // useEffect(() => {
+    //     setWordCache(null);
+    // }, [cwjson]);
+
     const editor = useEditor({
         onUpdate: ({editor}) => {
+            // setWordCache(editor.getJSON());
             persist(editor, cwjson);
         },
         editorProps: {
@@ -51,7 +61,7 @@ const Markdown = ({cwjson}) => {
         extensions: plugins,
         autofocus: 'start',
         onBeforeCreate: ({editor}) => {
-            window.electronAPI.readNotebookFile(cwjson.filename).then(content => {
+            window.electronAPI.readNotebookFile(`${curDir}/${cwjson.filename}`).then(content => {
                 editor.commands.setContent(content ? JSON.parse(content) : null);
             })
         },

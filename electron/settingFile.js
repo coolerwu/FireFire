@@ -18,6 +18,7 @@ const defaultSettingConfig = {
     notebookPath: path.join(confPath, 'notebook'),
     notebookSuffix: '.cwjson',
     themeSource: 'system',
+    autoSave: 10,
 };
 /**
  * 当前setting文件配置
@@ -57,7 +58,11 @@ exports.init = () => {
     }
 
     if (curSettingConfig.themeSource === undefined) {
-        curSettingConfig.themeSource = 'system'
+        curSettingConfig.themeSource = 'system';
+    }
+
+    if (curSettingConfig.autoSave === undefined) {
+        curSettingConfig.autoSave = 10;
     }
 
     setThemeSource();
