@@ -4,9 +4,7 @@
 name: build release
 
 on:
-#  push:
-#    branches: ['0.0.3']
-  pull_request:
+  push:
     branches: [ "master" ]
 
 jobs:
