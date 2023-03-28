@@ -1,6 +1,6 @@
 {
   "name": "firefire",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "private": true,
   "main": "main.js",
   "homepage": ".",
@@ -119,7 +119,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^20.0.2",
+    "electron": "^20.1.0",
     "electron-builder": "^23.3.3"
   }
 }

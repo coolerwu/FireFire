@@ -1,8 +1,16 @@
 import React, {useContext, useRef, useState} from "react";
-import {Button, Input, List, message, Modal} from "antd";
+import {Breadcrumb, Button, Col, Input, List, message, Modal, Row, Tooltip} from "antd";
 import './fileList.less';
 import moment from "moment";
-import {DeleteFilled, EditFilled, SearchOutlined} from "@ant-design/icons";
+import {
+    DeleteFilled,
+    EditFilled,
+    FileAddOutlined,
+    FileFilled,
+    HddOutlined,
+    ProfileFilled,
+    SearchOutlined
+} from "@ant-design/icons";
 import {Context} from "../../index";
 
 /**
@@ -14,11 +22,12 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
     const [chooseFileHover, setChooseFileHover] = useState(null);
     //重命名文件ref
     const renameFileRef = useRef(null);
+    //新建文件ref
+    const newFileRef = useRef(null);
     //刷新页面
-    const {setLoad} = useContext(Context);
+    const {setLoad, curDir, setCurDir} = useContext(Context);
     //展示文件
     const [displayCwjsonList, setDisplayCwjsonList] = useState(cwjsonList);
-
 
     //重命名文件
     const renameFunc = (item, e) => {
@@ -28,7 +37,7 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             content: <Input ref={renameFileRef}/>,
             okText: '确认',
             onOk: () => {
-                window.electronAPI.renameNotebookFile(item.id, renameFileRef.current.input.value).then(res => {
+                window.electronAPI.renameNotebookFile(`${curDir}/${item.id}`, `${curDir}/${renameFileRef.current.input.value}`).then(res => {
                     if (res) {
                         setLoad(true);
                     } else {
@@ -47,7 +56,7 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             icon: <DeleteFilled/>,
             okText: '确认',
             onOk: () => {
-                window.electronAPI.deleteNotebookFile(item.id).then(res => {
+                window.electronAPI.deleteNotebookFile(`${curDir}/${item.id}`).then(res => {
                     if (res) {
                         setLoad(true);
                     } else {
@@ -63,15 +72,27 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
     const renderItem = (item) => {
         //详情按钮
         const detailFunc = () => {
-            setChooseFileHover(item.id);
-            chooseCwjsonCallback(item);
+            if (item.isDirectory) {
+                setCurDir(`${curDir}/${item.filename}`)
+                setLoad(true);
+            } else {
+                setChooseFileHover(item.id);
+                chooseCwjsonCallback(item);
+            }
         }
 
         return (
             <>
                 <div onClick={detailFunc} className={chooseFileHover === item.id ? 'chooseListItem' : 'listItem'}>
                     <div>
-                        <h3>{item.id}</h3>
+                        <Row>
+                            <Col>
+                                {item.isDirectory ? <ProfileFilled/> : <FileFilled/>}
+                            </Col>
+                            <Col style={{marginLeft: "10px"}}>
+                                <h3>{item.id}</h3>
+                            </Col>
+                        </Row>
                     </div>
                     <div>
                         <span>{moment(item.updateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
@@ -101,7 +122,65 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                 size="large"
                 id={'fileList'}
                 style={{height: '100vh'}}
-                header={<Input prefix={<SearchOutlined/>} allowClear onChange={searchFunc} onClick={searchFunc}/>}
+                header={
+                    <div>
+                        <Row>
+                            <Col span={24}>
+                                <Input prefix={<SearchOutlined/>} allowClear onChange={searchFunc}
+                                       onClick={searchFunc}/>
+                            </Col>
+                        </Row>
+                        <Row style={{marginTop: '10px'}}>
+                            <Col span={12}>
+                                <Tooltip title={'创建文件夹'}>
+                                    <Button style={{width: '100%'}} icon={<HddOutlined/>} onClick={() => {
+                                        Modal.confirm({
+                                            title: `创建文件夹`,
+                                            icon: <HddOutlined/>,
+                                            content: <Input ref={newFileRef}/>,
+                                            okText: '确认',
+                                            onOk: () => {
+                                                window.electronAPI.createNotebookDir(`${curDir}/${newFileRef.current.input.value}`).then(() => {
+                                                    setLoad(true);
+                                                })
+                                            },
+                                            cancelText: '取消',
+                                        });
+                                    }}/>
+                                </Tooltip>
+                            </Col>
+                            <Col span={12}>
+                                <Tooltip title={'创建文件'}>
+                                    <Button style={{width: '100%'}} icon={<FileAddOutlined/>} onClick={() => {
+                                        Modal.confirm({
+                                            title: `创建文件`,
+                                            icon: <FileAddOutlined/>,
+                                            content: <Input ref={newFileRef}/>,
+                                            okText: '确认',
+                                            onOk: () => {
+                                                window.electronAPI.createNotebookFile(`${curDir}/${newFileRef.current.input.value}`).then(() => {
+                                                    setLoad(true);
+                                                })
+                                            },
+                                            cancelText: '取消',
+                                        });
+                                    }}/>
+                                </Tooltip>
+                            </Col>
+                        </Row>
+                        <Row style={{marginTop: '10px'}}>
+                            <Col span={24}>
+                                当前路径：{curDir.split("/").map(f => {
+                                    return <span key={f}><a style={{display: 'inline'}} onClick={() => {
+                                        setCurDir(curDir.substring(0, curDir.lastIndexOf(f)) + f);
+                                        setLoad(true);
+                                    }}>{f}</a>/</span>
+                                })}
+                                {/*<Breadcrumb items={[{ title: 'sample' }]} />*/}
+                            </Col>
+                        </Row>
+                    </div>
+                }
                 // footer={<div>Footer</div>}
                 bordered
                 dataSource={displayCwjsonList}

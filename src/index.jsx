@@ -1,5 +1,5 @@
 import React, {createContext, useEffect, useState} from 'react';
-import {ConfigProvider, Spin, Tabs} from "antd";
+import {Spin, Tabs} from "antd";
 import 'antd/dist/antd.min.css';
 import 'moment/locale/zh-cn';
 import moment from "moment";
@@ -30,31 +30,32 @@ const App = () => {
     const [cwjsonList, setCwjsonList] = useState([]);
     //配置文件信息
     const [setting, setSetting] = useState(null);
+    //当前路径
+    const [curDir, setCurDir] = useState('.');
     //主题
     // const [theme, setTheme] = useState(null);
 
     //项目初始化
     useEffect(() => {
-        Promise.all([window.electronAPI.readSettingFile(), window.electronAPI.readNotebookFileList()]).then(res => {
-            const themeSource = res[0].themeSource;
+        Promise.all([window.electronAPI.readSettingFile(), window.electronAPI.readNotebookFileList(curDir)]).then(res => {
             setSetting(res[0]);
             setCwjsonList(res[1]);
 
-            const theme = {};
-            if (themeSource === 'dark') {
-                theme.backgroundColor = '#1f1f1f';
-                theme.primaryColor = 'white';
-            } else {
-                theme.backgroundColor = 'white';
-                theme.primaryColor = '#25b864';
-            }
+            // const theme = {};
+            // if (themeSource === 'dark') {
+            //     theme.backgroundColor = '#1f1f1f';
+            //     theme.primaryColor = 'white';
+            // } else {
+            //     theme.backgroundColor = 'white';
+            //     theme.primaryColor = '#25b864';
+            // }
             // setTheme(theme);
-
-            ConfigProvider.config({
-                theme: {
-                    primaryColor: theme.primaryColor,
-                },
-            });
+            //
+            // ConfigProvider.config({
+            //     theme: {
+            //         primaryColor: theme.primaryColor,
+            //     },
+            // });
 
             setTimeout(() => {
                 setLoad(false);
@@ -69,7 +70,7 @@ const App = () => {
 
     return (
         <>
-            <Context.Provider value={{setLoad, setActiveKey, setting}}>
+            <Context.Provider value={{setLoad, setActiveKey, setting, curDir, setCurDir}}>
                 {load && <Spin style={{marginLeft: '50%', marginTop: '50%'}}/>}
                 {!load && (
                     <Tabs activeKey={activeKey} tabPosition={'left'} className={'slider'}
