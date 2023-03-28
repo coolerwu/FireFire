@@ -1,6 +1,6 @@
 import './markdown.less'
 import {EditorContent, useEditor} from '@tiptap/react';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 import MenuBar from "./menuBar";
 import {Divider, message} from "antd";
 import Bubble from "./bubble";
@@ -9,7 +9,7 @@ import plugins from "../../common/extensions";
 import {Context} from "../../index";
 
 const Markdown = ({cwjson}) => {
-    const {setLoad, setActiveKey, setting, curDir} = useContext(Context);
+    const {curDir} = useContext(Context);
     // const {wordCache, setWordCache} = useState(null);
     // console.log(setting.autoSave);
 

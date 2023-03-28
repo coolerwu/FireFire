@@ -61,7 +61,7 @@ const App = () => {
                 setLoad(false);
             }, 500);
         })
-    }, [load]);
+    }, [curDir, load]);
 
     //切换tab事件
     const tabClick = (activeKey) => {
