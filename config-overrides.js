@@ -16,9 +16,9 @@ module.exports = override(
             }
         }
     }),
-    adjustStyleLoaders(({ use: [, , postcss] }) => {
+    adjustStyleLoaders(({use: [, , postcss]}) => {
         const postcssOptions = postcss.options;
-        postcss.options = { postcssOptions };
+        postcss.options = {postcssOptions};
     }),
     //增加路径别名的处理
     addWebpackAlias({
@@ -28,5 +28,5 @@ module.exports = override(
         pages: path.resolve(__dirname, './src/pages'),
         common: path.resolve(__dirname, './src/common'),
         utils: path.resolve(__dirname, './src/utils'),
-    })
+    }),
 );

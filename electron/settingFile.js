@@ -53,6 +53,10 @@ exports.init = () => {
         curSettingConfig = JSON.parse(content);
     }
 
+    if (!curSettingConfig.notebookPath) {
+        curSettingConfig.notebookPath = defaultSettingConfig.notebookPath;
+    }
+
     if (!curSettingConfig.notebookSuffix) {
         curSettingConfig.notebookSuffix = defaultSettingConfig.notebookSuffix;
     }
