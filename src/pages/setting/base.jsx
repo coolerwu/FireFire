@@ -32,14 +32,14 @@ const BaseSetting = () => {
         }
     }, [setting]);
 
-    //选择文件保存路径
-    const [filePathTypeBtn, setFilePathTypeBtn] = useState('手动输入');
-    const changeFilePathTypeEvent = () => {
-        setFilePathTypeBtn(isSelfWrite(filePathTypeBtn) ? '选择文件夹' : '手动输入')
+    //选择笔记保存路径
+    const [notebookPathTypeBtn, setNotebookPathTypeBtn] = useState('手动输入');
+    const changeNotebookPathTypeEvent = () => {
+        setNotebookPathTypeBtn(isSelfWrite(notebookPathTypeBtn) ? '选择文件夹' : '手动输入')
     }
-    const filePathInput = useRef(null);
-    const confirmFileSavePathEvent = async () => {
-        if (!isSelfWrite(filePathTypeBtn)) {
+    const notebookPathInput = useRef(null);
+    const confirmNotebookSavePathEvent = async () => {
+        if (!isSelfWrite(notebookPathTypeBtn)) {
             const directory = await window.showDirectoryPicker();
             if (!directory) {
                 return;
@@ -52,14 +52,45 @@ const BaseSetting = () => {
             }
 
             const file = await directory.getFileHandle('demo.cwjson', {create: true});
-            if (filePathInput?.current?.input) {
-                filePathInput.current.input.value = directory.resolve(file)
+            if (notebookPathInput?.current?.input) {
+                notebookPathInput.current.input.value = directory.resolve(file)
             }
         }
 
         //保存路径
-        if (filePathInput?.current?.input) {
-            updateValueByKeyFunc('notebookPath', filePathInput.current.input.value);
+        if (notebookPathInput?.current?.input) {
+            updateValueByKeyFunc('notebookPath', notebookPathInput.current.input.value);
+        }
+    };
+
+    //选择附件保存路径
+    const [attachmentPathTypeBtn, setAttachmentPathTypeBtn] = useState('手动输入');
+    const changeAttachmentPathTypeEvent = () => {
+        setAttachmentPathTypeBtn(isSelfWrite(attachmentPathTypeBtn) ? '选择文件夹' : '手动输入')
+    }
+    const attachmentPathInput = useRef(null);
+    const confirmAttachmentSavePathEvent = async () => {
+        if (!isSelfWrite(attachmentPathTypeBtn)) {
+            const directory = await window.showDirectoryPicker();
+            if (!directory) {
+                return;
+            }
+
+            const permission = await verifyPermission(directory);
+            if (!permission) {
+                message.error('已选择的文件夹无法访问（权限不足）');
+                return;
+            }
+
+            const file = await directory.getFileHandle('demo.cwjson', {create: true});
+            if (attachmentPathInput?.current?.input) {
+                attachmentPathInput.current.input.value = directory.resolve(file)
+            }
+        }
+
+        //保存路径
+        if (attachmentPathInput?.current?.input) {
+            updateValueByKeyFunc('attachmentPath', attachmentPathInput.current.input.value);
         }
     };
 
@@ -73,15 +104,27 @@ const BaseSetting = () => {
 
     return (
         <div className={'index'}>
-            <Divider orientation={'left'} plain className={'gutter'}>文件保存路径</Divider>
+            <Divider orientation={'left'} plain className={'gutter'}>笔记保存路径</Divider>
             <Space.Compact className={'filePathInput'}>
-                <Button type="primary" onClick={changeFilePathTypeEvent}>{filePathTypeBtn}</Button>
-                <Input ref={filePathInput} placeholder={isSelfWrite(filePathTypeBtn) ? '请输入绝对路径' : ''}
+                <Button type="primary" onClick={changeNotebookPathTypeEvent}>{notebookPathTypeBtn}</Button>
+                <Input ref={notebookPathInput} placeholder={isSelfWrite(notebookPathTypeBtn) ? '请输入绝对路径' : ''}
                        defaultValue={setting.notebookPath}/>
                 <Button type="primary"
-                        onClick={confirmFileSavePathEvent}>{isSelfWrite(filePathTypeBtn) ? '保存' : '选择'}</Button>
+                        onClick={confirmNotebookSavePathEvent}>{isSelfWrite(notebookPathTypeBtn) ? '保存' : '选择'}</Button>
             </Space.Compact>
-            {isSelfWrite(filePathTypeBtn) && <Popover content={'请输入绝对路径'} className={'filePathInputTips'}>
+            {isSelfWrite(notebookPathTypeBtn) && <Popover content={'请输入绝对路径'} className={'filePathInputTips'}>
+                <IssuesCloseOutlined/>
+            </Popover>}
+
+            <Divider orientation={'left'} plain className={'gutter'}>附件保存路径</Divider>
+            <Space.Compact className={'filePathInput'}>
+                <Button type="primary" onClick={changeAttachmentPathTypeEvent}>{attachmentPathTypeBtn}</Button>
+                <Input ref={attachmentPathInput} placeholder={isSelfWrite(attachmentPathTypeBtn) ? '请输入绝对路径' : ''}
+                       defaultValue={setting.attachmentPath}/>
+                <Button type="primary"
+                        onClick={confirmAttachmentSavePathEvent}>{isSelfWrite(attachmentPathTypeBtn) ? '保存' : '选择'}</Button>
+            </Space.Compact>
+            {isSelfWrite(attachmentPathTypeBtn) && <Popover content={'请输入绝对路径'} className={'filePathInputTips'}>
                 <IssuesCloseOutlined/>
             </Popover>}
 
@@ -91,7 +134,6 @@ const BaseSetting = () => {
                 <Radio.Button value="dark">暗黑模式</Radio.Button>
                 <Radio.Button value="system">跟随系统</Radio.Button>
             </Radio.Group>
-
         </div>
     );
 };

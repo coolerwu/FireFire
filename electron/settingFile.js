@@ -16,6 +16,7 @@ const settingFullPath = path.join(confPath, settingJsonName);
  */
 const defaultSettingConfig = {
     notebookPath: path.join(confPath, 'notebook'),
+    attachmentPath: path.join(confPath, 'attachment'),
     notebookSuffix: '.cwjson',
     themeSource: 'system',
     autoSave: 10,
@@ -55,6 +56,10 @@ exports.init = () => {
 
     if (!curSettingConfig.notebookPath) {
         curSettingConfig.notebookPath = defaultSettingConfig.notebookPath;
+    }
+
+    if (!curSettingConfig.imagePath) {
+        curSettingConfig.imagePath = defaultSettingConfig.imagePath;
     }
 
     if (!curSettingConfig.notebookSuffix) {

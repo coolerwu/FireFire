@@ -6,3 +6,25 @@
 export const persist = (editor, cwjson) => {
     window.electronAPI.writeNotebookFile(cwjson.filename, JSON.stringify(editor.getJSON()));
 };
+
+/**
+ * 拷贝其他地方的文件到附件文件夹
+ */
+export const copyAttachment = (cwjson, fromPath) => {
+    if (!cwjson) {
+        return null;
+    }
+
+    return window.electronAPI.copyAttachment(fromPath, cwjson.attachmentPath);
+}
+
+/**
+ * 拷贝base64到附件文件夹
+ */
+export const copyAttachmentByBase64 = (cwjson, base64) => {
+    if (!cwjson) {
+        return null;
+    }
+
+    return window.electronAPI.copyAttachmentByBase64(base64, cwjson.attachmentPath);
+}

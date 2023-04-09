@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Col, Empty, Row} from "antd";
+import {Empty} from "antd";
 import FileList from "./fileList";
 import Markdown from "./markdown";
 
@@ -9,29 +9,21 @@ import Markdown from "./markdown";
 const File = ({cwjsonList}) => {
     //当前选择的文件
     const [curCwjson, setCurCwjson] = useState(null);
-
-    //选中文件的回调函数
     const chooseCwjsonCallback = (cwjson) => {
         setCurCwjson(cwjson);
     }
 
     return (
-        <>
-            <Row>
-                <Col span={8}>
-                    <FileList cwjsonList={cwjsonList} chooseCwjsonCallback={chooseCwjsonCallback}/>
-                </Col>
-                <Col span={16}>
-                    {/*{curCwjson && <CwEditor cwjson={curCwjson}/>}*/}
-                    {
-                        curCwjson && <Markdown cwjson={curCwjson}/>
-                    }
-                    {
-                        !curCwjson && <Empty/>
-                    }
-                </Col>
-            </Row>
-        </>
+        <div style={{display: 'flex'}}>
+            <div style={{width: '200px'}}>
+                <FileList cwjsonList={cwjsonList} chooseCwjsonCallback={chooseCwjsonCallback}/>
+            </div>
+            <div style={{width: 'calc(100% - 200px)'}}>
+                {/*{curCwjson && <CwEditor cwjson={curCwjson}/>}*/}
+                {curCwjson && <Markdown cwjson={curCwjson}/>}
+                {!curCwjson && <div style={{marginTop: '40vh', marginLeft: 'auto'}}><Empty/></div>}
+            </div>
+        </div>
     );
 }
 

@@ -18,7 +18,13 @@ import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 
 const plugins = [
-    StarterKit, CharacterCount, Image.configure({inline: true, allowBase64: true}),
+    StarterKit, CharacterCount,
+    Image.configure({
+        inline: true,
+        HTMLAttributes: {
+            class: 'image-class',
+        },
+    }),
     Highlight.configure({multicolor: true}), Dropcursor,
     CodeBlockLowlight.extend({
         addNodeView() {

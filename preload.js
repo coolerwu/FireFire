@@ -30,6 +30,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     renameNotebookFile: (oldPath, newPath) => ipcRenderer.invoke('renameNotebookFile', oldPath, newPath),
     //delete filename only in notebook path
     deleteNotebookFile: (absPath) => ipcRenderer.invoke('deleteNotebookFile', absPath),
-    //copy picture to notebook[pid] path
-    copyToNotebookDir: (pid, fromPath) => ipcRenderer.invoke('copyToNotebookDir', pid, fromPath),
+    //delete directory only in notebook path
+    deleteDirectory: (absPath) => ipcRenderer.invoke('deleteDirectory', absPath),
+    //copy picture to attachment path
+    copyAttachment: (fromPath, toDirectoryPath) => ipcRenderer.invoke('copyAttachment', fromPath, toDirectoryPath),
+    //copy base64 to attachment path
+    copyAttachmentByBase64: (base64, toDirectoryPath) => ipcRenderer.invoke('copyAttachmentByBase64', base64, toDirectoryPath),
 })

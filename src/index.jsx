@@ -1,5 +1,5 @@
 import React, {createContext, useEffect, useState} from 'react';
-import {ConfigProvider, Spin, Tabs} from "antd";
+import {ConfigProvider, Menu, Spin} from "antd";
 import 'antd/dist/antd.min';
 import 'moment/locale/zh-cn';
 import moment from "moment";
@@ -8,60 +8,35 @@ import ReactDOM from "react-dom";
 import {FileSearchOutlined, SettingOutlined} from "@ant-design/icons";
 import File from "./pages/file/file";
 import Setting from "./pages/setting";
+import buildThemeStyleFunc from "./utils/theme";
 
+/**
+ * 设置中文时区
+ */
 moment.locale('zh-cn');
 
-const {TabPane} = Tabs;
-
-const commonStyle = {
-    padding: 0,
-}
-
+/**
+ * 上下文
+ */
 export const Context = createContext(null);
 
-const chooseBackgroundFunc = (themeSource) => {
-    if (themeSource !== 'dark') {
-        return {
-            backgroundColor: 'white'
-        }
-    } else {
-        return {
-            backgroundColor: 'darkgray'
-        }
-    }
-};
-
-const chooseThemeFunc = (themeSource) => {
-    if (themeSource !== 'dark') {
-        return {
-            token: {
-                colorPrimary: '#00b96b',
-                colorBgContainer: 'white',
-                colorLink: '#b1cec0',
-                colorLinkActive: '#00ff94',
-                colorLinkHover: '#00b96b',
-            },
-        };
-    } else {
-        //暗黑模式
-        return {
-            token: {
-                colorPrimary: '#7d806e',
-                colorBgContainer: 'darkgray',
-                colorLink: '#7d806e',
-                colorLinkActive: '#d3ff00',
-                colorLinkHover: '#c2cc8c',
-            },
-        };
-    }
-};
-
+/**
+ * 菜单
+ */
+const menuItemList = [
+    {
+        label: '文章',
+        key: 'file',
+        icon: <FileSearchOutlined/>,
+    },
+    {
+        label: '设置',
+        key: 'setting',
+        icon: <SettingOutlined/>,
+    },
+]
 
 const App = () => {
-    //加载loading
-    const [load, setLoad] = useState(true);
-    //当前激活的key
-    const [activeKey, setActiveKey] = useState('2');
     //文件列表
     const [cwjsonList, setCwjsonList] = useState([]);
     //配置文件信息
@@ -71,53 +46,66 @@ const App = () => {
     //主题
     const [theme, setTheme] = useState(null);
 
-    //项目初始化
+    //项目刷新
+    const [loading, setLoading] = useState(true);
+    const refresh = (values) => {
+        if (values?.curDir) {
+            setCurDir(values.curDir);
+        }
+
+        //加载时机
+        setTimeout(() => {
+            setLoading(true);
+        }, 50);
+    }
     useEffect(() => {
         Promise.all([window.electronAPI.readSettingFile(), window.electronAPI.readNotebookFileList(curDir)]).then(res => {
+            //配置
             setSetting(res[0]);
+            setTheme(buildThemeStyleFunc(res[0]));
+
+            //文章
             setCwjsonList(res[1]);
 
-            const theme = {};
-            theme.fontSizeLarge = '20px';
-            theme.fontSizeMini = '10px';
-            theme.fontLinkColor = '#365ad2';
-            if (setting?.themeSource !== 'dark') {
-                theme.fontColor = '#1f1f1f';
-            } else {
-                theme.fontColor = 'white';
-            }
-            setTheme(theme);
-
+            //加载时机
             setTimeout(() => {
-                setLoad(false);
+                setLoading(false);
             }, 50);
         })
-    }, [curDir, load, setting]);
+    }, [curDir, loading]);
 
     //切换tab事件
-    const tabClick = (activeKey) => {
-        setActiveKey(activeKey);
+    const [activeKey, setActiveKey] = useState('file');
+    const changeActiveKeyEvent = (value) => {
+        setActiveKey(value.key);
     }
 
     return (
-        <div style={chooseBackgroundFunc(setting?.themeSource)}>
-            <ConfigProvider theme={chooseThemeFunc(setting?.themeSource)}>
-                <Context.Provider value={{setLoad, setActiveKey, setting, curDir, setCurDir, theme}}>
-                    {load && <Spin style={{marginLeft: '50%', marginTop: '50%'}}/>}
-                    {!load && (
-                        <Tabs activeKey={activeKey} tabPosition={'left'} className={'slider'}
-                              destroyInactiveTabPane={true} onTabClick={tabClick}>
-                            <TabPane key={'2'} tab={<span><FileSearchOutlined/>文章列表</span>} style={commonStyle}>
-                                <File cwjsonList={cwjsonList}/>
-                            </TabPane>
-                            <TabPane key={'100'} tab={<span><SettingOutlined/>设置</span>} style={commonStyle}>
-                                <Setting/>
-                            </TabPane>
-                        </Tabs>
-                    )}
-                </Context.Provider>
-            </ConfigProvider>
-        </div>
+        <Spin spinning={loading} style={{marginLeft: 'auto', marginTop: '50vh'}}>
+            {!loading && <div style={{backgroundColor: theme.backgroundColor}}>
+                <ConfigProvider theme={{token: theme.token}}>
+                    <Context.Provider value={{refresh, setActiveKey, setting, curDir, setCurDir, theme}}>
+                        <div style={{display: 'flex'}}>
+                            <Menu
+                                onClick={changeActiveKeyEvent}
+                                defaultSelectedKeys={[activeKey]}
+                                mode="inline"
+                                style={{
+                                    width: '110px', height: '100vh', backgroundColor: theme.backgroundColor,
+                                    borderRadius: '10px 10px 10px 0px', zIndex: '100',
+                                    boxShadow: `2px 2px 2px 1px ${theme.boxShadowColor}`
+                                }}
+                                items={menuItemList}
+                            />
+                            <div style={{width: 'calc(100vw - 110px)', height: '100vh'}}>
+                                {!loading && activeKey === 'file' && <File cwjsonList={cwjsonList}/>}
+                                {!loading && activeKey === 'setting' && <Setting/>}
+                            </div>
+                        </div>
+                    </Context.Provider>
+                </ConfigProvider>
+            </div>}
+        </Spin>
     );
 };
 

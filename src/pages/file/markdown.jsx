@@ -2,24 +2,19 @@ import './markdown.less'
 import {EditorContent, useEditor} from '@tiptap/react';
 import React, {useContext} from 'react';
 import MenuBar from "./menuBar";
-import {Divider, message} from "antd";
+import {message} from "antd";
 import Bubble from "./bubble";
-import {persist} from "../../utils/cwjsonFileOp";
+import {copyAttachment, copyAttachmentByBase64, persist} from "../../utils/cwjsonFileOp";
 import plugins from "../../common/extensions";
 import {Context} from "../../index";
 
 const Markdown = ({cwjson}) => {
+    //上下文
     const {curDir} = useContext(Context);
-    // const {wordCache, setWordCache} = useState(null);
-    // console.log(setting.autoSave);
 
-    // useEffect(() => {
-    //     setWordCache(null);
-    // }, [cwjson]);
-
+    //初始化编辑器
     const editor = useEditor({
         onUpdate: ({editor}) => {
-            // setWordCache(editor.getJSON());
             persist(editor, cwjson);
         },
         editorProps: {
@@ -30,25 +25,33 @@ const Markdown = ({cwjson}) => {
                     for (let i = 0; i < items.length; i++) {
                         const item = items[i];
                         if (item.kind === 'file' && item.type.startsWith('image')) {
-                            // console.log(item.getAsFile());
-                            // const reader = new FileReader();
-                            // reader.readAsBinaryString(item.getAsFile());
-                            // reader.onload = function (e) {
-                            //     window.electronAPI.writePicInNotebookDir(cwjson.id, `${uuid()}.png`, e.target.result).then(srcUrl => {
-                            //         console.log(srcUrl);
-                            //         const node = view.state.schema.nodes.image.create({src: `file://${srcUrl}`});
-                            //         const transaction = view.state.tr.replaceSelectionWith(node);
-                            //         view.dispatch(transaction);
-                            //     })
-                            // }
-
                             const file = item.getAsFile();
+                            const fileReader = new FileReader();
+                            fileReader.readAsDataURL(file);
+                            fileReader.onload = (e) => {
+                                const base64 = e.target.result;
+                                copyAttachmentByBase64(cwjson, base64).then(srcUrl => {
+                                    if (!srcUrl) {
+                                        message.error("附件复制异常")
+                                        return;
+                                    }
+
+                                    const node = view.state.schema.nodes.image.create({src: `file://${srcUrl}`});
+                                    const transaction = view.state.tr.replaceSelectionWith(node);
+                                    view.dispatch(transaction);
+                                });
+                            }
+
                             if (!file.path) {
-                                message.error('暂不支持截图');
                                 return false;
                             }
 
-                            window.electronAPI.copyToNotebookDir(cwjson.id, file.path).then(srcUrl => {
+                            copyAttachment(cwjson, file.path).then(srcUrl => {
+                                if (!srcUrl) {
+                                    message.error("附件复制异常")
+                                    return;
+                                }
+
                                 const node = view.state.schema.nodes.image.create({src: `file://${srcUrl}`});
                                 const transaction = view.state.tr.replaceSelectionWith(node);
                                 view.dispatch(transaction);
@@ -72,12 +75,7 @@ const Markdown = ({cwjson}) => {
             {editor && <Bubble editor={editor} persist={persist}/>}
             <div className={'markdown'}>
                 <MenuBar editor={editor}/>
-                <Divider/>
-                <EditorContent editor={editor}/>
-                <Divider/>
-                <div className={'footer'}>
-                    总字数：{editor?.storage?.characterCount?.words?.() || '-'}
-                </div>
+                <EditorContent editor={editor} style={{padding: '10px', overflow: 'scroll', height: '90vh'}}/>
             </div>
         </>
     );

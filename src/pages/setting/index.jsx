@@ -23,7 +23,7 @@ const menuItemList = [
 
 const Setting = () => {
     //上下文
-    const {setLoad, setActiveKey, setting} = useContext(Context);
+    const {refresh, setting} = useContext(Context);
 
     //持久化setting配置
     const updateValueByKeyFunc = (key, value) => {
@@ -33,8 +33,7 @@ const Setting = () => {
         }
         setting[key] = value;
         window.electronAPI.writeSettingFile(setting).then(() => {
-            setLoad(true);
-            setActiveKey('100');
+            refresh();
         }).catch(() => {
             message.error('配置更新失败');
         });
