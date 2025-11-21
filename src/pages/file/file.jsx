@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {Empty} from "antd";
-import FileList from "./fileList";
+import Timeline from "./timeline";
 import Markdown from "./markdown";
 
 /**
@@ -15,14 +15,16 @@ const File = ({cwjsonList}) => {
 
     return (
         <div style={{display: 'flex', height: '100vh', overflow: 'hidden'}}>
-            <div style={{width: '240px', height: '100%', overflow: 'hidden'}}>
-                <FileList cwjsonList={cwjsonList} chooseCwjsonCallback={chooseCwjsonCallback}/>
+            {/* 左侧：时间线视图 */}
+            <div style={{width: curCwjson ? '400px' : '100%', height: '100%', overflow: 'hidden', transition: 'width 0.3s ease'}}>
+                <Timeline chooseCwjsonCallback={chooseCwjsonCallback}/>
             </div>
-            <div style={{width: 'calc(100% - 240px)', height: '100%', overflow: 'hidden'}}>
-                {/*{curCwjson && <CwEditor cwjson={curCwjson}/>}*/}
-                {curCwjson && <Markdown cwjson={curCwjson}/>}
-                {!curCwjson && <div style={{marginTop: '40vh', marginLeft: 'auto'}}><Empty/></div>}
-            </div>
+            {/* 右侧：编辑器（仅在选中文件时显示） */}
+            {curCwjson && (
+                <div style={{width: 'calc(100% - 400px)', height: '100%', overflow: 'hidden', borderLeft: '1px solid #e5e5e5'}}>
+                    <Markdown cwjson={curCwjson}/>
+                </div>
+            )}
         </div>
     );
 }

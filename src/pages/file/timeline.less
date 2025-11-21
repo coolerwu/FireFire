@@ -1,0 +1,74 @@
+// 时间线样式
+.timeline-container {
+  padding: 20px;
+  background-color: var(--bg, #ffffff);
+}
+
+.timeline-card {
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.timeline-content {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--fg-secondary, #525252);
+
+  p {
+    margin-bottom: 12px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 16px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  code {
+    background-color: var(--gray-100, #f5f5f5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+  }
+
+  pre {
+    background-color: var(--gray-100, #f5f5f5);
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+
+  blockquote {
+    border-left: 4px solid var(--primary, #25b864);
+    padding-left: 16px;
+    margin-left: 0;
+    color: var(--fg-secondary, #525252);
+    font-style: italic;
+  }
+
+  ul, ol {
+    padding-left: 24px;
+
+    li {
+      margin-bottom: 6px;
+    }
+  }
+
+  a {
+    color: var(--primary, #25b864);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
