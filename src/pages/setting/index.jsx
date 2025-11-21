@@ -4,6 +4,7 @@ import {Menu, message} from "antd";
 import {Context} from "../../index";
 import {AppstoreOutlined} from "@ant-design/icons";
 import BaseSetting from "./base.jsx";
+import {electronAPI} from "../../utils/electronAPI";
 
 const menuItemList = [
     {
@@ -32,7 +33,7 @@ const Setting = () => {
             return;
         }
         setting[key] = value;
-        window.electronAPI.writeSettingFile(setting).then(() => {
+        electronAPI.writeSettingFile(setting).then(() => {
             refresh();
         }).catch(() => {
             message.error('配置更新失败');

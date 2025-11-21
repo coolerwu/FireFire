@@ -2,7 +2,7 @@ const fs = require('fs');
 const {ipcMain} = require("electron");
 const {getCurSettingConfig} = require("./settingFile");
 const path = require("path");
-const uuid = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 
 /**
  * 获取当前notebook完整path
@@ -179,7 +179,7 @@ exports.init = () => {
         }
 
         //移动指定文件
-        const srcUrl = path.join(toDirectoryPath, uuid.v4()) + attachmentSuffix;
+        const srcUrl = path.join(toDirectoryPath, uuidv4()) + attachmentSuffix;
         fs.cpSync(fromPath, srcUrl);
         return srcUrl;
     });
@@ -204,7 +204,7 @@ exports.init = () => {
         }
 
         //移动指定文件
-        const srcUrl = path.join(toDirectoryPath, uuid.v4()) + '.' + mime.substring(mime.lastIndexOf('/') + 1);
+        const srcUrl = path.join(toDirectoryPath, uuidv4()) + '.' + mime.substring(mime.lastIndexOf('/') + 1);
         fs.writeFileSync(srcUrl, u8arr)
         return srcUrl;
     });

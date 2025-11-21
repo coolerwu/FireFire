@@ -4,6 +4,7 @@ import moment from "moment/moment";
 import {Context} from "../../index";
 import './fileListItem.less';
 import {useContext, useRef, useState} from "react";
+import {electronAPI} from "../../utils/electronAPI";
 
 const FileListItem = ({item, chooseCwjsonCallback}) => {
     //上下文
@@ -18,7 +19,7 @@ const FileListItem = ({item, chooseCwjsonCallback}) => {
             content: <Input ref={renameFileRef}/>,
             okText: '确认',
             onOk: () => {
-                window.electronAPI.renameNotebookFile(`${curDir}/${item.id}`, `${curDir}/${renameFileRef.current.input.value}`).then(res => {
+                electronAPI.renameNotebookFile(`${curDir}/${item.id}`, `${curDir}/${renameFileRef.current.input.value}`).then(res => {
                     if (res) {
                         refresh();
                     } else {
@@ -38,7 +39,7 @@ const FileListItem = ({item, chooseCwjsonCallback}) => {
             okText: '确认',
             onOk: () => {
                 if (item.isDirectory) {
-                    window.electronAPI.deleteDirectory(`${curDir}/${item.id}`).then(res => {
+                    electronAPI.deleteDirectory(`${curDir}/${item.id}`).then(res => {
                         if (res) {
                             refresh();
                         } else {
@@ -46,7 +47,7 @@ const FileListItem = ({item, chooseCwjsonCallback}) => {
                         }
                     })
                 } else {
-                    window.electronAPI.deleteNotebookFile(`${curDir}/${item.id}`).then(res => {
+                    electronAPI.deleteNotebookFile(`${curDir}/${item.id}`).then(res => {
                         if (res) {
                             refresh();
                         } else {
@@ -111,7 +112,7 @@ const FileListItem = ({item, chooseCwjsonCallback}) => {
             content: `确认将${item.id}命名为${newFilename}`,
             okText: '确认',
             onOk: () => {
-                window.electronAPI.renameNotebookFile(`${curDir}/${item.id}`, `${curDir}/${newFilename}`).then(res => {
+                electronAPI.renameNotebookFile(`${curDir}/${item.id}`, `${curDir}/${newFilename}`).then(res => {
                     if (res) {
                         refresh();
                     } else {

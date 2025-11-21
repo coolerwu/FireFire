@@ -16,6 +16,7 @@ import TextStyle from "@tiptap/extension-text-style";
 import Underline from '@tiptap/extension-underline';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
+import Placeholder from '@tiptap/extension-placeholder';
 
 const plugins = [
     StarterKit, CharacterCount,
@@ -25,16 +26,35 @@ const plugins = [
             class: 'image-class',
         },
     }),
-    Highlight.configure({multicolor: true}), Dropcursor,
+    Highlight.configure({multicolor: true}),
+    Dropcursor.configure({
+        color: '#4a8cff',
+        width: 2,
+    }),
     CodeBlockLowlight.extend({
         addNodeView() {
             return ReactNodeViewRenderer(CodeBlockComponent)
         },
     }).configure({lowlight}),
-    Typography, TextAlign.configure({types: ['heading', 'paragraph']}),
-    BiliBiliNode, Link, Color, TextStyle, Underline, TaskList,
+    Typography,
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    BiliBiliNode,
+    Link.configure({
+        autolink: true,
+        linkOnPaste: true,
+        openOnClick: true,
+        HTMLAttributes: { rel: 'noopener noreferrer' },
+    }),
+    Color,
+    TextStyle,
+    Underline,
+    TaskList,
     TaskItem.configure({
         nested: true,
+    }),
+    Placeholder.configure({
+        placeholder: '开始书写...',
+        emptyEditorClass: 'is-editor-empty',
     }),
 ];
 

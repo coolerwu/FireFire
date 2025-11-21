@@ -4,6 +4,7 @@ import './fileList.less';
 import {FileAddOutlined, HddOutlined, SearchOutlined} from "@ant-design/icons";
 import {Context} from "../../index";
 import FileListItem from "./fileListItem";
+import {electronAPI} from "../../utils/electronAPI";
 
 /**
  * 创建文件/文件夹样式
@@ -33,7 +34,7 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             content: <Input ref={newFileOrDirectoryRef}/>,
             okText: '确认',
             onOk: () => {
-                window.electronAPI.createNotebookDir(`${curDir}/${newFileOrDirectoryRef.current.input.value}`).then(() => {
+                electronAPI.createNotebookDir(`${curDir}/${newFileOrDirectoryRef.current.input.value}`).then(() => {
                     refresh();
                 })
             },
@@ -47,7 +48,7 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             content: <Input ref={newFileOrDirectoryRef}/>,
             okText: '确认',
             onOk: () => {
-                window.electronAPI.createNotebookFile(`${curDir}/${newFileOrDirectoryRef.current.input.value}`).then(() => {
+                electronAPI.createNotebookFile(`${curDir}/${newFileOrDirectoryRef.current.input.value}`).then(() => {
                     refresh();
                 })
             },

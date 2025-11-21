@@ -7,10 +7,11 @@ import Bubble from "./bubble";
 import {copyAttachment, copyAttachmentByBase64, persist} from "../../utils/cwjsonFileOp";
 import plugins from "../../common/extensions";
 import {Context} from "../../index";
+import {electronAPI} from "../../utils/electronAPI";
 
 const Markdown = ({cwjson}) => {
     //上下文
-    const {curDir} = useContext(Context);
+    const {curDir, theme, setting} = useContext(Context);
 
     //初始化编辑器
     const editor = useEditor({
@@ -64,7 +65,7 @@ const Markdown = ({cwjson}) => {
         extensions: plugins,
         autofocus: 'start',
         onBeforeCreate: ({editor}) => {
-            window.electronAPI.readNotebookFile(`${curDir}/${cwjson.filename}`).then(content => {
+            electronAPI.readNotebookFile(`${curDir}/${cwjson.filename}`).then(content => {
                 editor.commands.setContent(content ? JSON.parse(content) : null);
             })
         },
@@ -73,9 +74,19 @@ const Markdown = ({cwjson}) => {
     return (
         <>
             {editor && <Bubble editor={editor} persist={persist}/>}
-            <div className={'markdown'}>
+            <div className={'markdown'} style={{
+                '--fg': theme?.fontColor || '#222',
+                '--bg': theme?.backgroundColor || '#fff',
+                '--muted': theme?.fontColor === 'white' ? '#aaa' : '#666',
+                '--border': theme?.fontColor === 'white' ? '#3a3a3a' : '#e5e5e5',
+                '--accent': (theme?.token?.colorPrimary || theme?.fontLinkColor || '#4a8cff'),
+                '--radius': '8px',
+                '--doc-width': '800px',
+                '--bubble-bg': (setting?.themeSource === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.85)'),
+                '--bubble-fg': '#fff',
+            }}>
                 <MenuBar editor={editor}/>
-                <EditorContent editor={editor} style={{padding: '10px', overflow: 'scroll', height: '90vh'}}/>
+                <EditorContent editor={editor}/>
             </div>
         </>
     );

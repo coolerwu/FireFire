@@ -54,7 +54,7 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "turndown": "^7.1.1",
-    "uuid": "^8.3.2"
+    "uuid": "^9.0.1"
   },
   "scripts": {
     "start": "react-app-rewired start",
@@ -62,7 +62,7 @@
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "estart": "electron .",
-    "all": "cnpm run build && cnpm run estart",
+    "all": "npm run build && npm run estart",
     "estart-dev": "electron . dev",
     "package-mac": "electron-builder --mac --x64 --publish=never",
     "package-win": "electron-builder --win --x64 --publish=never",
@@ -121,6 +121,6 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^20.3.9",
-    "electron-builder": "^23.3.3"
+    "electron-builder": "^24.6.4"
   }
 }

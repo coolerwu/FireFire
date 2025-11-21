@@ -104,7 +104,7 @@ const MenuBar = ({editor}) => {
                 </Tooltip>
                 <Tooltip title={'有序列表'}>
                     <Button
-                        type={'link'} onClick={() => editor.chain().focus().toggleBulletList().run()}
+                        type={'link'} onClick={() => editor.chain().focus().toggleOrderedList().run()}
                         className={editor.isActive('orderedList') ? 'is-active' : ''}
                         icon={<OrderedListOutlined/>}/>
                 </Tooltip>

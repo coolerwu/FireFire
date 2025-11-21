@@ -9,6 +9,7 @@ import {FileSearchOutlined, SettingOutlined} from "@ant-design/icons";
 import File from "./pages/file/file";
 import Setting from "./pages/setting";
 import buildThemeStyleFunc from "./utils/theme";
+import {electronAPI} from "./utils/electronAPI";
 
 /**
  * 设置中文时区
@@ -59,7 +60,7 @@ const App = () => {
         }, 50);
     }
     useEffect(() => {
-        Promise.all([window.electronAPI.readSettingFile(), window.electronAPI.readNotebookFileList(curDir)]).then(res => {
+        Promise.all([electronAPI.readSettingFile(), electronAPI.readNotebookFileList(curDir)]).then(res => {
             //配置
             setSetting(res[0]);
             setTheme(buildThemeStyleFunc(res[0]));
@@ -81,26 +82,28 @@ const App = () => {
     }
 
     return (
-        <Spin spinning={loading} style={{marginLeft: 'auto', marginTop: '50vh'}}>
-            {!loading && <div style={{backgroundColor: theme.backgroundColor}}>
+        <Spin spinning={loading} size="large" style={{marginLeft: '50vw', marginTop: '50vh'}}>
+            {!loading && <div className="app-container">
                 <ConfigProvider theme={{token: theme.token}}>
                     <Context.Provider value={{refresh, setActiveKey, setting, curDir, setCurDir, theme}}>
-                        <div style={{display: 'flex'}}>
+                        <div className="sidebar">
                             <Menu
                                 onClick={changeActiveKeyEvent}
                                 defaultSelectedKeys={[activeKey]}
                                 mode="inline"
                                 style={{
-                                    width: '110px', height: '100vh', backgroundColor: theme.backgroundColor,
-                                    borderRadius: '10px 10px 10px 0px', zIndex: '100',
-                                    boxShadow: `2px 2px 2px 1px ${theme.boxShadowColor}`
+                                    width: '80px',
+                                    height: '100vh',
+                                    background: 'transparent',
+                                    border: 'none',
+                                    paddingTop: '20px'
                                 }}
                                 items={menuItemList}
                             />
-                            <div style={{width: 'calc(100vw - 110px)', height: '100vh'}}>
-                                {!loading && activeKey === 'file' && <File cwjsonList={cwjsonList}/>}
-                                {!loading && activeKey === 'setting' && <Setting/>}
-                            </div>
+                        </div>
+                        <div className="main-content">
+                            {!loading && activeKey === 'file' && <File cwjsonList={cwjsonList}/>}
+                            {!loading && activeKey === 'setting' && <Setting/>}
                         </div>
                     </Context.Provider>
                 </ConfigProvider>

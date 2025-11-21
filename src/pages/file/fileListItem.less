@@ -1,13 +1,93 @@
 .listItem {
   cursor: pointer;
-  padding: 10px;
-  border-bottom: 1px solid #9b9b9b;
+  padding: 14px 16px;
+  margin: 8px 12px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-color: rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  // 文件/文件夹图标美化
+  .anticon {
+    font-size: 18px;
+    margin-right: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  // 标题样式
+  .file-title {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  // 时间样式
+  .file-time {
+    font-size: 12px;
+    color: #95a5a6;
+  }
 }
 
 .chooseListItem {
   cursor: pointer;
-  padding: 10px 7px 10px 10px;
-  border-right: 3px solid #25b864;
-  border-bottom: 1px solid #9b9b9b;
-  transition: .5s ease;
+  padding: 14px 16px;
+  margin: 8px 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+
+  &:hover {
+    box-shadow: 0 12px 24px rgba(102, 126, 234, 0.5);
+    transform: translateY(-3px) scale(1.02);
+  }
+
+  // 激活状态下的图标
+  .anticon {
+    font-size: 18px;
+    margin-right: 10px;
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+  }
+
+  // 激活状态下的文字
+  .file-title {
+    font-weight: 600;
+    color: white;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .file-time {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  // 操作按钮也改成白色
+  .ant-space button {
+    color: white !important;
+    opacity: 0.9;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }

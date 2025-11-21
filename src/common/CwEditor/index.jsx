@@ -6,6 +6,7 @@ import {splitBlock} from "prosemirror-commands";
 import {defaultMarkdownParser, defaultMarkdownSerializer, schema} from "prosemirror-markdown";
 import {exampleSetup} from "prosemirror-example-setup";
 import './index.less';
+import {electronAPI} from "../../utils/electronAPI";
 
 class CwEditor extends React.Component {
     constructor(props) {
@@ -19,7 +20,7 @@ class CwEditor extends React.Component {
     }
 
     componentDidMount() {
-        window.electronAPI.readNotebookFile(this.state.cwjson.filename).then(content => {
+        electronAPI.readNotebookFile(this.state.cwjson.filename).then(content => {
             // editor.commands.setContent(content ? JSON.parse(content) : null);
             // schema.node( {
             //     content: "inline*",
@@ -64,7 +65,7 @@ class CwEditor extends React.Component {
                     //     }
                     // })
                     // console.log(defaultMarkdownSerializer.serialize(this.state.editorView.state.doc));
-                    window.electronAPI.writeNotebookFile(this.state.cwjson.filename, defaultMarkdownSerializer.serialize(this.state.editorView.state.doc));
+                    electronAPI.writeNotebookFile(this.state.cwjson.filename, defaultMarkdownSerializer.serialize(this.state.editorView.state.doc));
                     this.state.editorView.updateState(newState);
                 }
             });

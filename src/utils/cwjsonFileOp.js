@@ -1,10 +1,12 @@
+import {electronAPI} from "./electronAPI";
+
 /**
  * markdown持久化
  * @param editor 编辑器
  * @param cwjson 文件
  */
 export const persist = (editor, cwjson) => {
-    window.electronAPI.writeNotebookFile(cwjson.filename, JSON.stringify(editor.getJSON()));
+    electronAPI.writeNotebookFile(cwjson.filename, JSON.stringify(editor.getJSON()));
 };
 
 /**
@@ -15,7 +17,7 @@ export const copyAttachment = (cwjson, fromPath) => {
         return null;
     }
 
-    return window.electronAPI.copyAttachment(fromPath, cwjson.attachmentPath);
+    return electronAPI.copyAttachment(fromPath, cwjson.attachmentPath);
 }
 
 /**
@@ -26,5 +28,5 @@ export const copyAttachmentByBase64 = (cwjson, base64) => {
         return null;
     }
 
-    return window.electronAPI.copyAttachmentByBase64(base64, cwjson.attachmentPath);
+    return electronAPI.copyAttachmentByBase64(base64, cwjson.attachmentPath);
 }

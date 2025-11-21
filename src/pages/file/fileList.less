@@ -1,3 +1,104 @@
-#fileList .ant-list-header {
-  padding: 20px;
+#fileList {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 0;
+  border: none;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .ant-list-header {
+    padding: 24px 20px 16px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(10px);
+
+    // 头部按钮组美化
+    .ant-row {
+      gap: 12px;
+    }
+
+    .ant-btn {
+      border-radius: 10px;
+      border: none;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .anticon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      &:hover .anticon {
+        color: white;
+        -webkit-text-fill-color: white;
+      }
+    }
+
+    // 搜索框美化
+    .ant-input {
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: white;
+      padding: 8px 12px;
+      transition: all 0.3s ease;
+
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+    }
+  }
+
+  .ant-list-items {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px 0;
+
+    // 滚动条美化
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+
+      &:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      }
+    }
+  }
+
+  // 空状态美化
+  .ant-empty {
+    padding: 60px 20px;
+
+    .ant-empty-image {
+      height: 120px;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+
+    .ant-empty-description {
+      color: #95a5a6;
+      font-size: 14px;
+    }
+  }
 }
