@@ -189,8 +189,13 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                         >
                             <div style={{display: 'flex', flexWrap: 'wrap', gap: '6px'}}>
                                 <Tag
-                                    color={selectedTag === null ? 'blue' : 'default'}
-                                    style={{cursor: 'pointer'}}
+                                    color={selectedTag === null ? 'blue' : undefined}
+                                    style={{
+                                        cursor: 'pointer',
+                                        backgroundColor: selectedTag === null ? undefined : 'var(--gray-100, #f5f5f5)',
+                                        borderColor: selectedTag === null ? undefined : 'var(--border, #e5e5e5)',
+                                        color: selectedTag === null ? undefined : 'var(--fg, #171717)',
+                                    }}
                                     onClick={() => setSelectedTag(null)}
                                 >
                                     全部
@@ -198,8 +203,13 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                                 {tags.map(tag => (
                                     <Tag
                                         key={tag.name}
-                                        color={selectedTag === tag.name ? 'blue' : 'default'}
-                                        style={{cursor: 'pointer'}}
+                                        color={selectedTag === tag.name ? 'blue' : undefined}
+                                        style={{
+                                            cursor: 'pointer',
+                                            backgroundColor: selectedTag === tag.name ? undefined : 'var(--gray-100, #f5f5f5)',
+                                            borderColor: selectedTag === tag.name ? undefined : 'var(--border, #e5e5e5)',
+                                            color: selectedTag === tag.name ? undefined : 'var(--fg, #171717)',
+                                        }}
                                         onClick={() => setSelectedTag(tag.name)}
                                     >
                                         #{tag.name} ({tag.count})
