@@ -352,6 +352,249 @@
   }
 }
 
+/* 嵌入式内容样式 */
+
+/* YouTube 嵌入 */
+.youtube-embed-wrapper {
+  position: relative;
+  margin: 1.5rem 0;
+
+  .youtube-embed-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--radius-lg, 8px);
+    background: var(--gray-100);
+  }
+
+  .youtube-embed-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: var(--radius-lg, 8px);
+  }
+
+  .youtube-embed-placeholder {
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted, #737373);
+    background: var(--gray-50);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg, 8px);
+  }
+}
+
+/* PDF 嵌入 */
+.pdf-embed-wrapper {
+  position: relative;
+  margin: 1.5rem 0;
+
+  .pdf-embed-container {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 8px);
+    background: var(--gray-50);
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .pdf-embed-loading,
+  .pdf-embed-error,
+  .pdf-embed-placeholder {
+    padding: 2rem;
+    color: var(--muted, #737373);
+  }
+
+  .pdf-embed-error {
+    color: #dc2626;
+  }
+
+  .react-pdf__Document {
+    display: flex;
+    justify-content: center;
+  }
+
+  .react-pdf__Page {
+    max-width: 100%;
+    canvas {
+      max-width: 100%;
+      height: auto !important;
+    }
+  }
+
+  .pdf-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .pdf-control-button {
+    padding: 0.5rem 1rem;
+    background: var(--bg, white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--fg);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+      background: var(--gray-100);
+      border-color: var(--primary);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .pdf-page-info {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+}
+
+/* 网页预览 */
+.web-embed-wrapper {
+  position: relative;
+  margin: 1.5rem 0;
+
+  .web-embed-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 8px);
+    padding: 1rem;
+    background: var(--bg, white);
+    text-decoration: none;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(37, 184, 100, 0.1);
+    }
+  }
+
+  .web-embed-loading,
+  .web-embed-error,
+  .web-embed-placeholder {
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted, #737373);
+  }
+
+  .web-embed-content {
+    flex: 1;
+  }
+
+  .web-embed-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .web-embed-favicon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  .web-embed-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .web-embed-description {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .web-embed-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .web-embed-button {
+    padding: 0.35rem 0.75rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm, 4px);
+    color: var(--fg);
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+
+    &:hover {
+      background: var(--gray-100);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  }
+
+  .web-embed-iframe-container {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 8px);
+    overflow: hidden;
+    background: var(--gray-50);
+  }
+
+  .web-embed-iframe {
+    width: 100%;
+    height: 500px;
+    border: none;
+  }
+}
+
+/* 通用嵌入删除按钮 */
+.embed-delete-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+
+  &:hover {
+    background: rgba(220, 38, 38, 0.9);
+  }
+}
+
+.youtube-embed-wrapper:hover .embed-delete-button,
+.pdf-embed-wrapper:hover .embed-delete-button,
+.web-embed-wrapper:hover .embed-delete-button {
+  opacity: 1;
+}
+
 // 未来编辑器功能样式（为 add-notion-style-editor 预留）
 
 // 拖拽手柄

@@ -84,6 +84,72 @@ const SlashMenuComponent = forwardRef((props, ref) => {
         editor.chain().focus().deleteRange(range).setHorizontalRule().run()
       },
     },
+    {
+      icon: '📺',
+      title: 'BiliBili 视频',
+      description: '嵌入 B站 视频',
+      command: ({ editor, range }) => {
+        const url = prompt('请输入 BiliBili 视频链接 (例如: https://www.bilibili.com/video/BV1xx411c7mD):')
+        if (url) {
+          const match = url.match(/BV[0-9a-zA-Z]+/)
+          if (match) {
+            editor.chain().focus().deleteRange(range).setBiliBiliVideo({ src: match[0] }).run()
+          } else {
+            alert('无效的 BiliBili 链接')
+          }
+        }
+      },
+    },
+    {
+      icon: '▶️',
+      title: 'YouTube 视频',
+      description: '嵌入 YouTube 视频',
+      command: ({ editor, range }) => {
+        const url = prompt('请输入 YouTube 视频链接:')
+        if (url) {
+          // Extract video ID
+          const patterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/,
+            /youtube\.com\/embed\/([^?&\s]+)/,
+          ]
+          let videoId = null
+          for (const pattern of patterns) {
+            const match = url.match(pattern)
+            if (match && match[1]) {
+              videoId = match[1]
+              break
+            }
+          }
+          if (videoId) {
+            editor.chain().focus().deleteRange(range).setYouTubeVideo({ videoId }).run()
+          } else {
+            alert('无效的 YouTube 链接')
+          }
+        }
+      },
+    },
+    {
+      icon: '📄',
+      title: 'PDF 文件',
+      description: '嵌入 PDF 文档',
+      command: ({ editor, range }) => {
+        const src = prompt('请输入 PDF 文件路径 (file:// 或 https://):')
+        if (src) {
+          editor.chain().focus().deleteRange(range).setPDFEmbed({ src }).run()
+        }
+      },
+    },
+    {
+      icon: '🔗',
+      title: '网页预览',
+      description: '嵌入网页链接',
+      command: ({ editor, range }) => {
+        const url = prompt('请输入网页链接:')
+        if (url) {
+          editor.chain().focus().deleteRange(range).setWebEmbed({ url }).run()
+        }
+      },
+    },
   ]
 
   const filteredCommands = commands.filter((item) =>

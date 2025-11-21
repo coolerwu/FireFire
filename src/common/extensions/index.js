@@ -19,6 +19,9 @@ import TaskList from '@tiptap/extension-task-list';
 import Placeholder from '@tiptap/extension-placeholder';
 import {SlashCommand} from './slashCommand';
 import {DragAndDrop} from './dragAndDrop';
+import {YouTubeEmbed} from './youtubeEmbed';
+import {PDFEmbed} from './pdfEmbed';
+import {WebEmbed} from './webEmbed';
 
 const plugins = [
     StarterKit, CharacterCount,
@@ -60,6 +63,9 @@ const plugins = [
     }),
     SlashCommand,
     DragAndDrop,
+    YouTubeEmbed,
+    PDFEmbed,
+    WebEmbed,
 ];
 
 export default plugins;
