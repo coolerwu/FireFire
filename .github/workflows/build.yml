@@ -53,15 +53,21 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - name: Setup Python for node-gyp
+        id: setup-python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Install Windows Build Tools
+      - name: Configure Python for node-gyp
         run: |
-          npm install --global windows-build-tools --vs2015
-        continue-on-error: true
-      - run: set CI=false
-      - name: Install dependencies with prebuild
+          python --version
+          which python
+          echo "PYTHON=$(which python)" >> $GITHUB_ENV
+        shell: bash
+      - name: Set CI=false
+        run: |
+          echo "CI=false" >> $GITHUB_ENV
+        shell: bash
+      - name: Install dependencies
         run: |
           npm install --prefer-offline --no-audit
         env:
