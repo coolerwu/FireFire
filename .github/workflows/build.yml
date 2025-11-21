@@ -32,7 +32,7 @@ jobs:
       - run: npm run package-linux
       - run: mv ./target/firefire_${{steps.version.outputs.value}}_amd64.deb ./target/firefire-${{steps.version.outputs.value}}.deb
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: firefire-${{steps.version.outputs.value}}.deb
           path: ./target/firefire-${{steps.version.outputs.value}}.deb
@@ -59,7 +59,7 @@ jobs:
           property: version
       - run: npm run package-win
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: firefire-${{steps.version.outputs.value}}.exe
           path: ./target/firefire Setup ${{steps.version.outputs.value}}.exe
@@ -87,7 +87,7 @@ jobs:
         property: version
     - run: npm run package-mac
     - name: Upload
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: firefire-${{steps.version.outputs.value}}.dmg
         path: ./target/firefire-${{steps.version.outputs.value}}.dmg
@@ -124,7 +124,7 @@ jobs:
           # 是否为预发布
           prerelease: false
       - name: Download mac
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: firefire-${{steps.version.outputs.value}}.dmg
       - name: Upload Release mac
@@ -137,7 +137,7 @@ jobs:
           asset_name: firefire-${{steps.version.outputs.value}}.dmg
           asset_content_type: application/octet-stream
       - name: Download win
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: firefire-${{steps.version.outputs.value}}.exe
       - name: Upload Release win
@@ -150,7 +150,7 @@ jobs:
           asset_name: firefire-${{steps.version.outputs.value}}.exe
           asset_content_type: application/octet-stream
       - name: Download linux
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: firefire-${{steps.version.outputs.value}}.deb
       - name: Upload Release linux
