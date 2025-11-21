@@ -93,6 +93,49 @@ const mockAPI = {
         console.warn('[Mock Mode] onUpdateStatus called - not available in browser');
         return () => {}; // Return empty cleanup function
     },
+    getAllTags: async () => {
+        console.warn('[Mock Mode] getAllTags called');
+        return [
+            { name: '工作', count: 5 },
+            { name: '学习', count: 3 },
+            { name: '生活', count: 2 },
+        ];
+    },
+    getNotesByTag: async (tag) => {
+        console.warn('[Mock Mode] getNotesByTag called', tag);
+        return [
+            {
+                title: '示例笔记',
+                path: '/mock/notebook/示例笔记.cwjson',
+                tags: [tag],
+                updatedAt: new Date().toISOString(),
+            }
+        ];
+    },
+    getBacklinks: async (noteId) => {
+        console.warn('[Mock Mode] getBacklinks called', noteId);
+        return [];
+    },
+    searchNotes: async (query) => {
+        console.warn('[Mock Mode] searchNotes called', query);
+        return [
+            {
+                id: 'demo-note',
+                title: '示例搜索结果',
+                path: '/mock/notebook/示例.cwjson',
+                tags: ['工作'],
+                score: 10,
+            }
+        ];
+    },
+    noteExists: async (noteId) => {
+        console.warn('[Mock Mode] noteExists called', noteId);
+        return false;
+    },
+    rebuildIndex: async () => {
+        console.warn('[Mock Mode] rebuildIndex called');
+        return true;
+    },
 };
 
 // 导出 API（优先使用真实 API，否则使用 mock）

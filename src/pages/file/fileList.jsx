@@ -1,10 +1,12 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Button, Col, Input, List, Modal, Row, Tooltip} from "antd";
+import {Button, Col, Input, List, Modal, Row, Tooltip, Tag, Collapse} from "antd";
 import './fileList.less';
-import {FileAddOutlined, HddOutlined, SearchOutlined} from "@ant-design/icons";
+import {FileAddOutlined, HddOutlined, SearchOutlined, TagsOutlined} from "@ant-design/icons";
 import {Context} from "../../index";
 import FileListItem from "./fileListItem";
 import {electronAPI} from "../../utils/electronAPI";
+
+const { Panel } = Collapse;
 
 /**
  * 创建文件/文件夹样式
@@ -24,6 +26,10 @@ const buildEditStyle = (theme) => {
 const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
     //上下文
     const {refresh, curDir, theme} = useContext(Context);
+
+    //标签相关状态
+    const [tags, setTags] = useState([]);
+    const [selectedTag, setSelectedTag] = useState(null);
 
     //新建文件/文件夹ref
     const newFileOrDirectoryRef = useRef(null);
@@ -58,14 +64,41 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
 
     //搜索符合规则的文件
     const [displayCwjsonList, setDisplayCwjsonList] = useState(cwjsonList);
-    const searchFunc = (e) => {
-        const searchValue = e.target.value;
-        if (searchValue) {
-            setDisplayCwjsonList(cwjsonList.filter(cwjson => cwjson.id.indexOf(searchValue) !== -1));
+    const [tagFilteredList, setTagFilteredList] = useState([]);
+
+    // 根据标签筛选笔记
+    useEffect(() => {
+        if (selectedTag) {
+            electronAPI.getNotesByTag(selectedTag).then(notes => {
+                // 将标签筛选的笔记路径转换为 cwjson 对象
+                const filteredList = cwjsonList.filter(cwjson => {
+                    return notes.some(note => note.path.includes(cwjson.id));
+                });
+                setTagFilteredList(filteredList);
+                setDisplayCwjsonList(filteredList);
+            });
         } else {
+            setTagFilteredList(cwjsonList);
             setDisplayCwjsonList(cwjsonList);
         }
+    }, [selectedTag, cwjsonList]);
+
+    const searchFunc = (e) => {
+        const value = e.target.value;
+        const baseList = selectedTag ? tagFilteredList : cwjsonList;
+        if (value) {
+            setDisplayCwjsonList(baseList.filter(cwjson => cwjson.id.indexOf(value) !== -1));
+        } else {
+            setDisplayCwjsonList(baseList);
+        }
     };
+
+    //加载标签
+    useEffect(() => {
+        electronAPI.getAllTags().then(setTags).catch(err => {
+            console.error('加载标签失败:', err);
+        });
+    }, []);
 
     //样式
     const [headerHeight, setHeaderHeight] = useState(null);
@@ -83,6 +116,44 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                                onClick={searchFunc}/>
                     </Col>
                 </Row>
+                {/* 标签筛选 */}
+                {tags.length > 0 && (
+                    <Collapse
+                        ghost
+                        style={{marginTop: '10px'}}
+                        defaultActiveKey={['tags']}
+                    >
+                        <Panel
+                            header={
+                                <span style={{fontSize: '13px'}}>
+                                    <TagsOutlined style={{marginRight: '6px'}}/>
+                                    标签筛选
+                                </span>
+                            }
+                            key="tags"
+                        >
+                            <div style={{display: 'flex', flexWrap: 'wrap', gap: '6px'}}>
+                                <Tag
+                                    color={selectedTag === null ? 'blue' : 'default'}
+                                    style={{cursor: 'pointer'}}
+                                    onClick={() => setSelectedTag(null)}
+                                >
+                                    全部
+                                </Tag>
+                                {tags.map(tag => (
+                                    <Tag
+                                        key={tag.name}
+                                        color={selectedTag === tag.name ? 'blue' : 'default'}
+                                        style={{cursor: 'pointer'}}
+                                        onClick={() => setSelectedTag(tag.name)}
+                                    >
+                                        #{tag.name} ({tag.count})
+                                    </Tag>
+                                ))}
+                            </div>
+                        </Panel>
+                    </Collapse>
+                )}
                 <Row style={{marginTop: '10px'}}>
                     <Col span={11}>
                         <Tooltip title={'创建文件夹'}>

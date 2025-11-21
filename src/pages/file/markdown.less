@@ -595,7 +595,45 @@
   opacity: 1;
 }
 
-// 未来编辑器功能样式（为 add-notion-style-editor 预留）
+/* 标签节点样式 */
+.tag-node {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 0 4px 0 0;
+  background: var(--tag-bg, #f0f9ff);
+  color: var(--tag-color, #0369a1);
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--tag-border, #bae6fd);
+  user-select: none;
+
+  &:hover {
+    background: var(--tag-hover-bg, #0369a1);
+    color: var(--tag-hover-color, white);
+    border-color: var(--tag-hover-border, #0369a1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(3, 105, 161, 0.2);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// 暗黑模式标签样式
+[data-theme="dark"] .tag-node {
+  --tag-bg: rgba(14, 165, 233, 0.15);
+  --tag-color: #7dd3fc;
+  --tag-border: rgba(14, 165, 233, 0.3);
+  --tag-hover-bg: #0284c7;
+  --tag-hover-color: white;
+  --tag-hover-border: #0284c7;
+}
+
+// 未来编辑器功能样式（为其他功能预留）
 
 // 拖拽手柄
 .drag-handle {

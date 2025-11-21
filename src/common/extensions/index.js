@@ -22,6 +22,7 @@ import {DragAndDrop} from './dragAndDrop';
 import {YouTubeEmbed} from './youtubeEmbed';
 import {PDFEmbed} from './pdfEmbed';
 import {WebEmbed} from './webEmbed';
+import {TagExtension} from './tagExtension';
 
 const plugins = [
     StarterKit, CharacterCount,
@@ -66,6 +67,7 @@ const plugins = [
     YouTubeEmbed,
     PDFEmbed,
     WebEmbed,
+    TagExtension,
 ];
 
 export default plugins;

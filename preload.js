@@ -46,4 +46,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('update-status', subscription);
         return () => ipcRenderer.removeListener('update-status', subscription);
     },
+    //tag and link index functions
+    getAllTags: () => ipcRenderer.invoke('get-all-tags'),
+    getNotesByTag: (tag) => ipcRenderer.invoke('get-notes-by-tag', tag),
+    getBacklinks: (noteId) => ipcRenderer.invoke('get-backlinks', noteId),
+    searchNotes: (query) => ipcRenderer.invoke('search-notes', query),
+    noteExists: (noteId) => ipcRenderer.invoke('note-exists', noteId),
+    rebuildIndex: () => ipcRenderer.invoke('rebuild-index'),
 })

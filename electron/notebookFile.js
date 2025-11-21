@@ -3,6 +3,7 @@ const {ipcMain} = require("electron");
 const {getCurSettingConfig} = require("./settingFile");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
+const indexManager = require("./indexManager");
 
 /**
  * 获取当前notebook完整path
@@ -123,6 +124,14 @@ exports.init = () => {
             console.log('error');
         }
         fs.writeFileSync(fileFullPath, content)
+
+        // 更新标签和链接索引
+        try {
+            const contentObj = JSON.parse(content);
+            indexManager.updateNoteIndex(fileFullPath, contentObj);
+        } catch (error) {
+            console.error('[NotebookFile] 更新索引失败:', error);
+        }
     });
     ipcMain.handle('renameNotebookFile', (event, oldPath, newPath) => {
         const curNotebookFullPath = getCurNotebookFullPath();
@@ -142,6 +151,10 @@ exports.init = () => {
         const fileFullPath = path.join(curNotebookFullPath, absPath) + curNotebookSuffix;
         if (fs.existsSync(fileFullPath)) {
             fs.rmSync(fileFullPath);
+
+            // 删除索引
+            indexManager.deleteNoteIndex(fileFullPath);
+
             return true;
         } else {
             return false;
