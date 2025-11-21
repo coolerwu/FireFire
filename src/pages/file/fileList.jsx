@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Button, Col, Input, List, Modal, Row, Tooltip, Tag, Collapse} from "antd";
 import './fileList.less';
-import {FileAddOutlined, HddOutlined, SearchOutlined, TagsOutlined} from "@ant-design/icons";
+import {FileAddOutlined, HddOutlined, SearchOutlined, TagsOutlined, ThunderboltOutlined} from "@ant-design/icons";
 import {Context} from "../../index";
 import FileListItem from "./fileListItem";
 import {electronAPI} from "../../utils/electronAPI";
@@ -60,6 +60,31 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             },
             cancelText: '取消',
         });
+    };
+
+    // 快速笔记功能
+    const createQuickNote = async () => {
+        try {
+            // 确保 Quick Notes 文件夹存在
+            const quickNotesDir = 'Quick Notes';
+            await electronAPI.createNotebookDir(quickNotesDir);
+
+            // 生成文件名：使用当前时间戳
+            const now = new Date();
+            const fileName = `笔记-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+
+            // 创建文件
+            const filePath = `${quickNotesDir}/${fileName}`;
+            await electronAPI.createNotebookFile(filePath);
+
+            // 刷新并选中新文件
+            refresh();
+
+            // 通知用户
+            console.log(`[QuickNote] 创建快速笔记: ${filePath}`);
+        } catch (error) {
+            console.error('[QuickNote] 创建失败:', error);
+        }
     };
 
     //搜索符合规则的文件
@@ -121,6 +146,25 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                 boxShadow: `0px 0px 10px 0px ${theme.boxShadowColor}`,
                 flexShrink: 0
             }}>
+                {/* 快速笔记按钮 */}
+                <Row style={{marginBottom: '10px'}}>
+                    <Col span={24}>
+                        <Button
+                            type="primary"
+                            icon={<ThunderboltOutlined />}
+                            onClick={createQuickNote}
+                            block
+                            style={{
+                                height: '40px',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                borderRadius: '8px',
+                            }}
+                        >
+                            快速笔记
+                        </Button>
+                    </Col>
+                </Row>
                 <Row>
                     <Col span={24}>
                         <Input prefix={<SearchOutlined/>} allowClear onChange={searchFunc}
