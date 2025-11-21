@@ -76,6 +76,23 @@ const mockAPI = {
         console.warn('[Mock Mode] copyAttachmentByBase64 called', toDirectoryPath);
         return '/mock/attachment/image.png';
     },
+    checkForUpdates: async () => {
+        console.warn('[Mock Mode] checkForUpdates called - not available in browser');
+    },
+    downloadUpdate: async () => {
+        console.warn('[Mock Mode] downloadUpdate called - not available in browser');
+    },
+    quitAndInstall: async () => {
+        console.warn('[Mock Mode] quitAndInstall called - not available in browser');
+    },
+    getAppVersion: async () => {
+        console.warn('[Mock Mode] getAppVersion called');
+        return '0.3.4-browser';
+    },
+    onUpdateStatus: (callback) => {
+        console.warn('[Mock Mode] onUpdateStatus called - not available in browser');
+        return () => {}; // Return empty cleanup function
+    },
 };
 
 // 导出 API（优先使用真实 API，否则使用 mock）

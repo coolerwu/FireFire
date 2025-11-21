@@ -36,4 +36,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     copyAttachment: (fromPath, toDirectoryPath) => ipcRenderer.invoke('copyAttachment', fromPath, toDirectoryPath),
     //copy base64 to attachment path
     copyAttachmentByBase64: (base64, toDirectoryPath) => ipcRenderer.invoke('copyAttachmentByBase64', base64, toDirectoryPath),
+    //auto-update functions
+    checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+    downloadUpdate: () => ipcRenderer.invoke('download-update'),
+    quitAndInstall: () => ipcRenderer.invoke('quit-and-install'),
+    getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+    onUpdateStatus: (callback) => {
+        const subscription = (event, status) => callback(status);
+        ipcRenderer.on('update-status', subscription);
+        return () => ipcRenderer.removeListener('update-status', subscription);
+    },
 })

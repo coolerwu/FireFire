@@ -1,6 +1,7 @@
-const {app, BrowserWindow, Menu} = require('electron');
+const {app, BrowserWindow, Menu, ipcMain} = require('electron');
 const path = require("path");
 const {init} = require("./electron");
+const updater = require('./electron/updater');
 
 //浏览器引用
 let window;
@@ -36,6 +37,20 @@ let createWindow = () => {
 
 const afterCreated = () => {
     init(window);
+
+    // 设置更新器的主窗口
+    updater.setMainWindow(window);
+
+    // 延迟3秒后检查更新（避免阻塞启动）
+    setTimeout(() => {
+        const {readSettingFile} = require('./electron/settingFile');
+        const settings = readSettingFile();
+
+        // 默认开启自动更新检查
+        if (settings.autoUpdate !== false) {
+            updater.checkForUpdates();
+        }
+    }, 3000);
 }
 
 const buildMenu = () => {
@@ -82,4 +97,21 @@ app.on('activate', () => {
     if (window == null) {
         createWindow();
     }
+});
+
+// 自动更新 IPC 处理程序
+ipcMain.handle('check-for-updates', () => {
+    updater.checkForUpdates();
+});
+
+ipcMain.handle('download-update', () => {
+    updater.downloadUpdate();
+});
+
+ipcMain.handle('quit-and-install', () => {
+    updater.quitAndInstall();
+});
+
+ipcMain.handle('get-app-version', () => {
+    return updater.getCurrentVersion();
 });
