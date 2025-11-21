@@ -1,0 +1,84 @@
+.journal-entry {
+  background: var(--card-bg, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  &.loading {
+    opacity: 0.6;
+  }
+
+  .journal-date-label {
+    display: flex;
+    align-items: baseline;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border, #f0f0f0);
+    background: linear-gradient(to bottom, var(--card-bg, #ffffff), var(--bg-secondary, #fafafa));
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 16px 0 0;
+      color: var(--text-primary, #171717);
+    }
+
+    .relative-date {
+      color: var(--text-secondary, #999);
+      font-size: 14px;
+      font-weight: 400;
+      padding: 4px 12px;
+      background: var(--bg-tertiary, #f5f5f5);
+      border-radius: 12px;
+    }
+  }
+
+  .journal-editor-container {
+    padding: 20px 24px;
+    min-height: 200px;
+
+    .loading-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 180px;
+      color: var(--text-secondary, #999);
+      font-size: 14px;
+    }
+
+    // 编辑器样式调整
+    .ProseMirror {
+      min-height: 160px;
+      outline: none;
+
+      &:focus {
+        outline: none;
+      }
+
+      p.is-editor-empty:first-child::before {
+        color: var(--text-placeholder, #bbb);
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+// 暗黑模式
+@media (prefers-color-scheme: dark) {
+  .journal-entry {
+    --card-bg: #2a2a2a;
+    --bg-secondary: #252525;
+    --bg-tertiary: #333;
+    --border: #3a3a3a;
+    --text-primary: #e5e5e5;
+    --text-secondary: #aaa;
+    --text-placeholder: #666;
+  }
+}

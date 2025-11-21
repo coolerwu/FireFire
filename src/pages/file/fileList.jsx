@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Button, Col, Input, List, Modal, Row, Tooltip, Tag, Collapse} from "antd";
 import './fileList.less';
-import {FileAddOutlined, HddOutlined, SearchOutlined, TagsOutlined, ThunderboltOutlined} from "@ant-design/icons";
+import {FileAddOutlined, HddOutlined, SearchOutlined, TagsOutlined, ThunderboltOutlined, CalendarOutlined} from "@ant-design/icons";
 import {Context} from "../../index";
 import FileListItem from "./fileListItem";
 import {electronAPI} from "../../utils/electronAPI";
@@ -87,6 +87,22 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
         }
     };
 
+    // 打开今日日记
+    const openTodayJournal = async () => {
+        try {
+            // 创建今日日记（如果不存在）
+            const journalPath = await electronAPI.createJournal();
+
+            // 刷新文件列表
+            refresh();
+
+            // 选中并打开日记
+            console.log(`[Journal] 打开今日日记: ${journalPath}`);
+        } catch (error) {
+            console.error('[Journal] 打开失败:', error);
+        }
+    };
+
     //搜索符合规则的文件
     const [displayCwjsonList, setDisplayCwjsonList] = useState(cwjsonList);
     const [tagFilteredList, setTagFilteredList] = useState([]);
@@ -146,9 +162,9 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                 boxShadow: `0px 0px 10px 0px ${theme.boxShadowColor}`,
                 flexShrink: 0
             }}>
-                {/* 快速笔记按钮 */}
-                <Row style={{marginBottom: '10px'}}>
-                    <Col span={24}>
+                {/* 快速笔记和今日日记按钮 */}
+                <Row gutter={8} style={{marginBottom: '10px'}}>
+                    <Col span={12}>
                         <Button
                             type="primary"
                             icon={<ThunderboltOutlined />}
@@ -162,6 +178,24 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                             }}
                         >
                             快速笔记
+                        </Button>
+                    </Col>
+                    <Col span={12}>
+                        <Button
+                            type="default"
+                            icon={<CalendarOutlined />}
+                            onClick={openTodayJournal}
+                            block
+                            style={{
+                                height: '40px',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                borderRadius: '8px',
+                                borderColor: 'var(--primary, #25b864)',
+                                color: 'var(--primary, #25b864)',
+                            }}
+                        >
+                            今日日记
                         </Button>
                     </Col>
                 </Row>

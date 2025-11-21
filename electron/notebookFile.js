@@ -3,7 +3,7 @@ const {ipcMain} = require("electron");
 const {getCurSettingConfig} = require("./settingFile");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
-const indexManager = require("./indexManager");
+const dbManager = require("./dbManager");
 
 /**
  * 获取当前notebook完整path
@@ -30,6 +30,92 @@ const getCurNotebookSuffix = () => {
  * 当前cwjson文件列表缓存
  */
 let cwjsonFileMap = {};
+
+/**
+ * 从 Tiptap JSON 内容中提取标签
+ */
+const extractTags = (contentObj) => {
+    const tags = new Set();
+    const traverse = (node) => {
+        if (node.type === 'tag' && node.attrs && node.attrs.tag) {
+            tags.add(node.attrs.tag);
+        }
+        if (node.content && Array.isArray(node.content)) {
+            node.content.forEach(traverse);
+        }
+    };
+    if (contentObj.content) {
+        traverse(contentObj);
+    }
+    return Array.from(tags);
+};
+
+/**
+ * 从 Tiptap JSON 内容中提取内部链接
+ */
+const extractLinks = (contentObj) => {
+    const links = new Set();
+    const traverse = (node) => {
+        if (node.type === 'internalLink' && node.attrs && node.attrs.target) {
+            links.add(node.attrs.target);
+        }
+        if (node.content && Array.isArray(node.content)) {
+            node.content.forEach(traverse);
+        }
+    };
+    if (contentObj.content) {
+        traverse(contentObj);
+    }
+    return Array.from(links);
+};
+
+/**
+ * 从 Tiptap JSON 内容中提取标题（第一个 heading 或段落的文本）
+ */
+const extractTitle = (contentObj) => {
+    let title = '';
+    const traverse = (node) => {
+        if (title) return; // Already found title
+
+        if (node.type === 'heading' && node.content) {
+            title = node.content.map(n => n.text || '').join('');
+            return;
+        }
+        if (node.type === 'paragraph' && node.content && !title) {
+            const text = node.content.map(n => n.text || '').join('');
+            if (text.trim()) {
+                title = text.substring(0, 100); // Limit to 100 chars
+                return;
+            }
+        }
+        if (node.content && Array.isArray(node.content)) {
+            node.content.forEach(traverse);
+        }
+    };
+    if (contentObj.content) {
+        traverse(contentObj);
+    }
+    return title || '未命名笔记';
+};
+
+/**
+ * 从 Tiptap JSON 内容中提取纯文本（用于全文搜索）
+ */
+const extractText = (contentObj) => {
+    const texts = [];
+    const traverse = (node) => {
+        if (node.text) {
+            texts.push(node.text);
+        }
+        if (node.content && Array.isArray(node.content)) {
+            node.content.forEach(traverse);
+        }
+    };
+    if (contentObj.content) {
+        traverse(contentObj);
+    }
+    return texts.join(' ');
+};
 
 /**
  * 文件初始化
@@ -125,12 +211,33 @@ exports.init = () => {
         }
         fs.writeFileSync(fileFullPath, content)
 
-        // 更新标签和链接索引
+        // 更新数据库索引
         try {
             const contentObj = JSON.parse(content);
-            indexManager.updateNoteIndex(fileFullPath, contentObj);
+            const noteId = path.basename(fileFullPath, curNotebookSuffix);
+            const tags = extractTags(contentObj);
+            const links = extractLinks(contentObj);
+            const title = extractTitle(contentObj);
+            const contentText = extractText(contentObj);
+
+            // 检查是否是日记（路径包含 journals/）
+            const isJournal = fileFullPath.includes('/journals/') || fileFullPath.includes('\\journals\\');
+            const journalDate = isJournal ? noteId : null;
+
+            console.log(`[NotebookFile] 保存笔记到数据库: id=${noteId}, isJournal=${isJournal}, journalDate=${journalDate}, path=${fileFullPath}`);
+
+            dbManager.saveNote({
+                id: noteId,
+                title: title,
+                path: fileFullPath,
+                contentText: contentText,
+                tags: tags,
+                outgoingLinks: links,
+                isJournal: isJournal,
+                journalDate: journalDate,
+            });
         } catch (error) {
-            console.error('[NotebookFile] 更新索引失败:', error);
+            console.error('[NotebookFile] 更新数据库索引失败:', error);
         }
     });
     ipcMain.handle('renameNotebookFile', (event, oldPath, newPath) => {
@@ -152,8 +259,9 @@ exports.init = () => {
         if (fs.existsSync(fileFullPath)) {
             fs.rmSync(fileFullPath);
 
-            // 删除索引
-            indexManager.deleteNoteIndex(fileFullPath);
+            // 从数据库删除
+            const noteId = path.basename(fileFullPath, curNotebookSuffix);
+            dbManager.deleteNote(noteId);
 
             return true;
         } else {

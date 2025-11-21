@@ -132,11 +132,83 @@ const mockAPI = {
         console.warn('[Mock Mode] noteExists called', noteId);
         return false;
     },
-    rebuildIndex: async () => {
-        console.warn('[Mock Mode] rebuildIndex called');
-        return true;
+    getAllNotes: async () => {
+        console.warn('[Mock Mode] getAllNotes called');
+        return [
+            {
+                id: 'demo-note-1',
+                title: '示例笔记1',
+                path: '/mock/notebook/示例1.cwjson',
+                updatedAt: new Date().toISOString(),
+            },
+            {
+                id: 'demo-note-2',
+                title: '示例笔记2',
+                path: '/mock/notebook/示例2.cwjson',
+                updatedAt: new Date().toISOString(),
+            }
+        ];
     },
-};
+    getNoteTags: async (noteId) => {
+        console.warn('[Mock Mode] getNoteTags called', noteId);
+        return ['工作', '学习'];
+    },
+    getTodayJournal: async () => {
+        console.warn('[Mock Mode] getTodayJournal called');
+        const today = new Date().toISOString().split('T')[0];
+        return `journals/${today}`;
+    },
+    createJournal: async (date) => {
+        console.warn('[Mock Mode] createJournal called', date);
+        return `journals/${date || new Date().toISOString().split('T')[0]}`;
+    },
+    getJournals: async (limit, offset) => {
+        console.warn('[Mock Mode] getJournals called', limit, offset);
+        return [
+            {
+                id: '2025-11-21',
+                title: '2025年11月21日 星期四',
+                path: '/mock/notebook/journals/2025-11-21.cwjson',
+                journalDate: '2025-11-21',
+                updatedAt: new Date().toISOString(),
+            },
+            {
+                id: '2025-11-20',
+                title: '2025年11月20日 星期三',
+                path: '/mock/notebook/journals/2025-11-20.cwjson',
+                journalDate: '2025-11-20',
+                updatedAt: new Date().toISOString(),
+            }
+        ];
+    },
+    journalExists: async (date) => {
+        console.warn('[Mock Mode] journalExists called', date);
+        return false;
+    },
+    getJournalCount: async () => {
+        console.warn('[Mock Mode] getJournalCount called');
+        return 10;
+    },
+    getRecentNotes: async (limit, offset) => {
+        console.warn('[Mock Mode] getRecentNotes called', limit, offset);
+        return [
+            {
+                id: 'mock-note-1',
+                title: '示例文章 1',
+                path: '/mock/notebook/example1.cwjson',
+                tags: ['tag1', 'tag2'],
+                updatedAt: new Date().toISOString(),
+            },
+            {
+                id: 'mock-note-2',
+                title: '示例文章 2',
+                path: '/mock/notebook/example2.cwjson',
+                tags: ['tag3'],
+                updatedAt: new Date(Date.now() - 86400000).toISOString(),
+            }
+        ];
+    },
+}
 
 // 导出 API（优先使用真实 API，否则使用 mock）
 export const electronAPI = isElectron ? window.electronAPI : mockAPI;

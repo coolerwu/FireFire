@@ -6,9 +6,11 @@ import moment from "moment";
 import './index.less';
 import 'tippy.js/dist/tippy.css';
 import ReactDOM from "react-dom";
-import {FileSearchOutlined, SettingOutlined} from "@ant-design/icons";
+import {SettingOutlined, CalendarOutlined, ClockCircleOutlined, FolderOutlined} from "@ant-design/icons";
 import File from "./pages/file/file";
 import Setting from "./pages/setting";
+import JournalView from "./pages/journal/JournalView";
+import TimelineView from "./pages/timeline/TimelineView";
 import buildThemeStyleFunc from "./utils/theme";
 import {electronAPI} from "./utils/electronAPI";
 
@@ -23,13 +25,23 @@ moment.locale('zh-cn');
 export const Context = createContext(null);
 
 /**
- * 菜单
+ * 菜单 - 按新顺序：日记、时间线、文件夹、设置
  */
 const menuItemList = [
     {
-        label: '文章',
-        key: 'file',
-        icon: <FileSearchOutlined/>,
+        label: '日记',
+        key: 'journal',
+        icon: <CalendarOutlined/>,
+    },
+    {
+        label: '时间线',
+        key: 'timeline',
+        icon: <ClockCircleOutlined/>,
+    },
+    {
+        label: '文件夹',
+        key: 'folder',
+        icon: <FolderOutlined/>,
     },
     {
         label: '设置',
@@ -76,8 +88,8 @@ const App = () => {
         })
     }, [curDir, loading]);
 
-    //切换tab事件
-    const [activeKey, setActiveKey] = useState('file');
+    //切换tab事件 - 默认显示日记
+    const [activeKey, setActiveKey] = useState('journal');
     const changeActiveKeyEvent = (value) => {
         setActiveKey(value.key);
     }
@@ -103,8 +115,22 @@ const App = () => {
                             />
                         </div>
                         <div className="main-content">
-                            {!loading && activeKey === 'file' && <File cwjsonList={cwjsonList}/>}
-                            {!loading && activeKey === 'setting' && <Setting/>}
+                            {!loading && (
+                                <>
+                                    <div style={{ display: activeKey === 'journal' ? 'block' : 'none', height: '100%' }}>
+                                        <JournalView/>
+                                    </div>
+                                    <div style={{ display: activeKey === 'timeline' ? 'block' : 'none', height: '100%' }}>
+                                        <TimelineView/>
+                                    </div>
+                                    <div style={{ display: activeKey === 'folder' ? 'block' : 'none', height: '100%' }}>
+                                        <File cwjsonList={cwjsonList}/>
+                                    </div>
+                                    <div style={{ display: activeKey === 'setting' ? 'block' : 'none', height: '100%' }}>
+                                        <Setting/>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </Context.Provider>
                 </ConfigProvider>

@@ -46,11 +46,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('update-status', subscription);
         return () => ipcRenderer.removeListener('update-status', subscription);
     },
-    //tag and link index functions
+    //database functions (tags, links, search)
     getAllTags: () => ipcRenderer.invoke('get-all-tags'),
     getNotesByTag: (tag) => ipcRenderer.invoke('get-notes-by-tag', tag),
     getBacklinks: (noteId) => ipcRenderer.invoke('get-backlinks', noteId),
     searchNotes: (query) => ipcRenderer.invoke('search-notes', query),
     noteExists: (noteId) => ipcRenderer.invoke('note-exists', noteId),
-    rebuildIndex: () => ipcRenderer.invoke('rebuild-index'),
+    getAllNotes: () => ipcRenderer.invoke('get-all-notes'),
+    getNoteTags: (noteId) => ipcRenderer.invoke('get-note-tags', noteId),
+    //journal functions
+    getTodayJournal: () => ipcRenderer.invoke('get-today-journal'),
+    createJournal: (date) => ipcRenderer.invoke('create-journal', date),
+    getJournals: (limit, offset) => ipcRenderer.invoke('get-journals', limit, offset),
+    journalExists: (date) => ipcRenderer.invoke('journal-exists', date),
+    getJournalCount: () => ipcRenderer.invoke('get-journal-count'),
+    //timeline functions
+    getRecentNotes: (limit, offset) => ipcRenderer.invoke('get-recent-notes', limit, offset),
 })

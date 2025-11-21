@@ -43,8 +43,8 @@ const afterCreated = () => {
 
     // 延迟3秒后检查更新（避免阻塞启动）
     setTimeout(() => {
-        const {readSettingFile} = require('./electron/settingFile');
-        const settings = readSettingFile();
+        const {getCurSettingConfig} = require('./electron/settingFile');
+        const settings = getCurSettingConfig();
 
         // 默认开启自动更新检查
         if (settings.autoUpdate !== false) {

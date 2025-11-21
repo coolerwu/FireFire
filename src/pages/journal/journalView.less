@@ -1,0 +1,116 @@
+.journal-view {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg, #ffffff);
+
+  .journal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border, #e5e5e5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    background: var(--card-bg, #ffffff);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    .journal-title {
+      display: flex;
+      align-items: center;
+      color: var(--primary, #25b864);
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+    }
+
+    .journal-nav {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .journal-timeline {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px;
+    background: var(--bg-secondary, #f9fafb);
+
+    // 自定义滚动条
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--bg-secondary, #f5f5f5);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border, #d9d9d9);
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--border-hover, #bfbfbf);
+      }
+    }
+
+    .journal-wrapper {
+      margin-bottom: 48px;
+
+      &:last-child {
+        margin-bottom: 24px;
+      }
+    }
+
+    .load-more-trigger {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 0;
+      min-height: 100px;
+
+      .loading-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: var(--text-secondary, #666);
+      }
+    }
+
+    .no-more {
+      text-align: center;
+      padding: 24px 0;
+      color: var(--text-secondary, #999);
+      font-size: 14px;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px;
+      color: var(--text-secondary, #999);
+
+      p {
+        margin: 16px 0 24px;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+// 暗黑模式支持
+@media (prefers-color-scheme: dark) {
+  .journal-view {
+    --bg: #1a1a1a;
+    --bg-secondary: #252525;
+    --card-bg: #2a2a2a;
+    --border: #3a3a3a;
+    --border-hover: #4a4a4a;
+    --text-secondary: #aaa;
+  }
+}

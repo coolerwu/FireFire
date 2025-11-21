@@ -1,127 +1,258 @@
 # FireFire
-* 一款知识构建的本地笔记软件，支持Windows、Mac、Linux
-* 朝着所见即所得方向发展，采用极简主义设计理念
-* 基于 Tiptap 编辑器，提供现代化的笔记体验
-* 欢迎提出宝贵意见
 
-# 现已支持
+[English](#english) | [中文](#中文)
 
-## 编辑器功能
-* **斜杠命令（Slash Commands）** - 输入 `/` 快速插入内容块
-  * 支持标题（H1、H2、H3）
-  * 支持列表（有序列表、无序列表、待办事项）
-  * 支持代码块、引用、分隔线
-  * 支持嵌入内容（BiliBili、YouTube、PDF、网页预览）
-  * 支持搜索过滤和键盘导航
-* **拖拽排序** - 可视化拖拽调整内容块顺序
-* **块级操作菜单** - 删除、复制、移动、转换内容块
-* **标签系统** - 使用 `#标签名` 组织笔记
-  * 自动提取和索引标签
-  * 标签筛选查看相关笔记
-  * 支持中英文标签
-* **内部链接** - 使用 `[[笔记名称]]` 连接笔记
-  * 自动补全笔记名称
-  * 链接验证（存在/不存在）
-  * 反向链接支持
+---
 
-## 基础功能
-* 支持Windows、Mac、Linux三大平台
-* 支持本地文件读写、创建文件、删除文件、重命名文件、文件名搜索
-* 支持文件夹嵌套管理
-* 支持自动保存（可自定义保存间隔）
-* **快速笔记** - 一键创建笔记，无需选择文件夹
+## English
 
-## Markdown 支持
-* 支持 Markdown 基本语法
-  * 图片的复制、图片拖动任意位置、截图粘贴
-  * 代码块语法高亮（基于 lowlight）
-  * 特殊语法自动转换
-    * `->`: `→`
-    * `>>`: `»`
-    * `--`: `—`
-    * `1/2`: `½`
-    * `!=`: `≠`
-  * BiliBili 视频链接嵌入
-  * 字体颜色、下划线、高亮
-  * 链接地址跳转（支持自动识别）
-  * 字体对齐（居中、居左、居右）
+### Overview
 
-## UI/UX
-* 极简主义设计风格
-  * 中性色调配色方案（灰度 + 品牌绿色 #25b864）
-  * 流畅的动画过渡
-  * 优化的性能表现
-* 暗黑模式支持
-* 自定义颜色主题选择
-* 用户自定义设置功能
-* **自动更新功能** - 自动检测并安装新版本
+FireFire is a local-first knowledge management and note-taking application built with Electron. It features a modern WYSIWYG editor powered by Tiptap, with a minimalist design philosophy.
 
-# 自动更新
+**Platforms**: Windows, macOS, Linux
 
-FireFire 支持自动检测和安装更新，确保您始终使用最新版本。
+### Key Features
 
-## 使用方法
-1. **自动检查**：应用启动 3 秒后自动检查更新（可在设置中关闭）
-2. **手动检查**：在"设置 > 软件更新"中点击"检查更新"按钮
-3. **更新流程**：
-   - 检测到新版本时弹出提示
-   - 点击"立即更新"开始下载
-   - 下载完成后提示重启安装
-   - 重启后自动完成更新
+#### 📝 Modern Editor
+- **Slash Commands** - Type `/` to insert content blocks (headings, lists, code blocks, embeds)
+- **Drag & Drop** - Visually reorder content blocks
+- **Block Menu** - Delete, duplicate, move, or convert blocks
+- **Rich Text Editing** - Colors, highlights, underlines, alignment
+- **Syntax Highlighting** - Powered by lowlight
 
-## 配置选项
-- **自动检查更新**：默认开启，可在设置页面关闭
-- **更新源**：使用 GitHub Releases（国内用户如遇下载慢可手动下载）
+#### 🔗 Knowledge Management
+- **Tags System** - Use `#tag` to organize notes
+  - Auto-extraction and indexing
+  - Filter by tags
+  - Chinese and English support
+- **Internal Links** - Use `[[note name]]` to link notes
+  - Auto-completion
+  - Link validation
+  - Backlinks support
+- **Daily Journal** - Logseq-style daily notes with infinite scroll
+- **Timeline View** - Browse all notes by edit time
 
-## 发布说明
-查看最新版本和更新日志：[GitHub Releases](https://github.com/coolerwu/FireFire/releases)
+#### 📁 File Management
+- Nested folder structure
+- File search
+- Quick note creation
+- Auto-save (customizable interval)
 
-# 预计支持
+#### 🎨 User Interface
+- **Minimalist Design** - Clean, distraction-free interface
+- **Dark Mode** - Automatic or manual theme switching
+- **Custom Themes** - Customize colors to your preference
+- **Smooth Animations** - Optimized performance
 
-## 未来计划
-* 导入导出Markdown/HTML文件
-* 标签功能
-* 标签功能Graph
-* 支持webdav功能
-* 支持复制Markdown内容，直接可视化展示
-* 接入ChatGPT
+#### 🔄 Auto-Update
+- Automatic update detection (can be disabled)
+- Download and install with one click
+- Update notifications
 
-# 界面
+### Planned Features
 
-## 主界面
-![fileList.png](readme/fileList1.png)
+- [ ] Import/Export Markdown and HTML
+- [ ] Graph view for tags and links
+- [ ] WebDAV sync support
+- [ ] ChatGPT integration
 
-## 设置页面
-![setting.png](readme/setting.png)
+### Screenshots
 
+#### Main Interface
+![File List](readme/fileList1.png)
 
-# 更新日志
-| 概要                               | 时间         |
-|----------------------------------|------------|
-| 实现快速笔记功能                       | 2025-11-21 |
-| 实现内部链接系统（Wiki 风格）           | 2025-11-21 |
-| 实现标签系统                          | 2025-11-21 |
-| 修复 sidebar 布局问题                 | 2025-11-21 |
-| 添加自动更新功能                       | 2025-11-21 |
-| 实现嵌入式内容和完成所有 Notion 风格功能    | 2025-11-21 |
-| 实现拖拽排序和块级操作菜单               | 2025-11-21 |
-| 实现斜杠命令功能（Notion 风格）           | 2025-11-21 |
-| 重构 UI 为极简主义风格                  | 2025-11-21 |
-| 升级 GitHub Actions 到 v4 版本        | 2025-11-21 |
-| 支持字体居中、居左、居右，修复当前路径BUG、支持截图粘贴 | 2023-04-09 |
-| 支持保存文件位置、调整页面样式、支持暗黑模式、自动保存、升级版本 | 2023-04-08 |
-| 支持文件夹格式                          | 2023-03-27 |
-| 优化win、mac安装包体积                   | 2022-08-25 |
-| 支持暗黑模式                           | 2022-08-23 |
-| 支持Linux                          | 2022-08-22 |
-| 支持字体颜色                           | 2022-08-22 |
-| 支持链接地址跳转                         | 2022-08-22 |
-| 支持文件搜索                           | 2022-08-20 |
-| 支持BiliBili视频链接                   | 2022-08-19 |
-| 支持代码块语法高亮                        | 2022-08-18 |
-| 支持图片拖动任意位置                       | 2022-08-18 |
-| 支持图片的复制                          | 2022-08-16 |
-| 支持删除文件、重命名文件                     | 2022-08-16 |
-| 支持Windows、Mac                    | 2022-08-16 |
-| 支持本地文件操作                         | 2022-08-15 |
-| 支持Markdown基本语法                   | 2022-08-07 |
+#### Settings
+![Settings](readme/setting.png)
+
+### Installation
+
+Download the latest release for your platform:
+- **Windows**: `.exe` installer
+- **macOS**: `.dmg` package
+- **Linux**: `.deb` package
+
+[Download from GitHub Releases](https://github.com/coolerwu/FireFire/releases)
+
+### Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start React dev server
+npm start
+
+# Start Electron in dev mode
+npm run estart-dev
+
+# Build for production
+npm run build
+npm run estart
+
+# Package for distribution
+npm run package-mac     # macOS
+npm run package-win     # Windows
+npm run package-linux   # Linux
+```
+
+### Tech Stack
+
+- **Frontend**: React 17, Ant Design 5
+- **Editor**: Tiptap 2 (ProseMirror)
+- **Desktop**: Electron 20
+- **Database**: SQLite (better-sqlite3) with FTS5
+- **Styling**: Less, CSS-in-JS
+
+### License
+
+MIT
+
+### Contributing
+
+Issues and pull requests are welcome!
+
+---
+
+## 中文
+
+### 简介
+
+FireFire 是一款本地优先的知识管理和笔记应用，基于 Electron 构建。它采用 Tiptap 编辑器，提供现代化的所见即所得体验，遵循极简主义设计理念。
+
+**支持平台**: Windows、macOS、Linux
+
+### 核心功能
+
+#### 📝 现代化编辑器
+- **斜杠命令** - 输入 `/` 快速插入内容块（标题、列表、代码、嵌入内容）
+- **拖拽排序** - 可视化拖拽调整内容块顺序
+- **块级菜单** - 删除、复制、移动、转换内容块
+- **富文本编辑** - 颜色、高亮、下划线、对齐
+- **语法高亮** - 基于 lowlight 的代码高亮
+
+#### 🔗 知识管理
+- **标签系统** - 使用 `#标签` 组织笔记
+  - 自动提取和索引
+  - 标签筛选
+  - 支持中英文
+- **内部链接** - 使用 `[[笔记名称]]` 连接笔记
+  - 自动补全
+  - 链接验证
+  - 反向链接支持
+- **每日日记** - Logseq 风格的日记视图，支持无限滚动
+- **时间线视图** - 按编辑时间浏览所有文章
+
+#### 📁 文件管理
+- 支持文件夹嵌套
+- 文件搜索
+- 快速创建笔记
+- 自动保存（可自定义间隔）
+
+#### 🎨 用户界面
+- **极简设计** - 清爽、专注的界面
+- **暗黑模式** - 自动或手动切换主题
+- **自定义主题** - 个性化配色方案
+- **流畅动画** - 优化的性能表现
+
+#### 🔄 自动更新
+- 自动检测更新（可关闭）
+- 一键下载安装
+- 更新通知
+
+### 计划功能
+
+- [ ] 导入/导出 Markdown 和 HTML
+- [ ] 标签和链接的关系图谱
+- [ ] WebDAV 同步支持
+- [ ] ChatGPT 集成
+
+### 截图
+
+#### 主界面
+![文件列表](readme/fileList1.png)
+
+#### 设置页面
+![设置](readme/setting.png)
+
+### 安装
+
+下载适合你平台的最新版本：
+- **Windows**: `.exe` 安装包
+- **macOS**: `.dmg` 安装包
+- **Linux**: `.deb` 安装包
+
+[从 GitHub Releases 下载](https://github.com/coolerwu/FireFire/releases)
+
+### 开发
+
+```bash
+# 安装依赖
+npm install
+
+# 启动 React 开发服务器
+npm start
+
+# 启动 Electron 开发模式
+npm run estart-dev
+
+# 生产环境构建
+npm run build
+npm run estart
+
+# 打包分发
+npm run package-mac     # macOS
+npm run package-win     # Windows
+npm run package-linux   # Linux
+```
+
+### 技术栈
+
+- **前端**: React 17, Ant Design 5
+- **编辑器**: Tiptap 2 (ProseMirror)
+- **桌面**: Electron 20
+- **数据库**: SQLite (better-sqlite3) with FTS5
+- **样式**: Less, CSS-in-JS
+
+### 协议
+
+MIT
+
+### 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+---
+
+## Changelog
+
+| Date | Changes |
+|------|---------|
+| 2025-11-21 | Added daily journal feature (Logseq-style) |
+| 2025-11-21 | Added timeline view for browsing notes by edit time |
+| 2025-11-21 | Added SQLite database with FTS5 full-text search |
+| 2025-11-21 | Implemented quick note creation |
+| 2025-11-21 | Implemented internal links system (Wiki-style) |
+| 2025-11-21 | Implemented tags system |
+| 2025-11-21 | Fixed sidebar layout issues |
+| 2025-11-21 | Added auto-update feature |
+| 2025-11-21 | Implemented embeds and all Notion-style features |
+| 2025-11-21 | Implemented drag & drop and block menu |
+| 2025-11-21 | Implemented slash commands (Notion-style) |
+| 2025-11-21 | Redesigned UI with minimalist style |
+| 2025-11-21 | Upgraded GitHub Actions to v4 |
+| 2023-04-09 | Added text alignment and screenshot paste |
+| 2023-04-08 | Added save location, dark mode, auto-save |
+| 2023-03-27 | Added folder support |
+| 2022-08-25 | Optimized package size for Windows and macOS |
+| 2022-08-23 | Added dark mode |
+| 2022-08-22 | Added Linux support |
+| 2022-08-22 | Added font colors |
+| 2022-08-22 | Added link navigation |
+| 2022-08-20 | Added file search |
+| 2022-08-19 | Added BiliBili video embeds |
+| 2022-08-18 | Added syntax highlighting |
+| 2022-08-18 | Added image drag & drop |
+| 2022-08-16 | Added image paste |
+| 2022-08-16 | Added file deletion and renaming |
+| 2022-08-16 | Initial release for Windows and macOS |
