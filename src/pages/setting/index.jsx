@@ -2,8 +2,9 @@ import React, {useContext, useState} from "react";
 import {Menu, message} from "antd";
 // import './index.less';
 import {Context} from "../../index";
-import {AppstoreOutlined} from "@ant-design/icons";
+import {AppstoreOutlined, FolderOutlined} from "@ant-design/icons";
 import BaseSetting from "./base.jsx";
+import WorkspaceSetting from "./workspace.jsx";
 import {electronAPI} from "../../utils/electronAPI";
 
 const menuItemList = [
@@ -11,6 +12,11 @@ const menuItemList = [
         label: '基本设置',
         key: 'base',
         icon: <AppstoreOutlined/>,
+    },
+    {
+        label: '工作空间',
+        key: 'workspace',
+        icon: <FolderOutlined/>,
     },
     // {
     //     label: (
@@ -48,6 +54,7 @@ const Setting = () => {
             <Menu mode="horizontal" onClick={e => setMenuSelectedKey(e.key)} selectedKeys={[menuSelectedKey]}
                   items={menuItemList}/>
             {menuSelectedKey === 'base' && <BaseSetting/>}
+            {menuSelectedKey === 'workspace' && <WorkspaceSetting/>}
         </Context.Provider>
     );
 };

@@ -61,7 +61,10 @@ const JournalCard = ({ journal, chooseCwjsonCallback, theme }) => {
             onClick={() => {
                 chooseCwjsonCallback({
                     id: journal.id,
+                    filename: `journals/${journal.id}`,
                     type: 'file',
+                    notebookPath: journal.path,
+                    attachmentPath: journal.path ? journal.path.replace(/\.(cwjson|md)$/, '').replace(/notebook/, 'attachment') : '',
                 });
             }}
         >
@@ -101,7 +104,10 @@ const JournalCard = ({ journal, chooseCwjsonCallback, theme }) => {
                             e.stopPropagation();
                             chooseCwjsonCallback({
                                 id: journal.id,
+                                filename: `journals/${journal.id}`,
                                 type: 'file',
+                                notebookPath: journal.path,
+                                attachmentPath: journal.path ? journal.path.replace(/\.(cwjson|md)$/, '').replace(/notebook/, 'attachment') : '',
                             });
                         }}
                     >

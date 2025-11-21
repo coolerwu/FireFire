@@ -17,7 +17,7 @@ import Underline from '@tiptap/extension-underline';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import Placeholder from '@tiptap/extension-placeholder';
-import {SlashCommand} from './slashCommand';
+// import {SlashCommand} from './slashCommand'; // 临时禁用以避免 Suggestion 插件冲突
 import {DragAndDrop} from './dragAndDrop';
 import {YouTubeEmbed} from './youtubeEmbed';
 import {PDFEmbed} from './pdfEmbed';
@@ -63,7 +63,7 @@ const plugins = [
         placeholder: '输入 / 查看所有命令...',
         emptyEditorClass: 'is-editor-empty',
     }),
-    SlashCommand,
+    // SlashCommand, // 临时禁用以避免 Suggestion 插件冲突
     DragAndDrop,
     YouTubeEmbed,
     PDFEmbed,

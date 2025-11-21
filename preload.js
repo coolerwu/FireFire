@@ -62,4 +62,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getJournalCount: () => ipcRenderer.invoke('get-journal-count'),
     //timeline functions
     getRecentNotes: (limit, offset) => ipcRenderer.invoke('get-recent-notes', limit, offset),
+    //workspace functions
+    getCurrentWorkspace: () => ipcRenderer.invoke('get-current-workspace'),
+    changeWorkspace: () => ipcRenderer.invoke('change-workspace'),
+    openWorkspaceFolder: () => ipcRenderer.invoke('open-workspace-folder'),
+    restartApp: () => ipcRenderer.invoke('restart-app'),
 })

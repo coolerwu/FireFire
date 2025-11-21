@@ -208,6 +208,21 @@ const mockAPI = {
             }
         ];
     },
+    getCurrentWorkspace: async () => {
+        console.warn('[Mock Mode] getCurrentWorkspace called');
+        return '/mock/workspace';
+    },
+    changeWorkspace: async () => {
+        console.warn('[Mock Mode] changeWorkspace called - not available in browser');
+        return { success: false, error: '浏览器模式不支持更改工作空间' };
+    },
+    openWorkspaceFolder: async () => {
+        console.warn('[Mock Mode] openWorkspaceFolder called - not available in browser');
+        return { success: false, error: '浏览器模式不支持打开文件夹' };
+    },
+    restartApp: async () => {
+        console.warn('[Mock Mode] restartApp called - not available in browser');
+    },
 }
 
 // 导出 API（优先使用真实 API，否则使用 mock）
