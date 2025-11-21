@@ -75,8 +75,11 @@
     "all": "npm run build && npm run estart",
     "estart-dev": "electron . dev",
     "postinstall": "node scripts/postinstall.js",
+    "rebuild": "npx @electron/rebuild",
     "rebuild-native": "electron-rebuild -f -w better-sqlite3",
-    "package-mac": "electron-builder --mac --x64 --publish=never",
+    "package-mac": "electron-builder --mac --publish=never",
+    "package-mac-arm64": "electron-builder --mac --arm64 --publish=never",
+    "package-mac-x64": "electron-builder --mac --x64 --publish=never",
     "package-win": "electron-builder --win --x64 --publish=never",
     "package-linux": "electron-builder --linux --x64 --publish=never",
     "publish-mac": "electron-builder --mac --x64 --publish=always",
@@ -105,8 +108,8 @@
       "main": "main.js"
     },
     "asarUnpack": [],
-    "npmRebuild": false,
-    "buildDependenciesFromSource": false,
+    "npmRebuild": true,
+    "buildDependenciesFromSource": true,
     "publish": {
       "provider": "github",
       "owner": "coolerwu",
