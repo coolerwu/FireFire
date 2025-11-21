@@ -18,6 +18,7 @@ import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import Placeholder from '@tiptap/extension-placeholder';
 import {SlashCommand} from './slashCommand';
+import {DragAndDrop} from './dragAndDrop';
 
 const plugins = [
     StarterKit, CharacterCount,
@@ -58,6 +59,7 @@ const plugins = [
         emptyEditorClass: 'is-editor-empty',
     }),
     SlashCommand,
+    DragAndDrop,
 ];
 
 export default plugins;

@@ -228,6 +228,88 @@
   }
 }
 
+/* 拖拽手柄样式 */
+.drag-handle-wrapper {
+  position: absolute;
+  left: -32px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  user-select: none;
+}
+
+.drag-handle {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: var(--gray-400, #a3a3a3);
+  border-radius: var(--radius-sm, 4px);
+
+  &:hover {
+    opacity: 1 !important;
+    color: var(--gray-600, #525252);
+    background: var(--gray-100, #f5f5f5);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &.visible {
+    opacity: 0.4;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+  }
+}
+
+/* 悬停时显示拖拽手柄 */
+.ProseMirror > * {
+  position: relative;
+
+  &:hover .drag-handle {
+    opacity: 0.6;
+  }
+}
+
+/* 拖拽时的样式 */
+.drag-handle-wrapper.is-dragging {
+  opacity: 0.4;
+}
+
+/* 拖拽指示器（蓝色线条） */
+.drop-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary, #25b864);
+  pointer-events: none;
+  z-index: 100;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary, #25b864);
+  }
+}
+
 .bubble-menu {
   display: flex;
   background-color: var(--gray-900);
