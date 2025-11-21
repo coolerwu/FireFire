@@ -13,11 +13,12 @@ const settingJsonName = 'setting.json';
 const settingFullPath = path.join(confPath, settingJsonName);
 /**
  * 默认setting文件配置
+ * NOTE: FireFire now uses Markdown (.md) format for all notes
  */
 const defaultSettingConfig = {
     notebookPath: path.join(confPath, 'notebook'),
     attachmentPath: path.join(confPath, 'attachment'),
-    notebookSuffix: '.cwjson',
+    notebookSuffix: '.md',  // Changed from .cwjson to .md
     themeSource: 'system',
     autoSave: 10,
 };

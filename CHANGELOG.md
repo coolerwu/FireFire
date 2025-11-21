@@ -2,6 +2,99 @@
 
 All notable changes to FireFire will be documented in this file.
 
+## [0.4.1] - 2025-11-21
+
+### 🎉 Major Changes
+
+#### Markdown 格式迁移
+- **完全迁移到 Markdown**: 从 .cwjson 格式迁移到标准 .md 格式
+- **Obsidian 兼容**: 笔记可在 Obsidian、VS Code 等编辑器中打开和编辑
+- **YAML Frontmatter**: 支持标准 Markdown frontmatter 存储元数据
+- **Wiki 链接**: 支持 `[[链接]]` 语法（Obsidian 风格）
+- **Hashtag 支持**: 保留 `#标签` 在 Markdown 内容中
+
+### ✨ Features
+
+#### Markdown 转换器
+- **双向转换**: Tiptap JSON ↔ Markdown 完整转换
+- **使用 marked.js**: 完整的 Markdown 解析支持
+- **格式支持**: Bold, Italic, Links, Code, Tables, Lists, Blockquotes, etc.
+- **自定义节点**: BiliBili/YouTube/PDF 嵌入保存为 HTML
+- **完整测试**: 包含测试文件验证转换正确性
+
+#### 文件存储
+- **默认 .md 格式**: 所有新笔记保存为 .md 文件
+- **Frontmatter 元数据**: title, created, updated, tags
+- **错误处理**: 完善的错误处理和日志
+- **自动目录创建**: 保存时自动创建必要的目录
+
+#### 数据库集成
+- **无缝集成**: SQLite FTS5 继续支持全文搜索
+- **标签提取**: 从 Markdown 内容提取标签
+- **链接提取**: 提取内部链接建立关联
+
+### 🔧 Technical Improvements
+
+#### 依赖更新
+- **新增 marked**: 成熟的 Markdown 解析器
+- **新增 gray-matter**: YAML frontmatter 解析
+- **新增 prebuild-install**: 优化原生模块安装
+
+#### CI/CD 优化
+- **修复 Windows 构建**: 解决原生模块编译问题
+- **智能 postinstall**: 平台特定的原生模块处理
+- **预编译二进制**: 优先使用预编译版本，加快安装
+
+#### 代码改进
+- **markdownConverter.js**: 595 行完整的转换器实现
+- **notebookFile.js**: 重写文件读写逻辑
+- **settingFile.js**: 更新默认设置为 .md
+
+### 📝 Documentation
+
+- **OpenSpec 提案**: 完整的迁移方案文档
+- **CI/CD 修复指南**: Windows 构建问题解决方案
+- **实施状态报告**: 详细的任务完成状态
+
+### 🔨 Breaking Changes
+
+- **移除 .cwjson 支持**: 不再读取 .cwjson 格式文件
+- **手动迁移**: 用户需要手动转换现有 .cwjson 文件
+- **默认格式**: 新笔记全部使用 .md 格式
+
+### 📦 Dependencies
+
+#### Added
+- `marked@^15.0.6`: Markdown 解析器
+- `gray-matter@^4.0.3`: YAML frontmatter 解析
+- `prebuild-install@^7.1.2`: 原生模块预编译安装
+
+### 🚀 Migration Guide
+
+#### 新用户
+直接使用即可，所有笔记将保存为标准 Markdown 格式。
+
+#### 现有用户
+需要手动将 .cwjson 文件转换为 .md 格式。转换方法：
+1. 在 FireFire 中打开 .cwjson 笔记
+2. 复制内容
+3. 创建新的 .md 笔记
+4. 粘贴内容并保存
+
+#### 验证
+- 检查 `~/.firefire/notebook/` 目录下的 .md 文件
+- 在 VS Code 或 Obsidian 中打开验证格式
+- 测试编辑器所有功能是否正常
+
+### 🎯 What's Next (v0.5.0)
+
+- 批量迁移工具（.cwjson → .md）
+- 更多 Markdown 扩展语法支持
+- 性能优化和测试
+- 用户文档完善
+
+---
+
 ## [0.4.0] - 2025-11-21
 
 ### 🎉 Major Features

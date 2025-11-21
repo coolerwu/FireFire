@@ -4,6 +4,7 @@ const {getCurSettingConfig} = require("./settingFile");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const dbManager = require("./dbManager");
+const { tiptapToMarkdown, markdownToTiptap, extractMetadata } = require("./markdownConverter");
 
 /**
  * 获取当前notebook完整path
@@ -187,57 +188,115 @@ exports.init = () => {
         }
     });
     ipcMain.handle('readNotebookFile', (event, absPath) => {
-        const curNotebookFullPath = getCurNotebookFullPath();
-        const curNotebookSuffix = getCurNotebookSuffix();
-        let fileFullPath = path.join(curNotebookFullPath, absPath);
-        if (!fileFullPath.endsWith(curNotebookSuffix)) {
-            fileFullPath += curNotebookSuffix;
+        try {
+            const curNotebookFullPath = getCurNotebookFullPath();
+            const curNotebookSuffix = getCurNotebookSuffix();
+            let fileFullPath = path.join(curNotebookFullPath, absPath);
+
+            if (!fileFullPath.endsWith(curNotebookSuffix)) {
+                fileFullPath += curNotebookSuffix;
+            }
+
+            if (!fs.existsSync(fileFullPath)) {
+                console.error('[NotebookFile] File not found:', fileFullPath);
+                throw new Error(`File not found: ${absPath}`);
+            }
+
+            const content = fs.readFileSync(fileFullPath, 'utf-8');
+
+            // Convert Markdown to Tiptap JSON for the editor
+            try {
+                const { content: tiptapJSON } = markdownToTiptap(content);
+                console.log('[NotebookFile] Successfully loaded Markdown file:', absPath);
+                return JSON.stringify(tiptapJSON);
+            } catch (error) {
+                console.error('[NotebookFile] Error converting Markdown to Tiptap:', error);
+                throw new Error(`Failed to parse Markdown file ${absPath}: ${error.message}`);
+            }
+        } catch (error) {
+            console.error('[NotebookFile] Error reading file:', error);
+            // Return empty document so UI doesn't crash
+            return JSON.stringify({ type: 'doc', content: [] });
         }
-        if (!fs.existsSync(fileFullPath)) {
-            console.log('error');
-        }
-        const content = fs.readFileSync(fileFullPath)
-        return content ? content.toString() : '';
     });
     ipcMain.handle('writeNotebookFile', (event, absPath, content) => {
-        const curNotebookFullPath = getCurNotebookFullPath();
-        const curNotebookSuffix = getCurNotebookSuffix();
-        let fileFullPath = path.join(curNotebookFullPath, absPath);
-        if (!fileFullPath.endsWith(curNotebookSuffix)) {
-            fileFullPath += curNotebookSuffix;
-        }
-        if (!fs.existsSync(fileFullPath)) {
-            console.log('error');
-        }
-        fs.writeFileSync(fileFullPath, content)
-
-        // 更新数据库索引
         try {
-            const contentObj = JSON.parse(content);
-            const noteId = path.basename(fileFullPath, curNotebookSuffix);
-            const tags = extractTags(contentObj);
-            const links = extractLinks(contentObj);
-            const title = extractTitle(contentObj);
-            const contentText = extractText(contentObj);
+            const curNotebookFullPath = getCurNotebookFullPath();
+            const curNotebookSuffix = getCurNotebookSuffix();
+            let fileFullPath = path.join(curNotebookFullPath, absPath);
 
-            // 检查是否是日记（路径包含 journals/）
-            const isJournal = fileFullPath.includes('/journals/') || fileFullPath.includes('\\journals\\');
-            const journalDate = isJournal ? noteId : null;
+            if (!fileFullPath.endsWith(curNotebookSuffix)) {
+                fileFullPath += curNotebookSuffix;
+            }
 
-            console.log(`[NotebookFile] 保存笔记到数据库: id=${noteId}, isJournal=${isJournal}, journalDate=${journalDate}, path=${fileFullPath}`);
+            // Parse Tiptap JSON (content is always JSON from editor)
+            let contentObj;
+            try {
+                contentObj = JSON.parse(content);
+            } catch (error) {
+                console.error('[NotebookFile] Invalid JSON content:', error);
+                throw new Error(`Invalid content format: ${error.message}`);
+            }
 
-            dbManager.saveNote({
-                id: noteId,
-                title: title,
-                path: fileFullPath,
-                contentText: contentText,
-                tags: tags,
-                outgoingLinks: links,
-                isJournal: isJournal,
-                journalDate: journalDate,
-            });
+            // Convert Tiptap JSON to Markdown
+            let writeContent;
+            try {
+                const noteId = path.basename(fileFullPath, curNotebookSuffix);
+                const metadata = extractMetadata(contentObj, noteId);
+                writeContent = tiptapToMarkdown(contentObj, metadata);
+                console.log('[NotebookFile] Successfully converted to Markdown format');
+            } catch (error) {
+                console.error('[NotebookFile] Error converting to Markdown:', error);
+                throw new Error(`Failed to convert to Markdown: ${error.message}`);
+            }
+
+            // Write file
+            try {
+                // Ensure directory exists
+                const dir = path.dirname(fileFullPath);
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir, { recursive: true });
+                }
+
+                fs.writeFileSync(fileFullPath, writeContent, 'utf-8');
+                console.log('[NotebookFile] Successfully wrote file:', fileFullPath);
+            } catch (error) {
+                console.error('[NotebookFile] Error writing file:', error);
+                throw new Error(`Failed to write file: ${error.message}`);
+            }
+
+            // 更新数据库索引
+            try {
+                const noteId = path.basename(fileFullPath, curNotebookSuffix);
+                const tags = extractTags(contentObj);
+                const links = extractLinks(contentObj);
+                const title = extractTitle(contentObj);
+                const contentText = extractText(contentObj);
+
+                // 检查是否是日记（路径包含 journals/）
+                const isJournal = fileFullPath.includes('/journals/') || fileFullPath.includes('\\journals\\');
+                const journalDate = isJournal ? noteId : null;
+
+                console.log(`[NotebookFile] 保存笔记到数据库: id=${noteId}, isJournal=${isJournal}, journalDate=${journalDate}`);
+
+                dbManager.saveNote({
+                    id: noteId,
+                    title: title,
+                    path: fileFullPath,
+                    contentText: contentText,
+                    tags: tags,
+                    outgoingLinks: links,
+                    isJournal: isJournal,
+                    journalDate: journalDate,
+                });
+            } catch (error) {
+                console.error('[NotebookFile] 更新数据库索引失败:', error);
+                // Database indexing failure shouldn't prevent file save
+                // Just log the error and continue
+            }
         } catch (error) {
-            console.error('[NotebookFile] 更新数据库索引失败:', error);
+            console.error('[NotebookFile] Error in writeNotebookFile:', error);
+            throw error; // Re-throw to let caller handle
         }
     });
     ipcMain.handle('renameNotebookFile', (event, oldPath, newPath) => {
