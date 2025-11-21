@@ -23,6 +23,7 @@ import {YouTubeEmbed} from './youtubeEmbed';
 import {PDFEmbed} from './pdfEmbed';
 import {WebEmbed} from './webEmbed';
 import {TagExtension} from './tagExtension';
+import {InternalLinkExtension} from './internalLinkExtension';
 
 const plugins = [
     StarterKit, CharacterCount,
@@ -68,6 +69,7 @@ const plugins = [
     PDFEmbed,
     WebEmbed,
     TagExtension,
+    InternalLinkExtension,
 ];
 
 export default plugins;

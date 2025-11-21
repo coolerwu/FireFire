@@ -633,6 +633,59 @@
   --tag-hover-border: #0284c7;
 }
 
+/* 内部链接样式 */
+.internal-link {
+  color: var(--primary, #25b864);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--primary, #25b864);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  padding: 0 2px;
+
+  &:hover {
+    color: var(--primary-hover, #1fa354);
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    background: var(--primary-light, #e6f7ef);
+  }
+
+  &.not-exists {
+    color: var(--error, #ef4444);
+    border-bottom-color: var(--error, #ef4444);
+    border-bottom-style: dotted;
+
+    &:hover {
+      color: #dc2626;
+      border-bottom-color: #dc2626;
+      background: #fee;
+    }
+  }
+}
+
+// 暗黑模式链接样式
+[data-theme="dark"] .internal-link {
+  &.exists {
+    color: var(--primary, #25b864);
+    border-bottom-color: var(--primary, #25b864);
+
+    &:hover {
+      background: rgba(37, 184, 100, 0.15);
+    }
+  }
+
+  &.not-exists {
+    color: #f87171;
+    border-bottom-color: #f87171;
+
+    &:hover {
+      color: #fca5a5;
+      border-bottom-color: #fca5a5;
+      background: rgba(239, 68, 68, 0.1);
+    }
+  }
+}
+
 // 未来编辑器功能样式（为其他功能预留）
 
 // 拖拽手柄

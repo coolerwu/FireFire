@@ -1,0 +1,114 @@
+.link-suggestion-list {
+  background: var(--bg, white);
+  border-radius: var(--radius-md, 6px);
+  box-shadow: var(--shadow-lg, 0 4px 12px rgba(0, 0, 0, 0.15));
+  border: 1px solid var(--border, #e5e5e5);
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 4px;
+  min-width: 280px;
+  max-width: 400px;
+
+  // 滚动条美化
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--gray-400);
+    }
+  }
+
+  .suggestion-empty {
+    padding: 16px;
+    text-align: center;
+    color: var(--muted, #737373);
+    font-size: 14px;
+  }
+
+  .suggestion-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px;
+    border-radius: var(--radius-sm, 4px);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    gap: 10px;
+
+    &:hover, &.selected {
+      background: var(--gray-100, #f5f5f5);
+    }
+
+    &.selected {
+      border-left: 2px solid var(--primary, #25b864);
+      padding-left: 8px;
+    }
+
+    .suggestion-icon {
+      font-size: 16px;
+      color: var(--muted, #737373);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .suggestion-content {
+      flex: 1;
+      min-width: 0; // 允许文本截断
+
+      .suggestion-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--fg, #171717);
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .suggestion-tags {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+
+        .ant-tag {
+          margin: 0;
+          font-size: 11px;
+          padding: 0 6px;
+          line-height: 18px;
+        }
+      }
+    }
+  }
+}
+
+// 暗黑模式
+[data-theme="dark"] .link-suggestion-list {
+  background: var(--gray-800, #262626);
+  border-color: var(--gray-700, #404040);
+
+  .suggestion-item {
+    &:hover, &.selected {
+      background: var(--gray-700, #404040);
+    }
+
+    &.selected {
+      border-left-color: var(--primary, #25b864);
+    }
+
+    .suggestion-title {
+      color: var(--gray-100, #f5f5f5);
+    }
+  }
+
+  .suggestion-empty {
+    color: var(--gray-400, #a3a3a3);
+  }
+}
