@@ -1,12 +1,12 @@
 # Implementation Tasks
 
 ## 1. 斜杠命令（Slash Commands）
-- [ ] 1.1 研究 Tiptap 斜杠命令实现方案（Extension API、Suggestion）
-- [ ] 1.2 创建 `slashCommand` 扩展文件 (`src/common/extensions/slashCommand.js`)
-- [ ] 1.3 实现命令菜单 UI 组件（弹出菜单、搜索过滤）
-- [ ] 1.4 定义命令列表（标题、列表、媒体、嵌入等）
-- [ ] 1.5 集成到编辑器并测试（输入 `/` 触发）
-- [ ] 1.6 添加样式（菜单定位、高亮、图标）
+- [x] 1.1 研究 Tiptap 斜杠命令实现方案（Extension API、Suggestion）
+- [x] 1.2 创建 `slashCommand` 扩展文件 (`src/common/extensions/slashCommand.js`)
+- [x] 1.3 实现命令菜单 UI 组件（弹出菜单、搜索过滤）
+- [x] 1.4 定义命令列表（标题、列表、媒体、嵌入等）
+- [x] 1.5 集成到编辑器并测试（输入 `/` 触发）
+- [x] 1.6 添加样式（菜单定位、高亮、图标）
 
 ## 2. 拖拽排序（Drag & Drop）
 - [ ] 2.1 研究拖拽实现方案（`@tiptap/extension-drag-handle` vs 自定义）

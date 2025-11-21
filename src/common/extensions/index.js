@@ -17,6 +17,7 @@ import Underline from '@tiptap/extension-underline';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import Placeholder from '@tiptap/extension-placeholder';
+import {SlashCommand} from './slashCommand';
 
 const plugins = [
     StarterKit, CharacterCount,
@@ -53,9 +54,10 @@ const plugins = [
         nested: true,
     }),
     Placeholder.configure({
-        placeholder: '开始书写...',
+        placeholder: '输入 / 查看所有命令...',
         emptyEditorClass: 'is-editor-empty',
     }),
+    SlashCommand,
 ];
 
 export default plugins;

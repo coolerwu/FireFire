@@ -4,6 +4,7 @@ import 'antd/dist/antd.min';
 import 'moment/locale/zh-cn';
 import moment from "moment";
 import './index.less';
+import 'tippy.js/dist/tippy.css';
 import ReactDOM from "react-dom";
 import {FileSearchOutlined, SettingOutlined} from "@ant-design/icons";
 import File from "./pages/file/file";
