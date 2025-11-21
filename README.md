@@ -57,14 +57,6 @@ FireFire is a local-first knowledge management and note-taking application built
 - [ ] WebDAV sync support
 - [ ] ChatGPT integration
 
-### Screenshots
-
-#### Main Interface
-![File List](readme/fileList1.png)
-
-#### Settings
-![Settings](readme/setting.png)
-
 ### Installation
 
 Download the latest release for your platform:
@@ -166,14 +158,6 @@ FireFire 是一款本地优先的知识管理和笔记应用，基于 Electron �
 - [ ] 标签和链接的关系图谱
 - [ ] WebDAV 同步支持
 - [ ] ChatGPT 集成
-
-### 截图
-
-#### 主界面
-![文件列表](readme/fileList1.png)
-
-#### 设置页面
-![设置](readme/setting.png)
 
 ### 安装
 
