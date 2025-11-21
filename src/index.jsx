@@ -93,7 +93,7 @@ const App = () => {
                                 defaultSelectedKeys={[activeKey]}
                                 mode="inline"
                                 style={{
-                                    width: '80px',
+                                    width: 'var(--sidebar-width, 80px)',
                                     height: '100vh',
                                     background: 'transparent',
                                     border: 'none',

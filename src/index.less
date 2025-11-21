@@ -29,7 +29,7 @@
   --muted: #737373;
 
   // 布局
-  --sidebar-width: 64px;
+  --sidebar-width: 80px;
   --doc-width: 720px;
 
   // 间距（4px 基准）
@@ -85,6 +85,7 @@ body {
   background: var(--bg);
   border-right: 1px solid var(--border);
   z-index: 1000;
+  overflow: hidden; // 防止内容溢出
 }
 
 // 主内容区
@@ -93,7 +94,8 @@ body {
   width: calc(100vw - var(--sidebar-width));
   height: 100vh;
   background: var(--bg);
-  overflow: hidden;
+  overflow: hidden; // 防止内容溢出
+  position: relative; // 确保子元素相对定位
 }
 
 .slider {

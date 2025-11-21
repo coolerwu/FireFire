@@ -108,8 +108,19 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
     }, []);
 
     return (
-        <div style={{borderRadius: '10px 10px 10px 0px', boxShadow: `2px 2px 2px 1px ${theme.boxShadowColor}`}}>
-            <div ref={headerRef} style={{padding: '10px', boxShadow: `0px 0px 10px 0px ${theme.boxShadowColor}`}}>
+        <div style={{
+            height: '100%',
+            borderRadius: '10px 10px 10px 0px',
+            boxShadow: `2px 2px 2px 1px ${theme.boxShadowColor}`,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+        }}>
+            <div ref={headerRef} style={{
+                padding: '10px',
+                boxShadow: `0px 0px 10px 0px ${theme.boxShadowColor}`,
+                flexShrink: 0
+            }}>
                 <Row>
                     <Col span={24}>
                         <Input prefix={<SearchOutlined/>} allowClear onChange={searchFunc}
@@ -190,7 +201,7 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                 size="large"
                 id={'fileList'}
                 style={{
-                    height: `calc(100vh - ${headerHeight}px)`,
+                    flex: 1,
                     overflow: 'auto',
                 }}
                 dataSource={displayCwjsonList}
