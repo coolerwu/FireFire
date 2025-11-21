@@ -148,3 +148,4 @@ Editor updates trigger `persist()` function in `src/utils/cwjsonFileOp.js`, whic
 - `webSecurity: false` is enabled for loading local file:// images
 - `nodeIntegration: true` with preload script limits renderer access
 - All file paths are validated to be within notebook/attachment directories
+- 中文回复

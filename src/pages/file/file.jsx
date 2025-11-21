@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import {Empty} from "antd";
 import Timeline from "./timeline";
 import Markdown from "./markdown";
 

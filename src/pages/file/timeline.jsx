@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
-import { List, Card, Tag, Typography, Space, Button } from "antd";
-import { ClockCircleOutlined, TagsOutlined, EditOutlined } from "@ant-design/icons";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { List, Card, Typography, Space, Button } from "antd";
+import { ClockCircleOutlined, EditOutlined } from "@ant-design/icons";
 import { Context } from "../../index";
 import { electronAPI } from "../../utils/electronAPI";
 import dayjs from "dayjs";
 import "./timeline.less";
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Text } = Typography;
 
 /**
  * 单个日记卡片组件
@@ -126,7 +126,7 @@ const Timeline = ({ chooseCwjsonCallback }) => {
     const limit = 10;
 
     // 加载日记
-    const loadJournals = async (reset = false) => {
+    const loadJournals = useCallback(async (reset = false) => {
         if (loading) return;
 
         setLoading(true);
@@ -148,11 +148,11 @@ const Timeline = ({ chooseCwjsonCallback }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [loading, offset, journals, limit]);
 
     useEffect(() => {
         loadJournals(true);
-    }, []);
+    }, [loadJournals]);
 
     return (
         <div style={{
