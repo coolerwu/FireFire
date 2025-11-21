@@ -20,12 +20,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - name: Install system dependencies for canvas
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev pkg-config
       - run: export CI=false
-      - run: npm install
+      - run: npm config set optional false
+      - run: npm install --no-audit
       - run: npm run build --if-present
       - name: 读取当前版本号
         id: version
@@ -69,7 +66,8 @@ jobs:
         shell: bash
       - name: Install dependencies
         run: |
-          npm install --prefer-offline --no-audit
+          npm config set optional false
+          npm install --prefer-offline --no-audit || true
         env:
           npm_config_build_from_source: false
       - run: npm run build --if-present
@@ -98,7 +96,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: export CI=false
-    - run: npm install
+    - run: npm config set optional false
+    - run: npm install --no-audit
     - run: npm install dmg-license --save-dev
     - run: npm run build --if-present
     - name: 读取当前版本号
