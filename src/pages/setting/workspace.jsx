@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Button, Card, Divider, message, Modal, Space, Typography} from "antd";
 import {FolderOpenOutlined, SyncOutlined, FolderOutlined} from "@ant-design/icons";
 import {electronAPI} from "../../utils/electronAPI";
+import {logger} from "../../utils/logger";
 import './base.less';
 
 const {Text, Paragraph} = Typography;
@@ -21,7 +22,7 @@ const WorkspaceSetting = () => {
             const path = await electronAPI.getCurrentWorkspace();
             setWorkspacePath(path || '未设置');
         } catch (error) {
-            console.error('获取工作空间路径失败:', error);
+            logger.error('获取工作空间路径失败:', error);
             message.error('获取工作空间路径失败');
         } finally {
             setLoading(false);
@@ -58,7 +59,7 @@ const WorkspaceSetting = () => {
                 message.error(result.error || '更改工作空间失败');
             }
         } catch (error) {
-            console.error('更改工作空间失败:', error);
+            logger.error('更改工作空间失败:', error);
             message.error('更改工作空间失败');
         }
     };
@@ -71,7 +72,7 @@ const WorkspaceSetting = () => {
                 message.error(result.error || '打开文件夹失败');
             }
         } catch (error) {
-            console.error('打开文件夹失败:', error);
+            logger.error('打开文件夹失败:', error);
             message.error('打开文件夹失败');
         }
     };

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Spin, Empty } from 'antd';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import { electronAPI } from '../../utils/electronAPI';
+import { logger } from '../../utils/logger';
 import { formatDisplayDate, getRelativeDate } from '../journal/dateUtils';
 import './timelineView.less';
 
@@ -40,7 +41,7 @@ const TimelineView = () => {
       setHasMore(newArticles.length === ARTICLES_PER_PAGE);
       setOffset(currentOffset + newArticles.length);
     } catch (error) {
-      console.error('[TimelineView] 加载文章列表失败:', error);
+      logger.error('[TimelineView] 加载文章列表失败:', error);
     } finally {
       setLoading(false);
     }
@@ -81,7 +82,7 @@ const TimelineView = () => {
   // 打开文章
   const openArticle = (article) => {
     // TODO: 实现打开文章的逻辑
-    console.log('[TimelineView] 打开文章:', article.id);
+    logger.debug('[TimelineView] 打开文章:', article.id);
   };
 
   return (

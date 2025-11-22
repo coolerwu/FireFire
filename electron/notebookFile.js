@@ -5,6 +5,14 @@ const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const dbManager = require("./dbManager");
 const { tiptapToMarkdown, markdownToTiptap, extractMetadata } = require("./markdownConverter");
+const {
+    validateAndResolvePath,
+    isPathWithinRoot,
+    isAllowedMimeType,
+    parseBase64DataUrl,
+    isFileSizeAllowed,
+    getExtensionFromMimeType,
+} = require("./utils/pathValidator");
 
 /**
  * 获取当前notebook完整path
@@ -29,8 +37,38 @@ const getCurNotebookSuffix = () => {
 
 /**
  * 当前cwjson文件列表缓存
+ * 使用 Map 实现简单的 LRU 缓存
  */
-let cwjsonFileMap = {};
+const MAX_CACHE_SIZE = 100;
+let cwjsonFileMap = new Map();
+
+/**
+ * 添加到缓存，自动清理超出限制的旧条目
+ */
+const addToCache = (key, value) => {
+    // 如果已存在，先删除再添加（移到末尾）
+    if (cwjsonFileMap.has(key)) {
+        cwjsonFileMap.delete(key);
+    }
+
+    // 超出限制时删除最早的条目
+    if (cwjsonFileMap.size >= MAX_CACHE_SIZE) {
+        const firstKey = cwjsonFileMap.keys().next().value;
+        cwjsonFileMap.delete(firstKey);
+        console.log('[NotebookFile] 缓存已满，清理旧条目:', firstKey);
+    }
+
+    cwjsonFileMap.set(key, value);
+};
+
+/**
+ * 清空缓存
+ */
+const clearCache = () => {
+    const size = cwjsonFileMap.size;
+    cwjsonFileMap.clear();
+    console.log('[NotebookFile] 缓存已清空，清理条目数:', size);
+};
 
 /**
  * 从 Tiptap JSON 内容中提取标签
@@ -130,10 +168,16 @@ exports.init = () => {
         }
 
         let fileFullPath;
-        if (absPath === undefined) {
+        if (absPath === undefined || absPath === '.' || absPath === '') {
             fileFullPath = curNotebookFullPath;
         } else {
-            fileFullPath = path.join(curNotebookFullPath, absPath);
+            // 路径验证
+            const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+            if (!validation.valid) {
+                console.error('[NotebookFile] 路径验证失败:', validation.error);
+                return [];
+            }
+            fileFullPath = validation.fullPath;
         }
 
         const fileList = fs.readdirSync(fileFullPath);
@@ -161,28 +205,50 @@ exports.init = () => {
                     notebookPath: curFilePath,
                     attachmentPath: attachmentFullPath,
                 };
-                cwjsonFileMap[cwjsonFile.id] = cwjsonFile;
+                addToCache(cwjsonFile.id, cwjsonFile);
                 return cwjsonFile;
             }).sort((left, right) => right.updateTime - left.updateTime);
         } else {
-            cwjsonFileMap = {};
+            clearCache();
             return [];
         }
     });
     ipcMain.handle('createNotebookFile', (event, absPath) => {
         const curNotebookFullPath = getCurNotebookFullPath();
         const curNotebookSuffix = getCurNotebookSuffix();
-        let fileFullPath = path.join(curNotebookFullPath, absPath);
+
+        // 路径验证
+        const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+        if (!validation.valid) {
+            console.error('[NotebookFile] createNotebookFile 路径验证失败:', validation.error);
+            throw new Error(validation.error);
+        }
+
+        let fileFullPath = validation.fullPath;
         if (!fileFullPath.endsWith(curNotebookSuffix)) {
             fileFullPath += curNotebookSuffix;
         }
+
+        // 再次验证添加后缀后的路径
+        if (!isPathWithinRoot(fileFullPath, curNotebookFullPath)) {
+            throw new Error('路径超出允许范围');
+        }
+
         if (!fs.existsSync(fileFullPath)) {
             fs.writeFileSync(fileFullPath, '');
         }
     });
     ipcMain.handle('createNotebookDir', (event, absPath) => {
         const curNotebookFullPath = getCurNotebookFullPath();
-        let fileFullPath = path.join(curNotebookFullPath, absPath);
+
+        // 路径验证
+        const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+        if (!validation.valid) {
+            console.error('[NotebookFile] createNotebookDir 路径验证失败:', validation.error);
+            throw new Error(validation.error);
+        }
+
+        const fileFullPath = validation.fullPath;
         if (!fs.existsSync(fileFullPath)) {
             fs.mkdirSync(fileFullPath);
         }
@@ -191,10 +257,22 @@ exports.init = () => {
         try {
             const curNotebookFullPath = getCurNotebookFullPath();
             const curNotebookSuffix = getCurNotebookSuffix();
-            let fileFullPath = path.join(curNotebookFullPath, absPath);
 
+            // 路径验证
+            const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+            if (!validation.valid) {
+                console.error('[NotebookFile] readNotebookFile 路径验证失败:', validation.error);
+                throw new Error(validation.error);
+            }
+
+            let fileFullPath = validation.fullPath;
             if (!fileFullPath.endsWith(curNotebookSuffix)) {
                 fileFullPath += curNotebookSuffix;
+            }
+
+            // 再次验证添加后缀后的路径
+            if (!isPathWithinRoot(fileFullPath, curNotebookFullPath)) {
+                throw new Error('路径超出允许范围');
             }
 
             if (!fs.existsSync(fileFullPath)) {
@@ -223,10 +301,22 @@ exports.init = () => {
         try {
             const curNotebookFullPath = getCurNotebookFullPath();
             const curNotebookSuffix = getCurNotebookSuffix();
-            let fileFullPath = path.join(curNotebookFullPath, absPath);
 
+            // 路径验证
+            const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+            if (!validation.valid) {
+                console.error('[NotebookFile] writeNotebookFile 路径验证失败:', validation.error);
+                throw new Error(validation.error);
+            }
+
+            let fileFullPath = validation.fullPath;
             if (!fileFullPath.endsWith(curNotebookSuffix)) {
                 fileFullPath += curNotebookSuffix;
+            }
+
+            // 再次验证添加后缀后的路径
+            if (!isPathWithinRoot(fileFullPath, curNotebookFullPath)) {
+                throw new Error('路径超出允许范围');
             }
 
             // Parse Tiptap JSON (content is always JSON from editor)
@@ -302,8 +392,31 @@ exports.init = () => {
     ipcMain.handle('renameNotebookFile', (event, oldPath, newPath) => {
         const curNotebookFullPath = getCurNotebookFullPath();
         const curNotebookSuffix = getCurNotebookSuffix();
-        const newFileFullPath = path.join(curNotebookFullPath, newPath) + curNotebookSuffix;
-        const oldFileFullPath = path.join(curNotebookFullPath, oldPath) + curNotebookSuffix;
+
+        // 验证旧路径
+        const oldValidation = validateAndResolvePath(oldPath, curNotebookFullPath);
+        if (!oldValidation.valid) {
+            console.error('[NotebookFile] renameNotebookFile 旧路径验证失败:', oldValidation.error);
+            return false;
+        }
+
+        // 验证新路径
+        const newValidation = validateAndResolvePath(newPath, curNotebookFullPath);
+        if (!newValidation.valid) {
+            console.error('[NotebookFile] renameNotebookFile 新路径验证失败:', newValidation.error);
+            return false;
+        }
+
+        const oldFileFullPath = oldValidation.fullPath + curNotebookSuffix;
+        const newFileFullPath = newValidation.fullPath + curNotebookSuffix;
+
+        // 再次验证添加后缀后的路径
+        if (!isPathWithinRoot(oldFileFullPath, curNotebookFullPath) ||
+            !isPathWithinRoot(newFileFullPath, curNotebookFullPath)) {
+            console.error('[NotebookFile] renameNotebookFile 路径超出允许范围');
+            return false;
+        }
+
         if (fs.existsSync(oldFileFullPath) && !fs.existsSync(newFileFullPath)) {
             fs.renameSync(oldFileFullPath, newFileFullPath);
             return true;
@@ -314,7 +427,22 @@ exports.init = () => {
     ipcMain.handle('deleteNotebookFile', (event, absPath) => {
         const curNotebookFullPath = getCurNotebookFullPath();
         const curNotebookSuffix = getCurNotebookSuffix();
-        const fileFullPath = path.join(curNotebookFullPath, absPath) + curNotebookSuffix;
+
+        // 路径验证
+        const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+        if (!validation.valid) {
+            console.error('[NotebookFile] deleteNotebookFile 路径验证失败:', validation.error);
+            return false;
+        }
+
+        const fileFullPath = validation.fullPath + curNotebookSuffix;
+
+        // 再次验证添加后缀后的路径
+        if (!isPathWithinRoot(fileFullPath, curNotebookFullPath)) {
+            console.error('[NotebookFile] deleteNotebookFile 路径超出允许范围');
+            return false;
+        }
+
         if (fs.existsSync(fileFullPath)) {
             fs.rmSync(fileFullPath);
 
@@ -329,7 +457,16 @@ exports.init = () => {
     });
     ipcMain.handle('deleteDirectory', (event, absPath) => {
         const curNotebookFullPath = getCurNotebookFullPath();
-        const fileFullPath = path.join(curNotebookFullPath, absPath);
+
+        // 路径验证
+        const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+        if (!validation.valid) {
+            console.error('[NotebookFile] deleteDirectory 路径验证失败:', validation.error);
+            return false;
+        }
+
+        const fileFullPath = validation.fullPath;
+
         if (fs.existsSync(fileFullPath)) {
             const fileList = fs.readdirSync(fileFullPath);
             if (fileList || fileList.length > 0) {
@@ -342,50 +479,117 @@ exports.init = () => {
         }
     });
     ipcMain.handle('copyAttachment', (event, fromPath, toDirectoryPath) => {
-        //检查路径
-        if (!fs.existsSync(fromPath)) {
+        const curAttachmentFullPath = getCurAttachmentFullPath();
+
+        // 检查源文件是否存在
+        if (!fromPath || !fs.existsSync(fromPath)) {
+            console.error('[NotebookFile] copyAttachment 源文件不存在:', fromPath);
             return null;
         }
 
-        //创建父目录
-        if (!fs.existsSync(toDirectoryPath)) {
-            fs.mkdirSync(toDirectoryPath);
+        // 验证目标路径在附件目录内
+        if (!isPathWithinRoot(toDirectoryPath, curAttachmentFullPath)) {
+            console.error('[NotebookFile] copyAttachment 目标路径超出允许范围:', toDirectoryPath);
+            return null;
         }
 
-        //附件后缀
+        // 创建父目录
+        if (!fs.existsSync(toDirectoryPath)) {
+            fs.mkdirSync(toDirectoryPath, { recursive: true });
+        }
+
+        // 附件后缀
         let attachmentSuffix = "";
         if (fromPath.lastIndexOf('.') !== -1) {
             attachmentSuffix = fromPath.substring(fromPath.lastIndexOf('.'));
         }
 
-        //移动指定文件
+        // 移动指定文件
         const srcUrl = path.join(toDirectoryPath, uuidv4()) + attachmentSuffix;
+
+        // 最终验证目标路径
+        if (!isPathWithinRoot(srcUrl, curAttachmentFullPath)) {
+            console.error('[NotebookFile] copyAttachment 最终路径超出允许范围:', srcUrl);
+            return null;
+        }
+
         fs.cpSync(fromPath, srcUrl);
         return srcUrl;
     });
     ipcMain.handle('copyAttachmentByBase64', (event, base64, toDirectoryPath) => {
-        //检查路径
+        const curAttachmentFullPath = getCurAttachmentFullPath();
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB 限制
+
+        // 检查 Base64 数据
         if (!base64) {
+            console.error('[NotebookFile] copyAttachmentByBase64 Base64 数据为空');
             return null;
         }
 
-        //创建父目录
+        // 验证目标路径在附件目录内
+        if (!isPathWithinRoot(toDirectoryPath, curAttachmentFullPath)) {
+            console.error('[NotebookFile] copyAttachmentByBase64 目标路径超出允许范围:', toDirectoryPath);
+            return null;
+        }
+
+        // 解析 Base64 数据
+        const parseResult = parseBase64DataUrl(base64);
+        if (!parseResult.valid) {
+            console.error('[NotebookFile] copyAttachmentByBase64 Base64 格式错误:', parseResult.error);
+            return null;
+        }
+
+        // 验证 MIME 类型
+        if (!isAllowedMimeType(parseResult.mimeType)) {
+            console.error('[NotebookFile] copyAttachmentByBase64 不允许的 MIME 类型:', parseResult.mimeType);
+            return null;
+        }
+
+        // 解码 Base64
+        let u8arr;
+        try {
+            const byteStr = atob(parseResult.data);
+            const n = byteStr.length;
+
+            // 检查文件大小
+            if (!isFileSizeAllowed(n, MAX_FILE_SIZE)) {
+                console.error('[NotebookFile] copyAttachmentByBase64 文件大小超出限制:', n, 'bytes');
+                return null;
+            }
+
+            u8arr = new Uint8Array(n);
+            for (let i = 0; i < n; i++) {
+                u8arr[i] = byteStr.charCodeAt(i);
+            }
+        } catch (error) {
+            console.error('[NotebookFile] copyAttachmentByBase64 Base64 解码失败:', error.message);
+            return null;
+        }
+
+        // 创建父目录
         if (!fs.existsSync(toDirectoryPath)) {
-            fs.mkdirSync(toDirectoryPath);
+            fs.mkdirSync(toDirectoryPath, { recursive: true });
         }
 
-        let arr = base64.split(',');
-        let mime = arr[0].match(/:(.*?);/)[1];
-        let byteStr = atob(arr[1]);
-        let n = byteStr.length
-        let u8arr = new Uint8Array(n);
-        while (n--) {
-            u8arr[n] = byteStr.charCodeAt(n);
+        // 获取文件扩展名
+        const extension = getExtensionFromMimeType(parseResult.mimeType);
+
+        // 生成目标路径
+        const srcUrl = path.join(toDirectoryPath, uuidv4()) + '.' + extension;
+
+        // 最终验证目标路径
+        if (!isPathWithinRoot(srcUrl, curAttachmentFullPath)) {
+            console.error('[NotebookFile] copyAttachmentByBase64 最终路径超出允许范围:', srcUrl);
+            return null;
         }
 
-        //移动指定文件
-        const srcUrl = path.join(toDirectoryPath, uuidv4()) + '.' + mime.substring(mime.lastIndexOf('/') + 1);
-        fs.writeFileSync(srcUrl, u8arr)
-        return srcUrl;
+        // 写入文件
+        try {
+            fs.writeFileSync(srcUrl, u8arr);
+            return srcUrl;
+        } catch (error) {
+            console.error('[NotebookFile] copyAttachmentByBase64 写入文件失败:', error.message);
+            return null;
+        }
     });
 };

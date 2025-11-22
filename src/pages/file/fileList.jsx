@@ -1,10 +1,13 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Button, Col, Input, List, Modal, Row, Tooltip, Tag, Collapse} from "antd";
+import {Button, Col, Input, List, Modal, Row, Tooltip, Tag, Collapse, message} from "antd";
 import './fileList.less';
 import {FileAddOutlined, HddOutlined, SearchOutlined, TagsOutlined, ThunderboltOutlined, CalendarOutlined} from "@ant-design/icons";
 import {Context} from "../../index";
 import FileListItem from "./fileListItem";
 import {electronAPI} from "../../utils/electronAPI";
+import {handleAPIError} from "../../utils/errorHandler";
+import {logger} from "../../utils/logger";
+import {FILE_CONSTANTS, formatDateForFilename} from "../../utils/constants";
 
 const { Panel } = Collapse;
 
@@ -40,9 +43,17 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             content: <Input ref={newFileOrDirectoryRef}/>,
             okText: '确认',
             onOk: () => {
-                electronAPI.createNotebookDir(`${curDir}/${newFileOrDirectoryRef.current.input.value}`).then(() => {
-                    refresh();
-                })
+                const dirName = newFileOrDirectoryRef.current?.input?.value;
+                if (!dirName || !dirName.trim()) {
+                    message.warning('请输入文件夹名称');
+                    return;
+                }
+                electronAPI.createNotebookDir(`${curDir}/${dirName.trim()}`)
+                    .then(() => {
+                        message.success('文件夹创建成功');
+                        refresh();
+                    })
+                    .catch(err => handleAPIError(err, 'createNotebookDir'));
             },
             cancelText: '取消',
         });
@@ -54,9 +65,17 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             content: <Input ref={newFileOrDirectoryRef}/>,
             okText: '确认',
             onOk: () => {
-                electronAPI.createNotebookFile(`${curDir}/${newFileOrDirectoryRef.current.input.value}`).then(() => {
-                    refresh();
-                })
+                const fileName = newFileOrDirectoryRef.current?.input?.value;
+                if (!fileName || !fileName.trim()) {
+                    message.warning('请输入文件名');
+                    return;
+                }
+                electronAPI.createNotebookFile(`${curDir}/${fileName.trim()}`)
+                    .then(() => {
+                        message.success('文件创建成功');
+                        refresh();
+                    })
+                    .catch(err => handleAPIError(err, 'createNotebookFile'));
             },
             cancelText: '取消',
         });
@@ -66,12 +85,11 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
     const createQuickNote = async () => {
         try {
             // 确保 Quick Notes 文件夹存在
-            const quickNotesDir = 'Quick Notes';
+            const quickNotesDir = FILE_CONSTANTS.QUICK_NOTES_DIR;
             await electronAPI.createNotebookDir(quickNotesDir);
 
             // 生成文件名：使用当前时间戳
-            const now = new Date();
-            const fileName = `笔记-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+            const fileName = `${FILE_CONSTANTS.NOTE_PREFIX}${formatDateForFilename()}`;
 
             // 创建文件
             const filePath = `${quickNotesDir}/${fileName}`;
@@ -81,9 +99,9 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             refresh();
 
             // 通知用户
-            console.log(`[QuickNote] 创建快速笔记: ${filePath}`);
+            logger.info(`创建快速笔记: ${filePath}`);
         } catch (error) {
-            console.error('[QuickNote] 创建失败:', error);
+            logger.error('创建快速笔记失败:', error);
         }
     };
 
@@ -97,9 +115,9 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             refresh();
 
             // 选中并打开日记
-            console.log(`[Journal] 打开今日日记: ${journalPath}`);
+            logger.info(`打开今日日记: ${journalPath}`);
         } catch (error) {
-            console.error('[Journal] 打开失败:', error);
+            logger.error('打开日记失败:', error);
         }
     };
 
@@ -137,7 +155,7 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
     //加载标签
     useEffect(() => {
         electronAPI.getAllTags().then(setTags).catch(err => {
-            console.error('加载标签失败:', err);
+            logger.error('加载标签失败:', err);
         });
     }, []);
 

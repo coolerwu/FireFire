@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NodeViewWrapper } from '@tiptap/react';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { logger } from '../../utils/logger';
 
 // Set worker path
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -17,7 +18,7 @@ const PDFComponent = ({ node, deleteNode }) => {
   };
 
   const onDocumentLoadError = (error) => {
-    console.error('PDF load error:', error);
+    logger.error('PDF load error:', error);
     setError('无法加载 PDF 文件');
   };
 

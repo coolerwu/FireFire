@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Tag, Empty, Spin, Space, Typography } from 'antd';
 import { TagsOutlined, ReloadOutlined } from '@ant-design/icons';
 import { electronAPI } from '../../utils/electronAPI';
+import { logger } from '../../utils/logger';
 import './TagSidebar.less';
 
 const { Title, Text } = Typography;
@@ -21,7 +22,7 @@ const TagSidebar = ({ onTagClick, selectedTag }) => {
       const tagList = await electronAPI.getAllTags();
       setTags(tagList);
     } catch (error) {
-      console.error('[TagSidebar] 加载标签失败:', error);
+      logger.error('[TagSidebar] 加载标签失败:', error);
     } finally {
       setLoading(false);
     }
@@ -39,7 +40,7 @@ const TagSidebar = ({ onTagClick, selectedTag }) => {
       await electronAPI.rebuildIndex();
       await loadTags();
     } catch (error) {
-      console.error('[TagSidebar] 重建索引失败:', error);
+      logger.error('[TagSidebar] 重建索引失败:', error);
     }
   };
 

@@ -1,11 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { NodeViewWrapper } from '@tiptap/react';
 
+/**
+ * 验证 URL 是否安全（只允许 http:// 和 https:// 协议）
+ * @param {string} urlString - 要验证的 URL
+ * @returns {{valid: boolean, url?: URL, error?: string}}
+ */
+const validateUrl = (urlString) => {
+  if (!urlString || typeof urlString !== 'string') {
+    return { valid: false, error: '无效的 URL' };
+  }
+
+  try {
+    const url = new URL(urlString);
+
+    // 只允许 http 和 https 协议
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return { valid: false, error: `不支持的协议: ${url.protocol}` };
+    }
+
+    return { valid: true, url };
+  } catch (error) {
+    return { valid: false, error: 'URL 格式不正确' };
+  }
+};
+
 const WebEmbedComponent = ({ node, deleteNode }) => {
   const { url } = node.attrs;
   const [metadata, setMetadata] = useState(null);
   const [loading, setLoading] = useState(true);
   const [useIframe, setUseIframe] = useState(false);
+  const [urlError, setUrlError] = useState(null);
 
   useEffect(() => {
     if (!url) {
@@ -13,25 +38,60 @@ const WebEmbedComponent = ({ node, deleteNode }) => {
       return;
     }
 
+    // 验证 URL 安全性
+    const validation = validateUrl(url);
+    if (!validation.valid) {
+      setUrlError(validation.error);
+      setLoading(false);
+      return;
+    }
+
     // Try to fetch metadata using a simple approach
     // Since CORS will block most sites, we'll show a simple card with URL
-    const hostname = new URL(url).hostname;
-    const favicon = `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
+    const hostname = validation.url.hostname;
+    const favicon = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=32`;
 
     setMetadata({
       title: hostname,
       description: url,
       favicon,
     });
+    setUrlError(null);
     setLoading(false);
   }, [url]);
 
-  if (!url) {
+  if (!url || urlError) {
     return (
       <NodeViewWrapper className="web-embed-wrapper">
         <div className="web-embed-placeholder">
-          无效的网页链接
+          {urlError || '无效的网页链接'}
         </div>
+        <button
+          className="embed-delete-button"
+          onClick={deleteNode}
+          contentEditable={false}
+        >
+          ✕
+        </button>
+      </NodeViewWrapper>
+    );
+  }
+
+  // 再次验证 URL（防止状态更新期间的竞态条件）
+  const urlValidation = validateUrl(url);
+  if (!urlValidation.valid) {
+    return (
+      <NodeViewWrapper className="web-embed-wrapper">
+        <div className="web-embed-placeholder">
+          {urlValidation.error}
+        </div>
+        <button
+          className="embed-delete-button"
+          onClick={deleteNode}
+          contentEditable={false}
+        >
+          ✕
+        </button>
       </NodeViewWrapper>
     );
   }
@@ -41,10 +101,11 @@ const WebEmbedComponent = ({ node, deleteNode }) => {
       {useIframe ? (
         <div className="web-embed-iframe-container">
           <iframe
-            src={url}
+            src={urlValidation.url.href}
             className="web-embed-iframe"
-            sandbox="allow-scripts allow-same-origin"
-            title={url}
+            sandbox="allow-scripts allow-same-origin allow-forms"
+            referrerPolicy="no-referrer"
+            title={urlValidation.url.hostname}
           />
           <div className="web-embed-controls">
             <button

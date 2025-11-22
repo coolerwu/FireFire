@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { formatDisplayDate, getRelativeDate } from './dateUtils';
 import { electronAPI } from '../../utils/electronAPI';
+import { logger } from '../../utils/logger';
 import journalExtensions from './journalExtensions';
 import './journalEntry.less';
 
@@ -30,9 +31,9 @@ const JournalEntry = ({ journal, onUpdate }) => {
         onUpdate(journalIdRef.current, json);
       }
       isDirtyRef.current = false;
-      console.log('[JournalEntry] 已保存:', journalPath);
+      logger.debug('[JournalEntry] 已保存:', journalPath);
     } catch (error) {
-      console.error('[JournalEntry] 保存失败:', error);
+      logger.error('[JournalEntry] 保存失败:', error);
     }
   };
 
@@ -76,7 +77,7 @@ const JournalEntry = ({ journal, onUpdate }) => {
           editor.commands.setContent(contentObj);
         }
       } catch (error) {
-        console.error('[JournalEntry] 加载日记失败:', error);
+        logger.error('[JournalEntry] 加载日记失败:', error);
       } finally {
         setLoading(false);
       }
@@ -131,9 +132,9 @@ const JournalEntry = ({ journal, onUpdate }) => {
           const journalPath = `journals/${journalIdRef.current}`;
           // 使用同步方式保存，确保在组件卸载前完成
           electronAPI.writeNotebookFile(journalPath, JSON.stringify(json));
-          console.log('[JournalEntry] 卸载时已保存:', journalPath);
+          logger.debug('[JournalEntry] 卸载时已保存:', journalPath);
         } catch (error) {
-          console.error('[JournalEntry] 卸载时保存失败:', error);
+          logger.error('[JournalEntry] 卸载时保存失败:', error);
         }
       }
     };

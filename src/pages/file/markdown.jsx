@@ -8,6 +8,8 @@ import {copyAttachment, copyAttachmentByBase64, persist} from "../../utils/cwjso
 import plugins from "../../common/extensions";
 import {Context} from "../../index";
 import {electronAPI} from "../../utils/electronAPI";
+import {handleAPIError} from "../../utils/errorHandler";
+import {logger} from "../../utils/logger";
 
 const Markdown = ({cwjson}) => {
     //上下文
@@ -31,32 +33,36 @@ const Markdown = ({cwjson}) => {
                             fileReader.readAsDataURL(file);
                             fileReader.onload = (e) => {
                                 const base64 = e.target.result;
-                                copyAttachmentByBase64(cwjson, base64).then(srcUrl => {
-                                    if (!srcUrl) {
-                                        message.error("附件复制异常")
-                                        return;
-                                    }
+                                copyAttachmentByBase64(cwjson, base64)
+                                    .then(srcUrl => {
+                                        if (!srcUrl) {
+                                            message.error("附件复制异常");
+                                            return;
+                                        }
 
-                                    const node = view.state.schema.nodes.image.create({src: `file://${srcUrl}`});
-                                    const transaction = view.state.tr.replaceSelectionWith(node);
-                                    view.dispatch(transaction);
-                                });
+                                        const node = view.state.schema.nodes.image.create({src: `file://${srcUrl}`});
+                                        const transaction = view.state.tr.replaceSelectionWith(node);
+                                        view.dispatch(transaction);
+                                    })
+                                    .catch(err => handleAPIError(err, 'copyAttachmentByBase64'));
                             }
 
                             if (!file.path) {
                                 return false;
                             }
 
-                            copyAttachment(cwjson, file.path).then(srcUrl => {
-                                if (!srcUrl) {
-                                    message.error("附件复制异常")
-                                    return;
-                                }
+                            copyAttachment(cwjson, file.path)
+                                .then(srcUrl => {
+                                    if (!srcUrl) {
+                                        message.error("附件复制异常");
+                                        return;
+                                    }
 
-                                const node = view.state.schema.nodes.image.create({src: `file://${srcUrl}`});
-                                const transaction = view.state.tr.replaceSelectionWith(node);
-                                view.dispatch(transaction);
-                            });
+                                    const node = view.state.schema.nodes.image.create({src: `file://${srcUrl}`});
+                                    const transaction = view.state.tr.replaceSelectionWith(node);
+                                    view.dispatch(transaction);
+                                })
+                                .catch(err => handleAPIError(err, 'copyAttachment'));
                         }
                     }
                 }
@@ -65,9 +71,19 @@ const Markdown = ({cwjson}) => {
         extensions: plugins,
         autofocus: 'start',
         onBeforeCreate: ({editor}) => {
-            electronAPI.readNotebookFile(`${curDir}/${cwjson.filename}`).then(content => {
-                editor.commands.setContent(content ? JSON.parse(content) : null);
-            })
+            electronAPI.readNotebookFile(`${curDir}/${cwjson.filename}`)
+                .then(content => {
+                    try {
+                        editor.commands.setContent(content ? JSON.parse(content) : null);
+                    } catch (parseError) {
+                        logger.error('[Markdown] 解析内容失败:', parseError);
+                        editor.commands.setContent(null);
+                    }
+                })
+                .catch(err => {
+                    handleAPIError(err, 'readNotebookFile');
+                    editor.commands.setContent(null);
+                });
         },
     }, [cwjson]);
 

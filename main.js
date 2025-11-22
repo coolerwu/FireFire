@@ -14,9 +14,11 @@ let createWindow = () => {
         width: 1200,
         height: 900,
         webPreferences: {
-            nodeIntegration: true,
+            nodeIntegration: false,      // 禁用 Node 集成，提升安全性
+            contextIsolation: true,       // 启用上下文隔离
+            sandbox: true,                // 启用沙箱模式
             preload: path.join(__dirname, './preload.js'),
-            webSecurity: false,
+            webSecurity: false,           // 暂时保留以支持 file:// 协议加载本地图片
         }
     });
 

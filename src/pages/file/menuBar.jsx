@@ -19,6 +19,7 @@ import {
 import './menuBar.less';
 import {Context} from "../../index";
 import {useContext} from "react";
+import SaveStatusIndicator from "../../components/SaveStatusIndicator";
 
 const MenuBar = ({editor}) => {
     //上下文
@@ -134,6 +135,9 @@ const MenuBar = ({editor}) => {
                 <Tooltip title={'重做'}>
                     <Button type={'link'} onClick={() => editor.chain().focus().redo().run()} icon={<RedoOutlined/>}/>
                 </Tooltip>
+                <div style={{ marginLeft: 'auto', paddingRight: '10px' }}>
+                    <SaveStatusIndicator />
+                </div>
             </div>
         </Affix>
     );

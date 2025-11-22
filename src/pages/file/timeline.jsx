@@ -3,6 +3,7 @@ import { List, Card, Typography, Space, Button } from "antd";
 import { ClockCircleOutlined, EditOutlined } from "@ant-design/icons";
 import { Context } from "../../index";
 import { electronAPI } from "../../utils/electronAPI";
+import { logger } from "../../utils/logger";
 import dayjs from "dayjs";
 import "./timeline.less";
 
@@ -41,7 +42,7 @@ const JournalCard = ({ journal, chooseCwjsonCallback, theme }) => {
                 const text = extractTextContent(parsed);
                 setTextPreview(text);
             } catch (error) {
-                console.error('[Timeline] 读取笔记失败:', error);
+                logger.error('[Timeline] 读取笔记失败:', error);
                 setTextPreview('加载失败');
             }
         };
@@ -150,7 +151,7 @@ const Timeline = ({ chooseCwjsonCallback }) => {
 
             setHasMore(result.length === limit);
         } catch (error) {
-            console.error('[Timeline] 加载失败:', error);
+            logger.error('[Timeline] 加载失败:', error);
         } finally {
             setLoading(false);
         }

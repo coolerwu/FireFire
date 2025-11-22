@@ -1,6 +1,7 @@
 import { ReactRenderer } from '@tiptap/react';
 import tippy from 'tippy.js';
 import LinkSuggestionList from './LinkSuggestionList';
+import { logger } from '../../utils/logger';
 
 /**
  * Link Suggestion - 内部链接自动补全配置
@@ -47,7 +48,7 @@ export const linkSuggestion = {
 
       return recentNotes.slice(0, 10);
     } catch (error) {
-      console.error('[LinkSuggestion] 获取建议失败:', error);
+      logger.error('[LinkSuggestion] 获取建议失败:', error);
       return [];
     }
   },

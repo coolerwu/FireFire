@@ -7,6 +7,7 @@ import {defaultMarkdownParser, defaultMarkdownSerializer, schema} from "prosemir
 import {exampleSetup} from "prosemirror-example-setup";
 import './index.less';
 import {electronAPI} from "../../utils/electronAPI";
+import {logger} from "../../utils/logger";
 
 class CwEditor extends React.Component {
     constructor(props) {
@@ -51,7 +52,7 @@ class CwEditor extends React.Component {
             const editorView = new EditorView(rootDiv, {
                 state: editorState,
                 dispatchTransaction: (tr) => {
-                    console.log("Document size went from", tr.before.content.size, "to", tr.doc.content.size)
+                    logger.debug("Document size went from", tr.before.content.size, "to", tr.doc.content.size)
                     let newState = this.state.editorView.state.apply(tr);
                     // newState.reconfigure()
                     // newState.schema = new Schema({

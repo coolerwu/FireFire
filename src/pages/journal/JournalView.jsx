@@ -4,6 +4,7 @@ import { CalendarOutlined, UpOutlined } from '@ant-design/icons';
 import JournalEntry from './JournalEntry';
 import { formatDate } from './dateUtils';
 import { electronAPI } from '../../utils/electronAPI';
+import { logger } from '../../utils/logger';
 import './journalView.less';
 
 const JOURNALS_PER_PAGE = 10;
@@ -40,7 +41,7 @@ const JournalView = () => {
       setHasMore(newJournals.length === JOURNALS_PER_PAGE);
       setOffset(currentOffset + newJournals.length);
     } catch (error) {
-      console.error('[JournalView] 加载日记列表失败:', error);
+      logger.error('[JournalView] 加载日记列表失败:', error);
     } finally {
       setLoading(false);
     }
@@ -114,7 +115,7 @@ const JournalView = () => {
 
   // 更新日记内容
   const handleJournalUpdate = (journalId, newContent) => {
-    console.log('[JournalView] 日记已更新:', journalId);
+    logger.debug('[JournalView] 日记已更新:', journalId);
   };
 
   return (

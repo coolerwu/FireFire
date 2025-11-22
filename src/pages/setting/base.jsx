@@ -4,6 +4,14 @@ import {useContext, useEffect, useRef, useState} from "react";
 import {Context} from "../../index";
 import {IssuesCloseOutlined, CheckCircleOutlined, SyncOutlined} from "@ant-design/icons";
 import {electronAPI} from "../../utils/electronAPI";
+import DOMPurify from 'dompurify';
+
+// DOMPurify 配置：只允许安全的 HTML 标签
+const DOMPURIFY_CONFIG = {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'b', 'i', 'ul', 'ol', 'li', 'a', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+    ALLOW_DATA_ATTR: false,
+};
 
 /**
  * 校验文件读写权限
@@ -135,7 +143,7 @@ const BaseSetting = () => {
                                 <p>最新版本: v{data.version}</p>
                                 {data.releaseNotes && (
                                     <div style={{ marginTop: '10px', maxHeight: '200px', overflow: 'auto' }}>
-                                        <div dangerouslySetInnerHTML={{ __html: data.releaseNotes }} />
+                                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.releaseNotes, DOMPURIFY_CONFIG) }} />
                                     </div>
                                 )}
                             </div>
