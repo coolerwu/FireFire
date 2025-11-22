@@ -157,15 +157,23 @@
     margin: 1rem 0;
     display: block;
     overflow-x: auto;
+    font-size: 0.95rem;
   }
   th, td {
     border: 1px solid var(--border, #e5e5e5);
-    padding: 0.5rem 0.75rem;
+    padding: 0.625rem 0.875rem;
     text-align: left;
   }
   thead th {
-    background: var(--gray-50);
+    background: var(--gray-100, #f5f5f5);
     font-weight: 600;
+    color: var(--fg);
+  }
+  tbody tr:nth-child(even) {
+    background: var(--gray-50, #fafafa);
+  }
+  tbody tr:hover {
+    background: var(--primary-light, rgba(37, 184, 100, 0.08));
   }
 
   /* 链接样式 */
@@ -184,15 +192,56 @@
   ul[data-type="taskList"] li {
     display: flex;
     align-items: flex-start;
-    gap: 0.5rem;
-    margin: 0.35rem 0;
+    gap: 0.625rem;
+    margin: 0.5rem 0;
+    padding: 0.25rem 0;
+  }
+  ul[data-type="taskList"] li > label {
+    display: flex;
+    align-items: center;
+    margin-top: 0.125rem;
   }
   ul[data-type="taskList"] li input[type="checkbox"] {
-    margin-top: 0.35rem;
-    width: 16px;
-    height: 16px;
-    border: 1px solid var(--border, #e5e5e5);
-    border-radius: var(--radius-sm, 4px);
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border, #d4d4d4);
+    border-radius: 4px;
+    background: var(--bg, white);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+
+    &:hover {
+      border-color: var(--primary, #25b864);
+    }
+
+    &:checked {
+      background: var(--primary, #25b864);
+      border-color: var(--primary, #25b864);
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 2px;
+        width: 5px;
+        height: 9px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37, 184, 100, 0.2);
+    }
+  }
+  ul[data-type="taskList"] li[data-checked="true"] > div {
+    text-decoration: line-through;
+    color: var(--muted, #737373);
   }
 
   /* 占位提示 */
@@ -312,22 +361,44 @@
 
 .bubble-menu {
   display: flex;
-  background-color: var(--gray-900);
-  padding: 0.25rem 0.35rem;
+  align-items: center;
+  gap: 2px;
+  background-color: var(--bubble-bg, #1f1f1f);
+  padding: 6px 8px;
   border-radius: var(--radius-md, 6px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05);
 
-  button {
-    border: none;
-    background: none;
-    color: white;
-    font-size: 0.85rem;
+  button,
+  .ant-btn {
+    border: none !important;
+    background: transparent !important;
+    color: var(--bubble-fg, rgba(255, 255, 255, 0.85)) !important;
+    font-size: 14px;
     font-weight: 500;
-    padding: 0 0.25rem;
-    opacity: 0.7;
+    padding: 4px 8px;
+    min-width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm, 4px);
+    transition: all 0.15s ease;
 
-    &:hover,
-    &.is-active { opacity: 1; }
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: white !important;
+    }
+
+    &.is-active {
+      background: var(--primary, #25b864) !important;
+      color: white !important;
+    }
+
+    .anticon {
+      font-size: 14px;
+    }
+  }
+
+  // 分隔线
+  &::before {
+    display: none;
   }
 }
 
@@ -814,4 +885,81 @@
   height: 2px;
   background: var(--primary);
   border-radius: 1px;
+}
+
+/* ==================== 暗色模式全面适配 ==================== */
+@media (prefers-color-scheme: dark) {
+  .markdown {
+    --fg: #e5e5e5;
+    --bg: #171717;
+    --muted: #a3a3a3;
+    --border: #404040;
+    --gray-50: #262626;
+    --gray-100: #303030;
+    --gray-200: #404040;
+    --gray-300: #525252;
+    --gray-400: #737373;
+    --gray-800: #e5e5e5;
+    --gray-900: #0a0a0a;
+    --primary-light: rgba(37, 184, 100, 0.15);
+  }
+}
+
+/* 手动暗色模式类 */
+.markdown[data-theme="dark"],
+.markdown.dark-mode {
+  --fg: #e5e5e5;
+  --bg: #171717;
+  --muted: #a3a3a3;
+  --border: #404040;
+  --gray-50: #262626;
+  --gray-100: #303030;
+  --gray-200: #404040;
+  --gray-300: #525252;
+  --gray-400: #737373;
+  --gray-800: #e5e5e5;
+  --gray-900: #0a0a0a;
+  --primary-light: rgba(37, 184, 100, 0.15);
+
+  .ProseMirror {
+    pre {
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+    }
+
+    code {
+      background: var(--gray-100);
+      border-color: var(--border);
+      color: #f0abfc;
+    }
+
+    blockquote {
+      background: var(--gray-100);
+      border-left-color: var(--gray-400);
+    }
+
+    table {
+      thead th {
+        background: var(--gray-100);
+      }
+      tbody tr:nth-child(even) {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      tbody tr:hover {
+        background: rgba(37, 184, 100, 0.1);
+      }
+    }
+
+    img {
+      border-color: var(--border);
+    }
+  }
+
+  .bubble-menu {
+    --bubble-bg: #2a2a2a;
+    --bubble-fg: rgba(255, 255, 255, 0.9);
+    background: var(--bubble-bg);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
 }
