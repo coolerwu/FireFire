@@ -212,6 +212,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-25 | **v0.6.3** - Updated CI to use macos-15-intel (macos-13 deprecated) |
 | 2025-11-25 | **v0.6.2** - Fixed macOS build for both Intel and Apple Silicon |
 | 2025-11-25 | **v0.6.0** - Notion-style UI refactor with Tailwind CSS |
 | 2025-11-25 | Added welcome page for first-time setup |
