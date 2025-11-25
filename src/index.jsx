@@ -1,16 +1,18 @@
 import React, {createContext, useEffect, useState, useCallback, useRef} from 'react';
-import {ConfigProvider, Menu, Spin, message} from "antd";
+import {ConfigProvider, Spin, message} from "antd";
 import 'antd/dist/antd.min';
 import 'moment/locale/zh-cn';
 import moment from "moment";
+import './styles/tailwind.css';
 import './index.less';
 import 'tippy.js/dist/tippy.css';
 import { createRoot } from "react-dom/client";
-import {SettingOutlined, CalendarOutlined, ClockCircleOutlined, FolderOutlined} from "@ant-design/icons";
 import File from "./pages/file/file";
 import Setting from "./pages/setting";
 import JournalView from "./pages/journal/JournalView";
 import TimelineView from "./pages/timeline/TimelineView";
+import Sidebar from "./components/Sidebar";
+import Welcome from "./pages/welcome/Welcome";
 import buildThemeStyleFunc from "./utils/theme";
 import {electronAPI} from "./utils/electronAPI";
 import {logger} from "./utils/logger";
@@ -26,32 +28,6 @@ moment.locale('zh-cn');
  */
 export const Context = createContext(null);
 
-/**
- * 菜单 - 按新顺序：日记、时间线、文件夹、设置
- */
-const menuItemList = [
-    {
-        label: '日记',
-        key: 'journal',
-        icon: <CalendarOutlined/>,
-    },
-    {
-        label: '时间线',
-        key: 'timeline',
-        icon: <ClockCircleOutlined/>,
-    },
-    {
-        label: '文件夹',
-        key: 'folder',
-        icon: <FolderOutlined/>,
-    },
-    {
-        label: '设置',
-        key: 'setting',
-        icon: <SettingOutlined/>,
-    },
-]
-
 const App = () => {
     //文件列表
     const [cwjsonList, setCwjsonList] = useState([]);
@@ -61,10 +37,37 @@ const App = () => {
     const [curDir, setCurDir] = useState('.');
     //主题
     const [theme, setTheme] = useState(null);
+    //侧边栏折叠状态
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    //首次启动检测
+    const [isFirstTime, setIsFirstTime] = useState(false);
+    const [checkingFirstTime, setCheckingFirstTime] = useState(true);
 
     //项目刷新
     const [loading, setLoading] = useState(true);
     const requestIdRef = useRef(0); // 用于处理竞态条件
+
+    // 检测首次启动
+    useEffect(() => {
+        const checkFirstTimeSetup = async () => {
+            try {
+                const isFirstTimeResult = await electronAPI.isFirstTimeSetup();
+                setIsFirstTime(isFirstTimeResult);
+            } catch (error) {
+                logger.error('[App] 检测首次启动失败:', error);
+                setIsFirstTime(false);
+            } finally {
+                setCheckingFirstTime(false);
+            }
+        };
+        checkFirstTimeSetup();
+    }, []);
+
+    // 欢迎页面完成回调
+    const handleWelcomeComplete = useCallback(() => {
+        setIsFirstTime(false);
+        loadData();
+    }, []);
 
     // 数据加载函数（提前声明）
     const loadData = useCallback(() => {
@@ -116,51 +119,90 @@ const App = () => {
 
     //切换tab事件 - 默认显示日记
     const [activeKey, setActiveKey] = useState('journal');
-    const changeActiveKeyEvent = (value) => {
-        setActiveKey(value.key);
+    const handleNavigate = (key) => {
+        setActiveKey(key);
+    };
+
+    const handleToggleSidebar = () => {
+        setSidebarCollapsed(!sidebarCollapsed);
+    };
+
+    // 根据主题设置暗色模式类
+    useEffect(() => {
+        if (setting?.themeSource === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else if (setting?.themeSource === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            // system - 跟随系统
+            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+    }, [setting?.themeSource]);
+
+    // 首次启动检测中
+    if (checkingFirstTime) {
+        return (
+            <div className="flex items-center justify-center h-screen bg-notion-bg-primary dark:bg-notion-dark-bg-primary">
+                <Spin size="large" />
+            </div>
+        );
+    }
+
+    // 首次启动显示欢迎页面
+    if (isFirstTime) {
+        return (
+            <ErrorBoundary>
+                <Welcome onComplete={handleWelcomeComplete} />
+            </ErrorBoundary>
+        );
     }
 
     return (
         <ErrorBoundary>
-            <Spin spinning={loading} size="large" style={{marginLeft: '50vw', marginTop: '50vh'}}>
-                {!loading && theme && <div className="app-container">
-                    <ConfigProvider theme={{token: theme.token}}>
-                        <Context.Provider value={{refresh, setActiveKey, setting, curDir, setCurDir, theme, loadData}}>
-                            <div className="sidebar">
-                                <Menu
-                                    onClick={changeActiveKeyEvent}
-                                    defaultSelectedKeys={[activeKey]}
-                                    mode="inline"
-                                    style={{
-                                        width: 'var(--sidebar-width, 80px)',
-                                        height: '100vh',
-                                        background: 'transparent',
-                                        border: 'none',
-                                        paddingTop: '20px'
-                                    }}
-                                    items={menuItemList}
+            {loading ? (
+                <div className="flex items-center justify-center h-screen bg-notion-bg-primary dark:bg-notion-dark-bg-primary">
+                    <Spin size="large" />
+                </div>
+            ) : (
+                theme && (
+                    <div className="app-container flex h-screen overflow-hidden bg-notion-bg-primary dark:bg-notion-dark-bg-primary">
+                        <ConfigProvider theme={{token: theme.token}}>
+                            <Context.Provider value={{refresh, setActiveKey, setting, curDir, setCurDir, theme, loadData}}>
+                                {/* 侧边栏 */}
+                                <Sidebar
+                                    activeKey={activeKey}
+                                    onNavigate={handleNavigate}
+                                    collapsed={sidebarCollapsed}
+                                    onToggleCollapse={handleToggleSidebar}
                                 />
-                            </div>
-                            <div className="main-content">
-                                <ErrorBoundary>
-                                    <div style={{ display: activeKey === 'journal' ? 'block' : 'none', height: '100%' }}>
-                                        <JournalView/>
-                                    </div>
-                                    <div style={{ display: activeKey === 'timeline' ? 'block' : 'none', height: '100%' }}>
-                                        <TimelineView/>
-                                    </div>
-                                    <div style={{ display: activeKey === 'folder' ? 'block' : 'none', height: '100%' }}>
-                                        <File cwjsonList={cwjsonList}/>
-                                    </div>
-                                    <div style={{ display: activeKey === 'setting' ? 'block' : 'none', height: '100%' }}>
-                                        <Setting/>
-                                    </div>
-                                </ErrorBoundary>
-                            </div>
-                        </Context.Provider>
-                    </ConfigProvider>
-                </div>}
-            </Spin>
+
+                                {/* 主内容区 */}
+                                <main className="flex-1 h-screen overflow-hidden bg-notion-bg-primary dark:bg-notion-dark-bg-primary">
+                                    <ErrorBoundary>
+                                        <div className={`h-full ${activeKey === 'journal' ? 'block' : 'hidden'}`}>
+                                            <JournalView/>
+                                        </div>
+                                        <div className={`h-full ${activeKey === 'timeline' ? 'block' : 'hidden'}`}>
+                                            <TimelineView/>
+                                        </div>
+                                        <div className={`h-full ${activeKey === 'folder' ? 'block' : 'hidden'}`}>
+                                            <File cwjsonList={cwjsonList}/>
+                                        </div>
+                                        <div className={`h-full ${activeKey === 'setting' ? 'block' : 'hidden'}`}>
+                                            <Setting/>
+                                        </div>
+                                    </ErrorBoundary>
+                                </main>
+                            </Context.Provider>
+                        </ConfigProvider>
+                    </div>
+                )
+            )}
         </ErrorBoundary>
     );
 };

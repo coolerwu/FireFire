@@ -13,7 +13,7 @@ import {logger} from "../../utils/logger";
 
 const Markdown = ({cwjson}) => {
     //上下文
-    const {curDir, theme, setting} = useContext(Context);
+    const {curDir, setting} = useContext(Context);
 
     //初始化编辑器
     const editor = useEditor({
@@ -87,24 +87,29 @@ const Markdown = ({cwjson}) => {
         },
     }, [cwjson]);
 
+    const isDark = setting?.themeSource === 'dark';
+
     return (
-        <>
+        <div className="h-full flex flex-col bg-notion-bg-primary dark:bg-notion-dark-bg-primary">
             {editor && <Bubble editor={editor} persist={persist}/>}
-            <div className={'markdown'} style={{
-                '--fg': theme?.fontColor || '#222',
-                '--bg': theme?.backgroundColor || '#fff',
-                '--muted': theme?.fontColor === 'white' ? '#aaa' : '#666',
-                '--border': theme?.fontColor === 'white' ? '#3a3a3a' : '#e5e5e5',
-                '--accent': (theme?.token?.colorPrimary || theme?.fontLinkColor || '#4a8cff'),
-                '--radius': '8px',
-                '--doc-width': '800px',
-                '--bubble-bg': (setting?.themeSource === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.85)'),
-                '--bubble-fg': '#fff',
-            }}>
+            <div
+                className="markdown flex-1 overflow-y-auto"
+                style={{
+                    '--fg': isDark ? '#e3e2e0' : '#37352f',
+                    '--bg': isDark ? '#191919' : '#ffffff',
+                    '--muted': isDark ? '#9b9a97' : '#787774',
+                    '--border': isDark ? 'rgba(255,255,255,0.094)' : 'rgba(55,53,47,0.09)',
+                    '--accent': '#0f7b6c',
+                    '--radius': '6px',
+                    '--doc-width': '700px',
+                    '--bubble-bg': isDark ? 'rgba(255,255,255,0.12)' : 'rgba(55,53,47,0.9)',
+                    '--bubble-fg': '#fff',
+                }}
+            >
                 <MenuBar editor={editor}/>
                 <EditorContent editor={editor}/>
             </div>
-        </>
+        </div>
     );
 }
 

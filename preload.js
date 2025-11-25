@@ -67,4 +67,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     changeWorkspace: () => ipcRenderer.invoke('change-workspace'),
     openWorkspaceFolder: () => ipcRenderer.invoke('open-workspace-folder'),
     restartApp: () => ipcRenderer.invoke('restart-app'),
+    isFirstTimeSetup: () => ipcRenderer.invoke('is-first-time-setup'),
+    completeFirstTimeSetup: () => ipcRenderer.invoke('complete-first-time-setup'),
 })

@@ -29,6 +29,11 @@ const defaultSettingConfig = {
 let curSettingConfig = defaultSettingConfig;
 
 /**
+ * 是否首次设置（用于显示欢迎页面）
+ */
+let isFirstTime = false;
+
+/**
  * 获取当前默认配置
  */
 exports.getCurSettingConfig = () => {
@@ -48,19 +53,30 @@ const setThemeSource = () => {
  */
 exports.init = () => {
     try {
-        if (!fs.existsSync(settingFullPath)) {
+        // 检测是否首次设置
+        const settingExists = fs.existsSync(settingFullPath);
+
+        if (!settingExists) {
+            // 首次设置：创建默认配置文件
+            isFirstTime = true;
             fs.writeFileSync(settingFullPath, JSON.stringify(curSettingConfig));
-        }
-        const content = fs.readFileSync(settingFullPath)?.toString();
-        if (!content) {
-            fs.writeFileSync(settingFullPath, JSON.stringify(curSettingConfig));
+            console.log('[SettingFile] 首次启动，创建默认配置');
         } else {
-            curSettingConfig = JSON.parse(content);
+            const content = fs.readFileSync(settingFullPath)?.toString();
+            if (!content) {
+                isFirstTime = true;
+                fs.writeFileSync(settingFullPath, JSON.stringify(curSettingConfig));
+            } else {
+                curSettingConfig = JSON.parse(content);
+                // 检查是否已完成首次设置
+                isFirstTime = curSettingConfig.firstTimeComplete !== true;
+            }
         }
     } catch (error) {
         console.error('[SettingFile] 初始化配置文件失败:', error);
         // 使用默认配置
         curSettingConfig = { ...defaultSettingConfig };
+        isFirstTime = true;
     }
 
     // 确保必要字段存在
@@ -105,6 +121,25 @@ exports.init = () => {
             return { success: true };
         } catch (error) {
             console.error('[SettingFile] 保存配置失败:', error);
+            return { success: false, error: error.message };
+        }
+    });
+
+    // 检查是否首次设置
+    ipcMain.handle('is-first-time-setup', () => {
+        return isFirstTime;
+    });
+
+    // 标记首次设置完成
+    ipcMain.handle('complete-first-time-setup', async () => {
+        try {
+            curSettingConfig.firstTimeComplete = true;
+            isFirstTime = false;
+            await fsPromises.writeFile(settingFullPath, JSON.stringify(curSettingConfig, null, 2));
+            console.log('[SettingFile] 首次设置完成');
+            return { success: true };
+        } catch (error) {
+            console.error('[SettingFile] 标记首次设置完成失败:', error);
             return { success: false, error: error.message };
         }
     });

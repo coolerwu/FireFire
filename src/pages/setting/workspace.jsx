@@ -1,17 +1,13 @@
 import React, {useEffect, useState} from "react";
-import {Button, Card, Divider, message, Modal, Space, Typography} from "antd";
-import {FolderOpenOutlined, SyncOutlined, FolderOutlined} from "@ant-design/icons";
+import {message, Modal} from "antd";
+import {FolderOpenOutlined, SyncOutlined, FolderOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
 import {electronAPI} from "../../utils/electronAPI";
 import {logger} from "../../utils/logger";
-import './base.less';
-
-const {Text, Paragraph} = Typography;
 
 const WorkspaceSetting = () => {
     const [workspacePath, setWorkspacePath] = useState('');
     const [loading, setLoading] = useState(true);
 
-    // 加载当前工作空间路径
     useEffect(() => {
         loadWorkspacePath();
     }, []);
@@ -29,20 +25,18 @@ const WorkspaceSetting = () => {
         }
     };
 
-    // 更改工作空间
     const handleChangeWorkspace = async () => {
         try {
             const result = await electronAPI.changeWorkspace();
 
             if (result.success) {
-                // 显示重启对话框
                 Modal.confirm({
                     title: '工作空间已更改',
-                    icon: <SyncOutlined style={{color: '#25b864'}}/>,
+                    icon: <SyncOutlined style={{color: '#0f7b6c'}}/>,
                     content: (
                         <div>
                             <p>新工作空间: {result.path}</p>
-                            <p style={{marginTop: '10px', color: '#666'}}>
+                            <p className="mt-2 text-notion-text-tertiary">
                                 需要重启应用以加载新工作空间
                             </p>
                         </div>
@@ -54,7 +48,7 @@ const WorkspaceSetting = () => {
                     },
                 });
             } else if (result.canceled) {
-                // 用户取消选择，不显示任何消息
+                // 用户取消
             } else {
                 message.error(result.error || '更改工作空间失败');
             }
@@ -64,7 +58,6 @@ const WorkspaceSetting = () => {
         }
     };
 
-    // 在文件管理器中打开
     const handleOpenInFileManager = async () => {
         try {
             const result = await electronAPI.openWorkspaceFolder();
@@ -78,59 +71,72 @@ const WorkspaceSetting = () => {
     };
 
     return (
-        <div className={'index'}>
-            <Divider orientation={'left'} plain className={'gutter'}>工作空间</Divider>
-
-            <Card size="small" style={{marginTop: '16px', maxWidth: '600px'}} loading={loading}>
-                <Space direction="vertical" style={{width: '100%'}} size="middle">
-                    <div>
-                        <Text type="secondary">当前工作空间路径:</Text>
-                        <Paragraph
-                            copyable
-                            style={{
-                                marginTop: '8px',
-                                padding: '8px 12px',
-                                background: '#f5f5f5',
-                                borderRadius: '4px',
-                                fontFamily: 'monospace',
-                                fontSize: '13px',
-                                wordBreak: 'break-all'
-                            }}
-                        >
-                            {workspacePath}
-                        </Paragraph>
+        <div className="space-y-6">
+            {/* 当前工作空间 */}
+            <div className="p-5 rounded-lg border border-notion-border dark:border-notion-dark-border bg-notion-bg-secondary dark:bg-notion-dark-bg-secondary">
+                <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-notion-accent-blue/10 flex items-center justify-center">
+                        <FolderOutlined className="text-lg text-notion-accent-blue" />
                     </div>
-
-                    <div style={{marginTop: '8px'}}>
-                        <Text type="secondary" style={{display: 'block', marginBottom: '8px'}}>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-notion-text-primary dark:text-notion-dark-text-primary">
+                            当前工作空间
+                        </h3>
+                        {loading ? (
+                            <div className="mt-2 h-8 bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary rounded animate-pulse" />
+                        ) : (
+                            <div className="mt-2 px-3 py-2 rounded-md bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary">
+                                <code className="text-xs text-notion-text-secondary dark:text-notion-dark-text-secondary break-all">
+                                    {workspacePath}
+                                </code>
+                            </div>
+                        )}
+                        <p className="mt-2 text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
                             工作空间包含所有笔记、附件和配置文件
-                        </Text>
+                        </p>
                     </div>
+                </div>
 
-                    <Space direction="horizontal" style={{width: '100%'}} size="middle">
-                        <Button
-                            type="primary"
-                            icon={<FolderOutlined />}
-                            onClick={handleChangeWorkspace}
-                        >
-                            更改工作空间
-                        </Button>
+                {/* 操作按钮 */}
+                <div className="flex gap-3 mt-5 pt-5 border-t border-notion-border/50 dark:border-notion-dark-border/50">
+                    <button
+                        onClick={handleChangeWorkspace}
+                        className="
+                            flex items-center gap-2 px-4 py-2 rounded-md
+                            bg-notion-accent-blue text-white
+                            text-sm font-medium
+                            hover:opacity-90
+                            transition-opacity duration-fast
+                        "
+                    >
+                        <FolderOutlined />
+                        更改工作空间
+                    </button>
+                    <button
+                        onClick={handleOpenInFileManager}
+                        className="
+                            flex items-center gap-2 px-4 py-2 rounded-md
+                            border border-notion-border dark:border-notion-dark-border
+                            text-notion-text-primary dark:text-notion-dark-text-primary
+                            text-sm font-medium
+                            hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover
+                            transition-colors duration-fast
+                        "
+                    >
+                        <FolderOpenOutlined />
+                        在文件管理器中打开
+                    </button>
+                </div>
+            </div>
 
-                        <Button
-                            icon={<FolderOpenOutlined />}
-                            onClick={handleOpenInFileManager}
-                        >
-                            在文件管理器中打开
-                        </Button>
-                    </Space>
-
-                    <div style={{marginTop: '16px', padding: '12px', background: '#fff7e6', borderRadius: '4px', border: '1px solid #ffd591'}}>
-                        <Text style={{fontSize: '12px', color: '#ad6800'}}>
-                            <strong>注意：</strong>更改工作空间需要重启应用。确保已保存所有正在编辑的内容。
-                        </Text>
-                    </div>
-                </Space>
-            </Card>
+            {/* 注意事项 */}
+            <div className="flex gap-3 p-4 rounded-lg bg-notion-accent-yellow/10 border border-notion-accent-yellow/30">
+                <ExclamationCircleOutlined className="flex-shrink-0 text-notion-accent-yellow mt-0.5" />
+                <div className="text-xs text-notion-text-secondary dark:text-notion-dark-text-secondary">
+                    <strong className="text-notion-text-primary dark:text-notion-dark-text-primary">注意：</strong>
+                    更改工作空间需要重启应用。确保已保存所有正在编辑的内容。
+                </div>
+            </div>
         </div>
     );
 };

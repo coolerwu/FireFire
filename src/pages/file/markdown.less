@@ -1,15 +1,23 @@
 /* 极简风格编辑器 */
+.tiptap {
+  height: 100%;
+  min-height: 100%;
+}
+
 .ProseMirror {
   height: 100%;
+  min-height: 100%;
   overflow-y: auto;
-  max-width: var(--doc-width, 720px);
+  width: 100%;
+  max-width: var(--doc-width, 700px);
   margin: 0 auto;
-  padding: 2rem 2rem 6rem;
-  color: var(--fg, #171717);
+  padding: 3rem 3rem 6rem;
+  color: var(--fg, #37352f);
   font-size: 16px;
   line-height: 1.6;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
   background: var(--bg, white);
+  outline: none;
 
   // 滚动条美化（简化）
   &::-webkit-scrollbar {
@@ -403,11 +411,20 @@
 }
 
 .markdown {
-  height: 100vh;
+  height: 100%;
   background: var(--bg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+
+  // EditorContent 需要填满剩余空间
+  > .tiptap,
+  > div:last-child {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
 
   .title {
     font-size: 28px;

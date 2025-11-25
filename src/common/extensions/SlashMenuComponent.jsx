@@ -1,37 +1,46 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react'
 
+/**
+ * SlashMenuComponent - 斜杠命令菜单
+ * 当用户输入 / 时显示命令列表
+ * Notion 风格设计
+ */
 const SlashMenuComponent = forwardRef((props, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   const commands = [
     {
-      icon: '#',
+      icon: 'H1',
       title: '标题 1',
       description: '大号标题',
+      category: '基础',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run()
       },
     },
     {
-      icon: '##',
+      icon: 'H2',
       title: '标题 2',
       description: '中号标题',
+      category: '基础',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run()
       },
     },
     {
-      icon: '###',
+      icon: 'H3',
       title: '标题 3',
       description: '小号标题',
+      category: '基础',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run()
       },
     },
     {
-      icon: '📝',
+      icon: '¶',
       title: '段落',
       description: '普通文本',
+      category: '基础',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setNode('paragraph').run()
       },
@@ -40,6 +49,7 @@ const SlashMenuComponent = forwardRef((props, ref) => {
       icon: '•',
       title: '无序列表',
       description: '创建无序列表',
+      category: '列表',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).toggleBulletList().run()
       },
@@ -48,30 +58,34 @@ const SlashMenuComponent = forwardRef((props, ref) => {
       icon: '1.',
       title: '有序列表',
       description: '创建有序列表',
+      category: '列表',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).toggleOrderedList().run()
       },
     },
     {
-      icon: '☑',
+      icon: '☐',
       title: '待办列表',
       description: '创建待办清单',
+      category: '列表',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).toggleTaskList().run()
       },
     },
     {
-      icon: '</>',
+      icon: '<>',
       title: '代码块',
       description: '插入代码块',
+      category: '高级',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setCodeBlock().run()
       },
     },
     {
-      icon: '💬',
+      icon: '"',
       title: '引用',
       description: '插入引用块',
+      category: '高级',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setBlockquote().run()
       },
@@ -80,14 +94,16 @@ const SlashMenuComponent = forwardRef((props, ref) => {
       icon: '—',
       title: '分隔线',
       description: '插入水平分隔线',
+      category: '高级',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setHorizontalRule().run()
       },
     },
     {
-      icon: '📺',
+      icon: 'B',
       title: 'BiliBili 视频',
       description: '嵌入 B站 视频',
+      category: '媒体',
       command: ({ editor, range }) => {
         const url = prompt('请输入 BiliBili 视频链接 (例如: https://www.bilibili.com/video/BV1xx411c7mD):')
         if (url) {
@@ -101,13 +117,13 @@ const SlashMenuComponent = forwardRef((props, ref) => {
       },
     },
     {
-      icon: '▶️',
+      icon: '▶',
       title: 'YouTube 视频',
       description: '嵌入 YouTube 视频',
+      category: '媒体',
       command: ({ editor, range }) => {
         const url = prompt('请输入 YouTube 视频链接:')
         if (url) {
-          // Extract video ID
           const patterns = [
             /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/,
             /youtube\.com\/embed\/([^?&\s]+)/,
@@ -129,9 +145,10 @@ const SlashMenuComponent = forwardRef((props, ref) => {
       },
     },
     {
-      icon: '📄',
+      icon: 'PDF',
       title: 'PDF 文件',
       description: '嵌入 PDF 文档',
+      category: '媒体',
       command: ({ editor, range }) => {
         const src = prompt('请输入 PDF 文件路径 (file:// 或 https://):')
         if (src) {
@@ -143,6 +160,7 @@ const SlashMenuComponent = forwardRef((props, ref) => {
       icon: '🔗',
       title: '网页预览',
       description: '嵌入网页链接',
+      category: '媒体',
       command: ({ editor, range }) => {
         const url = prompt('请输入网页链接:')
         if (url) {
@@ -194,12 +212,17 @@ const SlashMenuComponent = forwardRef((props, ref) => {
 
   if (filteredCommands.length === 0) {
     return (
-      <div className="slash-menu">
-        <div className="slash-menu-item" style={{ opacity: 0.5, cursor: 'default' }}>
-          <span className="icon">🔍</span>
-          <div style={{ flex: 1, textAlign: 'left' }}>
-            <div className="title">未找到命令</div>
-            <div className="description">尝试其他关键词</div>
+      <div className="
+        bg-notion-bg-primary dark:bg-notion-dark-bg-secondary
+        rounded-lg shadow-lg
+        border border-notion-border dark:border-notion-dark-border
+        p-4 min-w-[280px] max-w-[360px]
+      ">
+        <div className="flex items-center gap-3 text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+          <span className="text-lg opacity-50">🔍</span>
+          <div>
+            <div className="text-sm font-medium">未找到命令</div>
+            <div className="text-xs opacity-70">尝试其他关键词</div>
           </div>
         </div>
       </div>
@@ -207,22 +230,61 @@ const SlashMenuComponent = forwardRef((props, ref) => {
   }
 
   return (
-    <div className="slash-menu">
+    <div className="
+      bg-notion-bg-primary dark:bg-notion-dark-bg-secondary
+      rounded-lg shadow-lg
+      border border-notion-border dark:border-notion-dark-border
+      max-h-80 overflow-y-auto
+      p-1 min-w-[280px] max-w-[360px]
+      scrollbar-thin scrollbar-track-transparent scrollbar-thumb-notion-border dark:scrollbar-thumb-notion-dark-border
+    ">
       {filteredCommands.map((item, index) => (
         <button
           key={index}
-          className={`slash-menu-item ${index === selectedIndex ? 'selected' : ''}`}
+          className={`
+            w-full flex items-center gap-3 p-2.5 rounded-md cursor-pointer
+            text-left
+            transition-colors duration-fast
+            ${index === selectedIndex
+              ? 'bg-notion-accent-blue/10'
+              : 'hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover'
+            }
+          `}
           onClick={() => selectItem(index)}
+          onMouseEnter={() => setSelectedIndex(index)}
         >
-          <span className="icon">{item.icon}</span>
-          <div style={{ flex: 1, textAlign: 'left' }}>
-            <div className="title">{item.title}</div>
-            {item.description && <div className="description">{item.description}</div>}
+          <span className={`
+            w-8 h-8 flex items-center justify-center rounded-md
+            text-sm font-medium
+            ${index === selectedIndex
+              ? 'bg-notion-accent-blue/20 text-notion-accent-blue'
+              : 'bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary text-notion-text-secondary dark:text-notion-dark-text-secondary'
+            }
+          `}>
+            {item.icon}
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className={`
+              text-sm font-medium
+              ${index === selectedIndex
+                ? 'text-notion-accent-blue'
+                : 'text-notion-text-primary dark:text-notion-dark-text-primary'
+              }
+            `}>
+              {item.title}
+            </div>
+            {item.description && (
+              <div className="text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary truncate">
+                {item.description}
+              </div>
+            )}
           </div>
         </button>
       ))}
     </div>
   )
 })
+
+SlashMenuComponent.displayName = 'SlashMenuComponent'
 
 export default SlashMenuComponent

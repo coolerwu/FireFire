@@ -223,6 +223,15 @@ const mockAPI = {
     restartApp: async () => {
         console.warn('[Mock Mode] restartApp called - not available in browser');
     },
+    isFirstTimeSetup: async () => {
+        console.warn('[Mock Mode] isFirstTimeSetup called');
+        // 在浏览器模式下返回 false，直接进入主界面
+        return false;
+    },
+    completeFirstTimeSetup: async () => {
+        console.warn('[Mock Mode] completeFirstTimeSetup called');
+        return { success: true };
+    },
 }
 
 // 导出 API（优先使用真实 API，否则使用 mock）

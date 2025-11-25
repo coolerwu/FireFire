@@ -1,4 +1,4 @@
-import {Affix, Button, Tooltip} from "antd";
+import {Tooltip} from "antd";
 import {
     AlignCenterOutlined,
     AlignLeftOutlined,
@@ -16,130 +16,177 @@ import {
     UndoOutlined,
     UnorderedListOutlined
 } from "@ant-design/icons";
-import './menuBar.less';
-import {Context} from "../../index";
-import {useContext} from "react";
 import SaveStatusIndicator from "../../components/SaveStatusIndicator";
 
-const MenuBar = ({editor}) => {
-    //上下文
-    const {theme} = useContext(Context);
+const ToolButton = ({ icon, title, onClick, isActive, children }) => (
+    <Tooltip title={title}>
+        <button
+            onClick={onClick}
+            className={`
+                p-1.5 rounded-sm
+                text-notion-text-secondary dark:text-notion-dark-text-secondary
+                hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover
+                hover:text-notion-text-primary dark:hover:text-notion-dark-text-primary
+                transition-colors duration-fast
+                ${isActive ? 'bg-notion-bg-selected dark:bg-notion-dark-bg-selected text-notion-accent-blue' : ''}
+            `}
+        >
+            {icon || <span className="text-sm font-medium px-0.5">{children}</span>}
+        </button>
+    </Tooltip>
+);
 
+const Divider = () => (
+    <div className="w-px h-5 bg-notion-border dark:bg-notion-dark-border mx-1" />
+);
+
+const MenuBar = ({editor}) => {
     if (!editor) {
-        return null
+        return null;
     }
 
     return (
-        <Affix offsetTop={0}>
-            <div className={'menuBar'} style={{
-                maxHeight: '10vh',
-                borderRadius: '0px 0px 10px 10px',
-                paddingBottom: '10px',
-                marginLeft: '10px', marginRight: '10px',
-                boxShadow: `2px 2px 2px 2px ${theme.boxShadowColor}`
-            }}>
-                <Tooltip title={'加粗'}>
-                    <Button
-                        onClick={() => editor.chain().focus().toggleBold().run()}
-                        className={editor.isActive('bold') ? 'is-active' : ''}
-                        type={'link'}
-                        icon={<BoldOutlined/>}/>
-                </Tooltip>
-                <Tooltip title={'斜体'}>
-                    <Button
-                        onClick={() => editor.chain().focus().toggleItalic().run()}
-                        className={editor.isActive('italic') ? 'is-active' : ''}
-                        type={'link'}
-                        icon={<ItalicOutlined/>}/>
-                </Tooltip>
-                <Tooltip title={'删除线'}>
-                    <Button
-                        onClick={() => editor.chain().focus().toggleStrike().run()}
-                        className={editor.isActive('strike') ? 'is-active' : ''}
-                        type={'link'}
-                        icon={<StrikethroughOutlined/>}/>
-                </Tooltip>
-                <Tooltip title={'高亮'}>
-                    <Button type={'link'} icon={<HighlightOutlined/>}
-                            onClick={() => editor.chain().focus().toggleHighlight().run()}
-                            className={editor.isActive('highlight') ? 'is-active' : ''}/>
-                </Tooltip>
-                <Tooltip title={'居左'}>
-                    <Button type={'link'} icon={<AlignLeftOutlined/>}
-                            onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                            className={editor.isActive({textAlign: 'left'}) ? 'is-active' : ''}/>
-                </Tooltip>
-                <Tooltip title={'居中'}>
-                    <Button type={'link'} icon={<AlignCenterOutlined/>}
-                            onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                            className={editor.isActive({textAlign: 'center'}) ? 'is-active' : ''}/>
-                </Tooltip>
-                <Tooltip title={'居右'}>
-                    <Button type={'link'} icon={<AlignRightOutlined/>}
-                            onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                            className={editor.isActive({textAlign: 'right'}) ? 'is-active' : ''}/>
-                </Tooltip>
-                <Tooltip title={'h1'}>
-                    <Button
-                        type={'link'} onClick={() => editor.chain().focus().toggleHeading({level: 1}).run()}
-                        style={{paddingBottom: 0, paddingTop: 0}}
-                        className={editor.isActive('heading', {level: 1}) ? 'is-active' : ''}>H1</Button>
-                </Tooltip>
-                <Tooltip title={'h2'}>
-                    <Button
-                        type={'link'} onClick={() => editor.chain().focus().toggleHeading({level: 2}).run()}
-                        style={{paddingBottom: 0, paddingTop: 0}}
-                        className={editor.isActive('heading', {level: 2}) ? 'is-active' : ''}>H2</Button>
-                </Tooltip>
-                <Tooltip title={'h3'}>
-                    <Button
-                        type={'link'} onClick={() => editor.chain().focus().toggleHeading({level: 3}).run()}
-                        style={{paddingBottom: 0, paddingTop: 0}}
-                        className={editor.isActive('heading', {level: 3}) ? 'is-active' : ''}>H3</Button>
-                </Tooltip>
-                <Tooltip title={'无序列表'}>
-                    <Button
-                        type={'link'} onClick={() => editor.chain().focus().toggleBulletList().run()}
-                        className={editor.isActive('bulletList') ? 'is-active' : ''}
-                        icon={<UnorderedListOutlined/>}/>
-                </Tooltip>
-                <Tooltip title={'有序列表'}>
-                    <Button
-                        type={'link'} onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                        className={editor.isActive('orderedList') ? 'is-active' : ''}
-                        icon={<OrderedListOutlined/>}/>
-                </Tooltip>
-                <Tooltip title={'代码块'}>
-                    <Button
-                        type={'link'} onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                        className={editor.isActive('codeBlock') ? 'is-active' : ''}
-                        icon={<CodeOutlined/>}/>
-                </Tooltip>
-                <Tooltip title={'引述'}>
-                    <Button
-                        type={'link'} onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                        className={editor.isActive('blockquote') ? 'is-active' : ''}
-                        icon={<BlockOutlined/>}/>
-                </Tooltip>
-                <Tooltip title={'分割线'}>
-                    <Button type={'link'} icon={<DashOutlined/>}
-                            onClick={() => editor.chain().focus().setHorizontalRule().run()}/>
-                </Tooltip>
-                <Tooltip title={'换行'}>
-                    <Button type={'link'} onClick={() => editor.chain().focus().setHardBreak().run()}
-                            icon={<EnterOutlined/>}/>
-                </Tooltip>
-                <Tooltip title={'撤销'}>
-                    <Button type={'link'} onClick={() => editor.chain().focus().undo().run()} icon={<UndoOutlined/>}/>
-                </Tooltip>
-                <Tooltip title={'重做'}>
-                    <Button type={'link'} onClick={() => editor.chain().focus().redo().run()} icon={<RedoOutlined/>}/>
-                </Tooltip>
-                <div style={{ marginLeft: 'auto', paddingRight: '10px' }}>
-                    <SaveStatusIndicator />
-                </div>
+        <div className="
+            sticky top-0 z-10
+            flex items-center gap-0.5 px-3 py-2
+            bg-notion-bg-primary/95 dark:bg-notion-dark-bg-primary/95
+            backdrop-blur-sm
+            border-b border-notion-border dark:border-notion-dark-border
+        ">
+            {/* 文本格式 */}
+            <ToolButton
+                title="加粗"
+                onClick={() => editor.chain().focus().toggleBold().run()}
+                isActive={editor.isActive('bold')}
+                icon={<BoldOutlined />}
+            />
+            <ToolButton
+                title="斜体"
+                onClick={() => editor.chain().focus().toggleItalic().run()}
+                isActive={editor.isActive('italic')}
+                icon={<ItalicOutlined />}
+            />
+            <ToolButton
+                title="删除线"
+                onClick={() => editor.chain().focus().toggleStrike().run()}
+                isActive={editor.isActive('strike')}
+                icon={<StrikethroughOutlined />}
+            />
+            <ToolButton
+                title="高亮"
+                onClick={() => editor.chain().focus().toggleHighlight().run()}
+                isActive={editor.isActive('highlight')}
+                icon={<HighlightOutlined />}
+            />
+
+            <Divider />
+
+            {/* 对齐 */}
+            <ToolButton
+                title="左对齐"
+                onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                isActive={editor.isActive({textAlign: 'left'})}
+                icon={<AlignLeftOutlined />}
+            />
+            <ToolButton
+                title="居中"
+                onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                isActive={editor.isActive({textAlign: 'center'})}
+                icon={<AlignCenterOutlined />}
+            />
+            <ToolButton
+                title="右对齐"
+                onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                isActive={editor.isActive({textAlign: 'right'})}
+                icon={<AlignRightOutlined />}
+            />
+
+            <Divider />
+
+            {/* 标题 */}
+            <ToolButton
+                title="一级标题"
+                onClick={() => editor.chain().focus().toggleHeading({level: 1}).run()}
+                isActive={editor.isActive('heading', {level: 1})}
+            >
+                H1
+            </ToolButton>
+            <ToolButton
+                title="二级标题"
+                onClick={() => editor.chain().focus().toggleHeading({level: 2}).run()}
+                isActive={editor.isActive('heading', {level: 2})}
+            >
+                H2
+            </ToolButton>
+            <ToolButton
+                title="三级标题"
+                onClick={() => editor.chain().focus().toggleHeading({level: 3}).run()}
+                isActive={editor.isActive('heading', {level: 3})}
+            >
+                H3
+            </ToolButton>
+
+            <Divider />
+
+            {/* 列表和块 */}
+            <ToolButton
+                title="无序列表"
+                onClick={() => editor.chain().focus().toggleBulletList().run()}
+                isActive={editor.isActive('bulletList')}
+                icon={<UnorderedListOutlined />}
+            />
+            <ToolButton
+                title="有序列表"
+                onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                isActive={editor.isActive('orderedList')}
+                icon={<OrderedListOutlined />}
+            />
+            <ToolButton
+                title="代码块"
+                onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                isActive={editor.isActive('codeBlock')}
+                icon={<CodeOutlined />}
+            />
+            <ToolButton
+                title="引用"
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                isActive={editor.isActive('blockquote')}
+                icon={<BlockOutlined />}
+            />
+
+            <Divider />
+
+            {/* 插入和操作 */}
+            <ToolButton
+                title="分割线"
+                onClick={() => editor.chain().focus().setHorizontalRule().run()}
+                icon={<DashOutlined />}
+            />
+            <ToolButton
+                title="换行"
+                onClick={() => editor.chain().focus().setHardBreak().run()}
+                icon={<EnterOutlined />}
+            />
+
+            <Divider />
+
+            {/* 撤销重做 */}
+            <ToolButton
+                title="撤销"
+                onClick={() => editor.chain().focus().undo().run()}
+                icon={<UndoOutlined />}
+            />
+            <ToolButton
+                title="重做"
+                onClick={() => editor.chain().focus().redo().run()}
+                icon={<RedoOutlined />}
+            />
+
+            {/* 保存状态 */}
+            <div className="ml-auto">
+                <SaveStatusIndicator />
             </div>
-        </Affix>
+        </div>
     );
 };
 

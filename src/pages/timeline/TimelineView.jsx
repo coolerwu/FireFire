@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Spin, Empty } from 'antd';
-import { ClockCircleOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
+import { ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
 import { electronAPI } from '../../utils/electronAPI';
 import { logger } from '../../utils/logger';
 import { formatDisplayDate, getRelativeDate } from '../journal/dateUtils';
-import './timelineView.less';
 
 const ARTICLES_PER_PAGE = 20;
 
 /**
- * 时间线视图 - 按编辑时间倒序展示所有文章（无限滚动）
+ * 时间线视图 - Notion 风格按编辑时间倒序展示
  */
 const TimelineView = () => {
   const [articles, setArticles] = useState([]);
@@ -21,7 +20,6 @@ const TimelineView = () => {
   const loadMoreRef = useRef(null);
   const observerRef = useRef(null);
 
-  // 加载文章列表
   const loadArticles = useCallback(async (reset = false) => {
     if (loading) return;
 
@@ -29,7 +27,6 @@ const TimelineView = () => {
       setLoading(true);
       const currentOffset = reset ? 0 : offset;
 
-      // 从数据库获取文章列表，按更新时间倒序
       const newArticles = await electronAPI.getRecentNotes(ARTICLES_PER_PAGE, currentOffset);
 
       if (reset) {
@@ -47,13 +44,11 @@ const TimelineView = () => {
     }
   }, [loading, offset]);
 
-  // 初始加载
   useEffect(() => {
     loadArticles(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 设置 IntersectionObserver 实现无限滚动
   useEffect(() => {
     if (!loadMoreRef.current) return;
 
@@ -79,81 +74,149 @@ const TimelineView = () => {
     };
   }, [hasMore, loading, loadArticles]);
 
-  // 打开文章
   const openArticle = (article) => {
-    // TODO: 实现打开文章的逻辑
     logger.debug('[TimelineView] 打开文章:', article.id);
   };
 
   return (
-    <div className="timeline-view">
-      <div className="timeline-header">
-        <div className="timeline-title">
-          <ClockCircleOutlined style={{ fontSize: '24px', marginRight: '12px' }} />
-          <h1>时间线</h1>
-        </div>
-        <div className="timeline-stats">
-          共 {articles.length} 篇文章
+    <div className="h-full flex flex-col bg-notion-bg-primary dark:bg-notion-dark-bg-primary">
+      {/* 页面头部 */}
+      <div className="flex-shrink-0 px-8 py-6 border-b border-notion-border dark:border-notion-dark-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-notion-accent-purple/10 flex items-center justify-center">
+              <ClockCircleOutlined className="text-xl text-notion-accent-purple" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-notion-text-primary dark:text-notion-dark-text-primary">
+                时间线
+              </h1>
+              <p className="text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+                按时间浏览所有笔记
+              </p>
+            </div>
+          </div>
+
+          <div className="text-sm text-notion-text-secondary dark:text-notion-dark-text-secondary">
+            共 {articles.length} 篇文章
+          </div>
         </div>
       </div>
 
-      <div className="timeline-content" ref={timelineRef}>
-        {articles.map((article) => {
-          const updateDate = new Date(article.updatedAt);
-          return (
-            <div
-              key={article.id}
-              className="timeline-item"
-              onClick={() => openArticle(article)}
-            >
-              <div className="timeline-item-date">
-                <span className="date-display">{formatDisplayDate(updateDate)}</span>
-                <span className="date-relative">{getRelativeDate(article.updatedAt.split('T')[0])}</span>
-              </div>
-              <div className="timeline-item-content">
-                <h3 className="article-title">{article.title}</h3>
-                {article.path && (
-                  <div className="article-path">{article.path}</div>
-                )}
-                {article.tags && article.tags.length > 0 && (
-                  <div className="article-tags">
-                    {article.tags.map((tag, index) => (
-                      <span key={index} className="tag">#{tag}</span>
-                    ))}
+      {/* 时间线内容 */}
+      <div className="flex-1 overflow-y-auto" ref={timelineRef}>
+        <div className="max-w-3xl mx-auto px-8 py-6">
+          {articles.map((article, index) => {
+            const updateDate = new Date(article.updatedAt);
+            const prevArticle = articles[index - 1];
+            const prevDate = prevArticle ? new Date(prevArticle.updatedAt) : null;
+
+            // 检查是否需要显示日期分隔
+            const showDateDivider = !prevDate ||
+              updateDate.toDateString() !== prevDate.toDateString();
+
+            return (
+              <React.Fragment key={article.id}>
+                {/* 日期分隔 */}
+                {showDateDivider && (
+                  <div className="flex items-center gap-4 mb-4 mt-6 first:mt-0">
+                    <div className="text-sm font-semibold text-notion-text-primary dark:text-notion-dark-text-primary">
+                      {formatDisplayDate(updateDate)}
+                    </div>
+                    <div className="flex-1 h-px bg-notion-border dark:bg-notion-dark-border" />
+                    <div className="text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+                      {getRelativeDate(article.updatedAt.split('T')[0])}
+                    </div>
                   </div>
                 )}
+
+                {/* 文章卡片 */}
+                <div
+                  onClick={() => openArticle(article)}
+                  className="
+                    group p-4 mb-2 rounded-lg cursor-pointer
+                    border border-transparent
+                    hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover
+                    hover:border-notion-border dark:hover:border-notion-dark-border
+                    transition-all duration-fast
+                  "
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-md bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary flex items-center justify-center group-hover:bg-notion-bg-selected dark:group-hover:bg-notion-dark-bg-selected transition-colors">
+                      <FileTextOutlined className="text-notion-text-tertiary dark:text-notion-dark-text-tertiary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-medium text-notion-text-primary dark:text-notion-dark-text-primary truncate">
+                        {article.title}
+                      </h3>
+                      {article.path && (
+                        <div className="text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary mt-0.5 truncate">
+                          {article.path}
+                        </div>
+                      )}
+                      {article.tags && article.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {article.tags.map((tag, tagIndex) => (
+                            <span
+                              key={tagIndex}
+                              className="
+                                px-2 py-0.5 rounded text-xs
+                                bg-notion-accent-blue/10 text-notion-accent-blue
+                              "
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-shrink-0 text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+                      {updateDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
+              </React.Fragment>
+            );
+          })}
+
+          {/* 加载更多 */}
+          {hasMore && (
+            <div ref={loadMoreRef} className="py-8 flex justify-center">
+              {loading && (
+                <div className="flex items-center gap-3 text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+                  <Spin size="small" />
+                  <span className="text-sm">加载更多文章...</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 到底了 */}
+          {!hasMore && articles.length > 0 && (
+            <div className="py-8 text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary">
+                <span className="text-sm text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+                  已加载全部 {articles.length} 篇文章
+                </span>
               </div>
             </div>
-          );
-        })}
+          )}
 
-        {/* 加载更多触发器 */}
-        {hasMore && (
-          <div ref={loadMoreRef} className="load-more-trigger">
-            {loading && (
-              <div className="loading-indicator">
-                <Spin tip="加载更多文章..." />
+          {/* 空状态 */}
+          {!loading && articles.length === 0 && (
+            <div className="py-20 flex flex-col items-center justify-center">
+              <div className="w-16 h-16 rounded-2xl bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary flex items-center justify-center mb-4">
+                <ClockCircleOutlined className="text-3xl text-notion-text-tertiary dark:text-notion-dark-text-tertiary" />
               </div>
-            )}
-          </div>
-        )}
-
-        {/* 没有更多文章 */}
-        {!hasMore && articles.length > 0 && (
-          <div className="no-more">
-            <p>已加载全部 {articles.length} 篇文章</p>
-          </div>
-        )}
-
-        {/* 空状态 */}
-        {!loading && articles.length === 0 && (
-          <div className="empty-state">
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="还没有文章"
-            />
-          </div>
-        )}
+              <h3 className="text-lg font-medium text-notion-text-primary dark:text-notion-dark-text-primary mb-2">
+                还没有文章
+              </h3>
+              <p className="text-sm text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+                创建第一篇笔记开始记录
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

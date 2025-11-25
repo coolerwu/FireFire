@@ -3,6 +3,9 @@ import { Plugin, PluginKey } from '@tiptap/pm/state';
 import Suggestion from '@tiptap/suggestion';
 import { linkSuggestion } from './linkSuggestion';
 
+// 创建唯一的 PluginKey 以避免与其他 Suggestion 插件冲突
+const linkSuggestionPluginKey = new PluginKey('linkSuggestion');
+
 /**
  * Internal Link Extension - 支持 [[链接]] 语法
  *
@@ -160,6 +163,7 @@ export const InternalLinkExtension = Node.create({
       // Suggestion 插件（自动补全）
       Suggestion({
         editor: this.editor,
+        pluginKey: linkSuggestionPluginKey,
         ...linkSuggestion,
       }),
 

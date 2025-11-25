@@ -1,4 +1,4 @@
-const {override, fixBabelImports, addLessLoader, addWebpackAlias, adjustStyleLoaders} = require("customize-cra");
+const {override, fixBabelImports, addLessLoader, addWebpackAlias, adjustStyleLoaders, addPostcssPlugins} = require("customize-cra");
 const path = require("path");
 
 module.exports = override(
@@ -12,10 +12,15 @@ module.exports = override(
         lessOptions: {
             javascriptEnabled: true,
             modifyVars: {
-                '@primary-color': '#25b864',
+                '@primary-color': '#0f7b6c', // Notion 绿色
             }
         }
     }),
+    // 添加 PostCSS 插件支持 Tailwind
+    addPostcssPlugins([
+        require('tailwindcss'),
+        require('autoprefixer'),
+    ]),
     adjustStyleLoaders(({use: [, , postcss]}) => {
         const postcssOptions = postcss.options;
         postcss.options = {postcssOptions};

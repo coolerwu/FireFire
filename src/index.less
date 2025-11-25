@@ -1,54 +1,56 @@
-// 极简主义设计系统
+// Notion 风格设计系统 - Less 变量（用于 Ant Design 组件覆盖）
 :root {
-  // 中性色（灰度）
-  --gray-50: #fafafa;
-  --gray-100: #f5f5f5;
-  --gray-200: #e5e5e5;
-  --gray-300: #d4d4d4;
-  --gray-400: #a3a3a3;
-  --gray-500: #737373;
-  --gray-600: #525252;
-  --gray-700: #404040;
-  --gray-800: #262626;
-  --gray-900: #171717;
+  // Notion 亮色模式
+  --notion-bg-primary: #ffffff;
+  --notion-bg-secondary: #f7f6f3;
+  --notion-bg-tertiary: #f1f1ef;
+  --notion-bg-hover: rgba(55, 53, 47, 0.08);
+  --notion-text-primary: #37352f;
+  --notion-text-secondary: #787774;
+  --notion-text-tertiary: #9b9a97;
+  --notion-border: rgba(55, 53, 47, 0.09);
+  --notion-border-strong: rgba(55, 53, 47, 0.16);
 
-  // 强调色（品牌色）
-  --primary: #25b864;
-  --primary-hover: #1fa354;
-  --primary-light: #e6f7ef;
-
-  // 功能色
-  --success: #10b981;
-  --error: #ef4444;
-  --warning: #f59e0b;
-
-  // 语义色
-  --bg: #ffffff;
-  --fg: #171717;
-  --border: #e5e5e5;
-  --muted: #737373;
+  // 强调色
+  --notion-accent-blue: #2eaadc;
+  --notion-accent-green: #0f7b6c;
+  --notion-accent-red: #e03e3e;
 
   // 布局
-  --sidebar-width: 80px;
-  --doc-width: 720px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --editor-width: 700px;
 
-  // 间距（4px 基准）
+  // 间距
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 12px;
   --spacing-lg: 16px;
   --spacing-xl: 24px;
-  --spacing-2xl: 32px;
 
   // 圆角
-  --radius-sm: 4px;
+  --radius-sm: 3px;
   --radius-md: 6px;
   --radius-lg: 8px;
 
-  // 阴影（简化）
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+  // 阴影
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+  --shadow-menu: 0 0 0 1px rgba(55, 53, 47, 0.09), 0 3px 6px rgba(55, 53, 47, 0.15);
+}
+
+// 暗色模式变量
+.dark {
+  --notion-bg-primary: #191919;
+  --notion-bg-secondary: #202020;
+  --notion-bg-tertiary: #2f2f2f;
+  --notion-bg-hover: rgba(255, 255, 255, 0.055);
+  --notion-text-primary: #e3e2e0;
+  --notion-text-secondary: #9b9a97;
+  --notion-text-tertiary: #6b6b6b;
+  --notion-border: rgba(255, 255, 255, 0.094);
+  --notion-border-strong: rgba(255, 255, 255, 0.16);
+  --shadow-menu: 0 0 0 1px rgba(255, 255, 255, 0.094), 0 3px 6px rgba(0, 0, 0, 0.4);
 }
 
 // 全局样式重置
@@ -58,207 +60,318 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
-  background: var(--gray-50);
+  background: var(--notion-bg-primary);
+  color: var(--notion-text-primary);
+}
+
+#root {
+  height: 100%;
 }
 
 // 主应用容器
 .app-container {
-  position: relative;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: var(--gray-50);
+  background: var(--notion-bg-primary);
 }
 
-// 侧边栏
-.sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: var(--sidebar-width);
-  height: 100vh;
-  background: var(--bg);
-  border-right: 1px solid var(--border);
-  z-index: 1000;
-  overflow: hidden; // 防止内容溢出
-}
+// Ant Design 组件样式覆盖 - Notion 风格
 
-// 主内容区
-.main-content {
-  margin-left: var(--sidebar-width);
-  width: calc(100vw - var(--sidebar-width));
-  height: 100vh;
-  background: var(--bg);
-  overflow: hidden; // 防止内容溢出
-  position: relative; // 确保子元素相对定位
-}
-
-.slider {
-  border-right: 1px solid var(--border);
-  height: calc(100vh);
-  background: var(--bg);
-}
-
-.content {
-  height: calc(100vh);
-  background: var(--gray-50);
-}
-
-// Ant Design 组件美化（极简风格）
-.ant-menu {
-  &.ant-menu-inline {
-    .ant-menu-item {
-      margin: var(--spacing-sm);
-      height: 48px;
-      line-height: 48px;
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted);
-      background: transparent;
-      border: none;
-      transition: all 0.2s ease;
-
-      .anticon {
-        font-size: 20px;
-        margin: 0;
-      }
-
-      &:hover {
-        background: var(--gray-100);
-        color: var(--fg);
-      }
-
-      &.ant-menu-item-selected {
-        background: var(--primary-light);
-        color: var(--primary);
-
-        &::after {
-          display: none;
-        }
-      }
-    }
-  }
-}
-
-// Modal 美化
+// Modal 弹窗
 .ant-modal {
   .ant-modal-content {
     border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-menu);
+    background: var(--notion-bg-primary);
   }
 
   .ant-modal-header {
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
+    background: var(--notion-bg-primary);
+    border-bottom: 1px solid var(--notion-border);
     padding: var(--spacing-lg) var(--spacing-xl);
   }
 
   .ant-modal-title {
     font-weight: 600;
     font-size: 16px;
-    color: var(--fg);
+    color: var(--notion-text-primary);
   }
 
   .ant-modal-body {
     padding: var(--spacing-xl);
+    background: var(--notion-bg-primary);
   }
 
   .ant-modal-footer {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--notion-border);
     padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--notion-bg-primary);
 
     .ant-btn {
-      border-radius: var(--radius-md);
-      height: 36px;
-      padding: 0 var(--spacing-lg);
+      border-radius: var(--radius-sm);
+      height: 32px;
+      padding: 0 var(--spacing-md);
       font-weight: 500;
-      transition: all 0.2s ease;
+      font-size: 14px;
+      transition: all 150ms ease-out;
 
       &.ant-btn-primary {
-        background: var(--primary);
+        background: var(--notion-accent-green);
         border: none;
+        color: white;
 
         &:hover {
-          background: var(--primary-hover);
+          opacity: 0.9;
         }
       }
 
       &:not(.ant-btn-primary) {
-        border: 1px solid var(--border);
+        border: 1px solid var(--notion-border);
+        background: transparent;
+        color: var(--notion-text-primary);
 
         &:hover {
-          border-color: var(--primary);
-          color: var(--primary);
+          background: var(--notion-bg-hover);
         }
       }
     }
   }
 }
 
-// Message 通知美化
+// Message 通知
 .ant-message {
   .ant-message-notice-content {
     border-radius: var(--radius-md);
-    padding: var(--spacing-md) var(--spacing-lg);
-    box-shadow: var(--shadow-md);
-    background: var(--bg);
-    border: 1px solid var(--border);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    box-shadow: var(--shadow-menu);
+    background: var(--notion-bg-primary);
+    border: 1px solid var(--notion-border);
   }
 
   .ant-message-success .anticon {
-    color: var(--success);
+    color: var(--notion-accent-green);
   }
 
   .ant-message-error .anticon {
-    color: var(--error);
+    color: var(--notion-accent-red);
   }
 
   .ant-message-info .anticon {
-    color: var(--primary);
+    color: var(--notion-accent-blue);
   }
 }
 
-// Input 输入框美化
-.ant-input, .ant-input-affix-wrapper {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  transition: all 0.2s ease;
+// Input 输入框
+.ant-input,
+.ant-input-affix-wrapper {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--notion-border);
+  background: var(--notion-bg-primary);
+  color: var(--notion-text-primary);
+  transition: all 150ms ease-out;
+
+  &::placeholder {
+    color: var(--notion-text-tertiary);
+  }
 
   &:hover {
-    border-color: var(--gray-300);
+    border-color: var(--notion-border-strong);
   }
 
-  &:focus, &-focused {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px var(--primary-light);
+  &:focus,
+  &-focused {
+    border-color: var(--notion-accent-blue);
+    box-shadow: 0 0 0 2px rgba(46, 170, 220, 0.2);
   }
 }
 
-// 页面切换动画（简化）
-.fade-enter {
+// Select 选择器
+.ant-select {
+  .ant-select-selector {
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--notion-border) !important;
+    background: var(--notion-bg-primary) !important;
+
+    &:hover {
+      border-color: var(--notion-border-strong) !important;
+    }
+  }
+
+  &.ant-select-focused .ant-select-selector {
+    border-color: var(--notion-accent-blue) !important;
+    box-shadow: 0 0 0 2px rgba(46, 170, 220, 0.2) !important;
+  }
+}
+
+.ant-select-dropdown {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-menu);
+  background: var(--notion-bg-primary);
+  border: 1px solid var(--notion-border);
+  padding: var(--spacing-xs);
+
+  .ant-select-item {
+    border-radius: var(--radius-sm);
+    color: var(--notion-text-primary);
+
+    &:hover {
+      background: var(--notion-bg-hover);
+    }
+
+    &-option-selected {
+      background: var(--notion-bg-hover);
+      font-weight: 500;
+    }
+  }
+}
+
+// Button 按钮
+.ant-btn {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: all 150ms ease-out;
+
+  &.ant-btn-primary {
+    background: var(--notion-accent-green);
+    border-color: var(--notion-accent-green);
+
+    &:hover {
+      opacity: 0.9;
+      background: var(--notion-accent-green);
+      border-color: var(--notion-accent-green);
+    }
+  }
+
+  &.ant-btn-default {
+    border: 1px solid var(--notion-border);
+    background: transparent;
+    color: var(--notion-text-primary);
+
+    &:hover {
+      background: var(--notion-bg-hover);
+      border-color: var(--notion-border-strong);
+      color: var(--notion-text-primary);
+    }
+  }
+
+  &.ant-btn-text {
+    color: var(--notion-text-secondary);
+
+    &:hover {
+      background: var(--notion-bg-hover);
+      color: var(--notion-text-primary);
+    }
+  }
+}
+
+// Tooltip 工具提示
+.ant-tooltip {
+  .ant-tooltip-inner {
+    background: var(--notion-text-primary);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .ant-tooltip-arrow-content {
+    background: var(--notion-text-primary);
+  }
+}
+
+// Dropdown 下拉菜单
+.ant-dropdown-menu {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-menu);
+  background: var(--notion-bg-primary);
+  border: 1px solid var(--notion-border);
+  padding: var(--spacing-xs);
+
+  .ant-dropdown-menu-item {
+    border-radius: var(--radius-sm);
+    color: var(--notion-text-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+
+    &:hover {
+      background: var(--notion-bg-hover);
+    }
+
+    &-selected {
+      background: var(--notion-bg-hover);
+    }
+  }
+}
+
+// Spin 加载
+.ant-spin {
+  .ant-spin-dot-item {
+    background-color: var(--notion-accent-green);
+  }
+}
+
+// Popover 气泡卡片
+.ant-popover {
+  .ant-popover-inner {
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-menu);
+    background: var(--notion-bg-primary);
+  }
+}
+
+// 页面切换动画
+.page-transition-enter {
   opacity: 0;
 }
 
-.fade-enter-active {
+.page-transition-enter-active {
   opacity: 1;
-  transition: opacity 0.2s ease;
+  transition: opacity 150ms ease-out;
 }
 
-.fade-exit {
+.page-transition-exit {
   opacity: 1;
 }
 
-.fade-exit-active {
+.page-transition-exit-active {
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 150ms ease-out;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(55, 53, 47, 0.16);
+  border-radius: 4px;
+
+  &:hover {
+    background: rgba(55, 53, 47, 0.24);
+  }
+}
+
+.dark {
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.24);
+    }
+  }
 }
