@@ -149,3 +149,5 @@ Editor updates trigger `persist()` function in `src/utils/cwjsonFileOp.js`, whic
 - `nodeIntegration: true` with preload script limits renderer access
 - All file paths are validated to be within notebook/attachment directories
 - 中文回复
+- 每一次变动都需要更新readme
+- 每次修改都要调整版本号
