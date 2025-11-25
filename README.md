@@ -212,6 +212,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-25 | **v0.6.6** - Skip canvas in electron-rebuild (-o canvas) |
 | 2025-11-25 | **v0.6.5** - Fixed npm 9+ compatibility (--omit=optional) |
 | 2025-11-25 | **v0.6.4** - Fixed native module crash by upgrading CI to Node.js 18.x |
 | 2025-11-25 | **v0.6.3** - Updated CI to use macos-15-intel (macos-13 deprecated) |

@@ -24,7 +24,7 @@ jobs:
           cache: 'npm'
       - run: npm install --omit=optional --no-audit
       - name: Rebuild native modules
-        run: npx @electron/rebuild -f -w better-sqlite3
+        run: npx @electron/rebuild -f -w better-sqlite3 -o canvas
       - run: npm run build --if-present
       - name: 读取当前版本号
         id: version
@@ -61,7 +61,7 @@ jobs:
       - name: Install dependencies
         run: npm install --omit=optional --prefer-offline --no-audit || true
       - name: Rebuild native modules
-        run: npx @electron/rebuild -f -w better-sqlite3
+        run: npx @electron/rebuild -f -w better-sqlite3 -o canvas
       - run: npm run build --if-present
       - name: 读取当前版本号
         id: version
@@ -94,7 +94,7 @@ jobs:
     - run: npm install --omit=optional --no-audit
     - run: npm install dmg-license --save-dev
     - name: Rebuild native modules for x64
-      run: npx @electron/rebuild -f -w better-sqlite3 --arch=x64
+      run: npx @electron/rebuild -f -w better-sqlite3 --arch=x64 -o canvas
     - run: npm run build --if-present
     - name: 读取当前版本号
       id: version
@@ -129,7 +129,7 @@ jobs:
     - run: npm install --omit=optional --no-audit
     - run: npm install dmg-license --save-dev
     - name: Rebuild native modules for arm64
-      run: npx @electron/rebuild -f -w better-sqlite3 --arch=arm64
+      run: npx @electron/rebuild -f -w better-sqlite3 --arch=arm64 -o canvas
     - run: npm run build --if-present
     - name: 读取当前版本号
       id: version
