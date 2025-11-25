@@ -22,8 +22,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: npm config set optional false
-      - run: npm install --no-audit
+      - run: npm install --omit=optional --no-audit
       - name: Rebuild native modules
         run: npx @electron/rebuild -f -w better-sqlite3
       - run: npm run build --if-present
@@ -60,11 +59,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: |
-          npm config set optional false
-          npm install --prefer-offline --no-audit || true
-        env:
-          npm_config_build_from_source: false
+        run: npm install --omit=optional --prefer-offline --no-audit || true
       - name: Rebuild native modules
         run: npx @electron/rebuild -f -w better-sqlite3
       - run: npm run build --if-present
@@ -96,8 +91,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm config set optional false
-    - run: npm install --no-audit
+    - run: npm install --omit=optional --no-audit
     - run: npm install dmg-license --save-dev
     - name: Rebuild native modules for x64
       run: npx @electron/rebuild -f -w better-sqlite3 --arch=x64
@@ -132,8 +126,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm config set optional false
-    - run: npm install --no-audit
+    - run: npm install --omit=optional --no-audit
     - run: npm install dmg-license --save-dev
     - name: Rebuild native modules for arm64
       run: npx @electron/rebuild -f -w better-sqlite3 --arch=arm64
