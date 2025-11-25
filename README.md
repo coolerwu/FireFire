@@ -94,7 +94,7 @@ npm run package-linux   # Linux
 - **Editor**: Tiptap 2 (ProseMirror)
 - **Desktop**: Electron 20
 - **Database**: SQLite (better-sqlite3) with FTS5
-- **Styling**: Less, CSS-in-JS
+- **Styling**: Tailwind CSS, Less
 
 ### License
 
@@ -196,7 +196,7 @@ npm run package-linux   # Linux
 - **编辑器**: Tiptap 2 (ProseMirror)
 - **桌面**: Electron 20
 - **数据库**: SQLite (better-sqlite3) with FTS5
-- **样式**: Less, CSS-in-JS
+- **样式**: Tailwind CSS, Less
 
 ### 协议
 
@@ -212,6 +212,10 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-25 | **v0.6.0** - Notion-style UI refactor with Tailwind CSS |
+| 2025-11-25 | Added welcome page for first-time setup |
+| 2025-11-25 | Fixed slash commands and internal links conflict |
+| 2025-11-25 | Optimized tag sidebar, link suggestions, slash menu styles |
 | 2025-11-21 | Added daily journal feature (Logseq-style) |
 | 2025-11-21 | Added timeline view for browsing notes by edit time |
 | 2025-11-21 | Added SQLite database with FTS5 full-text search |
