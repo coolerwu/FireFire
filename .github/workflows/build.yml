@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 16.x ]
+        node-version: [ 18.x ]
     env:
       CI: false
     steps:
@@ -45,7 +45,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        node-version: [ 16.x ]
+        node-version: [ 18.x ]
     env:
       CI: false
     steps:
@@ -86,7 +86,7 @@ jobs:
     runs-on: macos-15-intel  # Intel runner
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
     env:
       CI: false
     steps:
@@ -122,7 +122,7 @@ jobs:
     runs-on: macos-latest  # Apple Silicon runner
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
     env:
       CI: false
     steps:
@@ -158,10 +158,10 @@ jobs:
     needs: ['build-mac-x64', 'build-mac-arm64', 'build-win', 'build-linux']
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 18.x
           cache: 'npm'
       - name: 读取当前版本号
         id: version
