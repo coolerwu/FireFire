@@ -112,11 +112,16 @@ jobs:
     - run: npm run package-mac-x64
     - name: Rename DMG
       run: mv "./target/firefire-${{steps.version.outputs.value}}.dmg" "./target/firefire-${{steps.version.outputs.value}}-x64.dmg" || mv "./target/firefire-${{steps.version.outputs.value}}-x64.dmg" "./target/firefire-${{steps.version.outputs.value}}-x64.dmg"
-    - name: Upload
+    - name: Upload DMG
       uses: actions/upload-artifact@v4
       with:
         name: firefire-${{steps.version.outputs.value}}-x64.dmg
         path: ./target/firefire-${{steps.version.outputs.value}}-x64.dmg
+    - name: Upload latest-mac.yml
+      uses: actions/upload-artifact@v4
+      with:
+        name: latest-mac-x64.yml
+        path: ./target/latest-mac.yml
 
   # macOS Apple Silicon (arm64) build
   build-mac-arm64:
@@ -149,11 +154,16 @@ jobs:
     - run: npm run package-mac-arm64
     - name: Rename DMG
       run: mv "./target/firefire-${{steps.version.outputs.value}}.dmg" "./target/firefire-${{steps.version.outputs.value}}-arm64.dmg" || mv "./target/firefire-${{steps.version.outputs.value}}-arm64.dmg" "./target/firefire-${{steps.version.outputs.value}}-arm64.dmg"
-    - name: Upload
+    - name: Upload DMG
       uses: actions/upload-artifact@v4
       with:
         name: firefire-${{steps.version.outputs.value}}-arm64.dmg
         path: ./target/firefire-${{steps.version.outputs.value}}-arm64.dmg
+    - name: Upload latest-mac.yml
+      uses: actions/upload-artifact@v4
+      with:
+        name: latest-mac-arm64.yml
+        path: ./target/latest-mac.yml
 
   release:
     runs-on: ubuntu-latest
@@ -237,3 +247,17 @@ jobs:
           asset_path: ./firefire-${{steps.version.outputs.value}}.deb
           asset_name: firefire-${{steps.version.outputs.value}}.deb
           asset_content_type: application/octet-stream
+      # Upload latest-mac.yml for auto-update (use arm64 build's yml)
+      - name: Download latest-mac.yml
+        uses: actions/download-artifact@v4
+        with:
+          name: latest-mac-arm64.yml
+      - name: Upload latest-mac.yml
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.create_release.outputs.upload_url}}
+          asset_path: ./latest-mac.yml
+          asset_name: latest-mac.yml
+          asset_content_type: text/yaml

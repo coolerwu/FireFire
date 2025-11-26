@@ -4,6 +4,14 @@
 
 ---
 
+## Screenshots / 截图
+
+| Daily Journal / 日记 | Timeline / 时间线 | AI Chat / AI 对话 |
+|:---:|:---:|:---:|
+| ![Journal](docs/screenshots/journal.png) | ![Timeline](docs/screenshots/timeline.png) | ![AI Chat](docs/screenshots/ai-chat.png) |
+
+---
+
 ## English
 
 ### Overview
@@ -236,6 +244,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-26 | **v0.6.23** - Added database maintenance tools (integrity check, repair, FTS rebuild); Fixed AI config sync issue; Fixed toolbar overflow; Added screenshots to README; Fixed auto-update yml upload in CI |
 | 2025-11-26 | **v0.6.22** - Added AI assistant (OpenAI/Claude/DeepSeek); Added WebDAV sync (Jianguoyun/Nextcloud); New icon setup |
 | 2025-11-26 | **v0.6.21** - Added global search modal (Cmd/Ctrl+K); Improved journal styling (Logseq-style); Fixed workspace switching issue |
 | 2025-11-26 | **v0.6.20** - Fixed directory structure: journals folder now correctly located inside notebook/; Removed "所有笔记" sidebar entry; Added delete button in timeline view; New note opens in standalone editor; Added factory reset in settings |
