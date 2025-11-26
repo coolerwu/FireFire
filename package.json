@@ -1,6 +1,6 @@
 {
   "name": "firefire",
-  "version": "0.6.9",
+  "version": "0.6.21",
   "private": true,
   "main": "main.js",
   "homepage": ".",
@@ -36,7 +36,7 @@
     "antd": "^5.4.0",
     "autoprefixer": "^10.4.22",
     "babel-plugin-import": "^1.13.5",
-    "better-sqlite3": "^11.10.0",
+    "better-sqlite3": "^9.6.0",
     "customize-cra": "^1.0.0",
     "dayjs": "^1.11.19",
     "dompurify": "^3.3.0",
@@ -106,12 +106,15 @@
       "electron/**/*",
       "main.js",
       "preload.js",
-      "package.json"
+      "package.json",
+      "!node_modules/canvas/**/*"
     ],
     "extraMetadata": {
       "main": "main.js"
     },
-    "asarUnpack": [],
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*"
+    ],
     "npmRebuild": true,
     "buildDependenciesFromSource": true,
     "publish": {

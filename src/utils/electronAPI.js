@@ -232,6 +232,10 @@ const mockAPI = {
         console.warn('[Mock Mode] completeFirstTimeSetup called');
         return { success: true };
     },
+    factoryReset: async () => {
+        console.warn('[Mock Mode] factoryReset called - not available in browser');
+        return { success: false, error: '浏览器模式不支持恢复出厂设置' };
+    },
 }
 
 // 导出 API（优先使用真实 API，否则使用 mock）

@@ -1,6 +1,6 @@
 import './markdown.less'
 import {EditorContent, useEditor} from '@tiptap/react';
-import React, {useContext} from 'react';
+import React, {useContext, useState, useRef, useEffect} from 'react';
 import MenuBar from "./menuBar";
 import {message} from "antd";
 import Bubble from "./bubble";
@@ -12,6 +12,72 @@ import {handleAPIError} from "../../utils/errorHandler";
 import {logger} from "../../utils/logger";
 
 const Markdown = ({cwjson}) => {
+    // 标题状态 - 从文件名中提取（去掉后缀）
+    const [title, setTitle] = useState('');
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const titleInputRef = useRef(null);
+    const originalTitleRef = useRef('');
+
+    // 初始化标题
+    useEffect(() => {
+        if (cwjson?.id) {
+            setTitle(cwjson.id);
+            originalTitleRef.current = cwjson.id;
+        }
+    }, [cwjson?.id]);
+
+    // 聚焦到标题输入框
+    useEffect(() => {
+        if (isEditingTitle && titleInputRef.current) {
+            titleInputRef.current.focus();
+            titleInputRef.current.select();
+        }
+    }, [isEditingTitle]);
+
+    // 保存标题（重命名文件）
+    const handleTitleSave = async () => {
+        setIsEditingTitle(false);
+        const newTitle = title.trim();
+
+        if (!newTitle || newTitle === originalTitleRef.current) {
+            setTitle(originalTitleRef.current);
+            return;
+        }
+
+        try {
+            // 构建旧路径和新路径
+            const oldPath = cwjson.id;
+            const newPath = newTitle;
+
+            const success = await electronAPI.renameNotebookFile(oldPath, newPath);
+
+            if (success) {
+                message.success('重命名成功');
+                originalTitleRef.current = newTitle;
+                // 更新 cwjson 对象
+                cwjson.id = newTitle;
+                cwjson.filename = newTitle + (cwjson.filename.substring(cwjson.filename.lastIndexOf('.')));
+            } else {
+                message.error('重命名失败，文件可能已存在');
+                setTitle(originalTitleRef.current);
+            }
+        } catch (error) {
+            logger.error('[Markdown] 重命名失败:', error);
+            message.error('重命名失败');
+            setTitle(originalTitleRef.current);
+        }
+    };
+
+    // 处理标题输入框按键
+    const handleTitleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleTitleSave();
+        } else if (e.key === 'Escape') {
+            setTitle(originalTitleRef.current);
+            setIsEditingTitle(false);
+        }
+    };
     //上下文
     const {curDir, setting} = useContext(Context);
 
@@ -107,6 +173,40 @@ const Markdown = ({cwjson}) => {
                 }}
             >
                 <MenuBar editor={editor}/>
+                {/* 可编辑标题 */}
+                <div className="max-w-[var(--doc-width)] mx-auto px-4 pt-8 pb-2">
+                    {isEditingTitle ? (
+                        <input
+                            ref={titleInputRef}
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            onBlur={handleTitleSave}
+                            onKeyDown={handleTitleKeyDown}
+                            className="
+                                w-full text-3xl font-bold
+                                bg-transparent border-none outline-none
+                                text-notion-text-primary dark:text-notion-dark-text-primary
+                                placeholder-notion-text-tertiary dark:placeholder-notion-dark-text-tertiary
+                            "
+                            placeholder="输入标题..."
+                        />
+                    ) : (
+                        <h1
+                            onClick={() => setIsEditingTitle(true)}
+                            className="
+                                text-3xl font-bold cursor-text
+                                text-notion-text-primary dark:text-notion-dark-text-primary
+                                hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover
+                                px-1 -mx-1 py-0.5 rounded
+                                transition-colors duration-fast
+                            "
+                            title="点击编辑标题（会重命名文件）"
+                        >
+                            {title || '未命名'}
+                        </h1>
+                    )}
+                </div>
                 <EditorContent editor={editor}/>
             </div>
         </div>

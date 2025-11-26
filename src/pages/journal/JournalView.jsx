@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { DatePicker, Spin } from 'antd';
 import { CalendarOutlined, UpOutlined, PlusOutlined } from '@ant-design/icons';
 import JournalEntry from './JournalEntry';
 import { formatDate } from './dateUtils';
 import { electronAPI } from '../../utils/electronAPI';
 import { logger } from '../../utils/logger';
+import { Context } from '../../index';
 
 const JOURNALS_PER_PAGE = 10;
 
@@ -12,68 +13,114 @@ const JOURNALS_PER_PAGE = 10;
  * 日记视图组件 - Notion 风格无限滚动时间轴
  */
 const JournalView = () => {
+  const { refreshKey } = useContext(Context);
   const [journals, setJournals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [offset, setOffset] = useState(0);
 
   const timelineRef = useRef(null);
   const loadMoreRef = useRef(null);
-  const observerRef = useRef(null);
+  const refreshKeyRef = useRef(refreshKey);
 
-  const loadJournals = useCallback(async (reset = false) => {
-    if (loading) return;
+  // 使用单一 ref 对象管理所有可变状态，避免闭包问题
+  const stateRef = useRef({
+    loading: false,
+    hasMore: true,
+    offset: 0,
+    initialized: false
+  });
+
+  // 加载日记的函数 - 不使用 useCallback，直接定义
+  const loadJournals = async (reset = false) => {
+    const state = stateRef.current;
+
+    // 防止并发加载
+    if (state.loading) {
+      return;
+    }
 
     try {
+      state.loading = true;
       setLoading(true);
-      const currentOffset = reset ? 0 : offset;
+
+      const currentOffset = reset ? 0 : state.offset;
+      logger.debug(`[JournalView] 加载日记: reset=${reset}, offset=${currentOffset}`);
 
       const newJournals = await electronAPI.getJournals(JOURNALS_PER_PAGE, currentOffset);
 
       if (reset) {
         setJournals(newJournals);
+        state.offset = newJournals.length;
       } else {
         setJournals(prev => [...prev, ...newJournals]);
+        state.offset = currentOffset + newJournals.length;
       }
 
-      setHasMore(newJournals.length === JOURNALS_PER_PAGE);
-      setOffset(currentOffset + newJournals.length);
+      const more = newJournals.length === JOURNALS_PER_PAGE;
+      state.hasMore = more;
+      setHasMore(more);
+
+      logger.debug(`[JournalView] 加载完成: count=${newJournals.length}, hasMore=${more}`);
     } catch (error) {
       logger.error('[JournalView] 加载日记列表失败:', error);
     } finally {
+      state.loading = false;
       setLoading(false);
     }
-  }, [loading, offset]);
+  };
 
+  // 初始加载 - 只执行一次
   useEffect(() => {
-    loadJournals(true);
+    const state = stateRef.current;
+    if (!state.initialized) {
+      state.initialized = true;
+      loadJournals(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 监听 refreshKey 变化，刷新列表（跳过初始渲染）
   useEffect(() => {
-    if (!loadMoreRef.current) return;
+    if (refreshKeyRef.current !== refreshKey) {
+      refreshKeyRef.current = refreshKey;
+      logger.debug('[JournalView] refreshKey 变化，重新加载列表');
+      // 重置状态
+      stateRef.current.offset = 0;
+      stateRef.current.hasMore = true;
+      loadJournals(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshKey]);
 
-    const options = {
-      root: timelineRef.current,
-      rootMargin: '100px',
-      threshold: 0.1,
-    };
+  // IntersectionObserver 用于无限滚动 - 只设置一次
+  useEffect(() => {
+    const element = loadMoreRef.current;
+    if (!element) return;
 
-    observerRef.current = new IntersectionObserver((entries) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && hasMore && !loading) {
-        loadJournals(false);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        const state = stateRef.current;
+
+        // 只有当元素可见、还有更多内容、且不在加载中时才加载
+        if (entry.isIntersecting && state.hasMore && !state.loading) {
+          loadJournals(false);
+        }
+      },
+      {
+        root: timelineRef.current,
+        rootMargin: '100px',
+        threshold: 0.1,
       }
-    }, options);
+    );
 
-    observerRef.current.observe(loadMoreRef.current);
+    observer.observe(element);
 
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      observer.disconnect();
     };
-  }, [hasMore, loading, loadJournals]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const goToToday = () => {
     if (timelineRef.current) {
@@ -91,7 +138,10 @@ const JournalView = () => {
       await electronAPI.createJournal(targetDate);
     }
 
-    loadJournals(true);
+    // 重置状态
+    stateRef.current.offset = 0;
+    stateRef.current.hasMore = true;
+    await loadJournals(true);
 
     setTimeout(() => {
       const targetElement = document.querySelector(`[data-journal-id="${targetDate}"]`);
@@ -107,61 +157,49 @@ const JournalView = () => {
 
   const handleCreateToday = async () => {
     await electronAPI.createJournal();
-    loadJournals(true);
+    // 重置状态
+    stateRef.current.offset = 0;
+    stateRef.current.hasMore = true;
+    await loadJournals(true);
   };
 
   return (
     <div className="h-full flex flex-col bg-notion-bg-primary dark:bg-notion-dark-bg-primary">
-      {/* 页面头部 */}
-      <div className="flex-shrink-0 px-8 py-6 border-b border-notion-border dark:border-notion-dark-border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-notion-accent-orange/10 flex items-center justify-center">
-              <CalendarOutlined className="text-xl text-notion-accent-orange" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-notion-text-primary dark:text-notion-dark-text-primary">
-                日记
-              </h1>
-              <p className="text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
-                记录每一天的想法
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={goToToday}
-              className="
-                flex items-center gap-2 px-3 py-1.5 rounded-md
-                text-sm font-medium
-                text-notion-text-secondary dark:text-notion-dark-text-secondary
-                hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover
-                transition-colors duration-fast
-              "
-            >
-              <UpOutlined className="text-xs" />
-              返回今天
-            </button>
-            <DatePicker
-              onChange={jumpToDate}
-              placeholder="跳转日期"
-              allowClear
-              format="YYYY-MM-DD"
-              className="w-36"
-            />
-          </div>
-        </div>
-      </div>
-
       {/* 日记时间线 */}
       <div className="flex-1 overflow-y-auto" ref={timelineRef}>
-        <div className="max-w-3xl mx-auto px-8 py-6">
+        {/* 顶部工具栏 - 浮动在右上角 */}
+        <div className="sticky top-0 z-10 flex items-center justify-end gap-2 px-6 py-3">
+          <button
+            onClick={goToToday}
+            className="
+              flex items-center gap-1.5 px-2.5 py-1 rounded-md
+              text-xs font-medium
+              text-notion-text-tertiary dark:text-notion-dark-text-tertiary
+              hover:text-notion-text-primary dark:hover:text-notion-dark-text-primary
+              hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover
+              transition-colors duration-fast
+              bg-notion-bg-primary/80 dark:bg-notion-dark-bg-primary/80
+              backdrop-blur-sm
+            "
+          >
+            <UpOutlined className="text-[10px]" />
+            今天
+          </button>
+          <DatePicker
+            onChange={jumpToDate}
+            placeholder="跳转"
+            allowClear
+            format="YYYY-MM-DD"
+            size="small"
+            className="w-28"
+          />
+        </div>
+
+        <div className="max-w-2xl mx-auto px-6 pb-16">
           {journals.map((journal) => (
             <div
               key={journal.id}
               data-journal-id={journal.id}
-              className="mb-6"
             >
               <JournalEntry
                 journal={journal}
@@ -170,52 +208,47 @@ const JournalView = () => {
             </div>
           ))}
 
-          {/* 加载更多 */}
-          {hasMore && (
-            <div ref={loadMoreRef} className="py-8 flex justify-center">
-              {loading && (
-                <div className="flex items-center gap-3 text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
-                  <Spin size="small" />
-                  <span className="text-sm">加载更多日记...</span>
-                </div>
-              )}
-            </div>
-          )}
+          {/* 加载更多触发器 */}
+          <div
+            ref={loadMoreRef}
+            className="py-6 flex justify-center"
+            style={{ display: hasMore ? 'flex' : 'none' }}
+          >
+            {loading && (
+              <div className="flex items-center gap-2 text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+                <Spin size="small" />
+                <span className="text-xs">加载中...</span>
+              </div>
+            )}
+          </div>
 
-          {/* 到底了 */}
+          {/* 到底了 - 简洁提示 */}
           {!hasMore && journals.length > 0 && (
-            <div className="py-8 text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary">
-                <span className="text-sm text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
-                  已加载全部 {journals.length} 篇日记
-                </span>
-              </div>
+            <div className="py-6 text-center">
+              <span className="text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+                - 已加载全部 -
+              </span>
             </div>
           )}
 
-          {/* 空状态 */}
+          {/* 空状态 - 简洁风格 */}
           {!loading && journals.length === 0 && (
-            <div className="py-20 flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-2xl bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary flex items-center justify-center mb-4">
-                <CalendarOutlined className="text-3xl text-notion-text-tertiary dark:text-notion-dark-text-tertiary" />
-              </div>
-              <h3 className="text-lg font-medium text-notion-text-primary dark:text-notion-dark-text-primary mb-2">
+            <div className="py-16 flex flex-col items-center justify-center">
+              <p className="text-sm text-notion-text-tertiary dark:text-notion-dark-text-tertiary mb-4">
                 还没有日记
-              </h3>
-              <p className="text-sm text-notion-text-tertiary dark:text-notion-dark-text-tertiary mb-6">
-                开始记录你的第一篇日记吧
               </p>
               <button
                 onClick={handleCreateToday}
                 className="
-                  flex items-center gap-2 px-4 py-2 rounded-md
-                  bg-notion-accent-blue text-white
+                  flex items-center gap-1.5 px-3 py-1.5 rounded-md
                   text-sm font-medium
-                  hover:opacity-90
-                  transition-opacity duration-fast
+                  text-notion-text-secondary dark:text-notion-dark-text-secondary
+                  hover:text-notion-text-primary dark:hover:text-notion-dark-text-primary
+                  hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover
+                  transition-colors duration-fast
                 "
               >
-                <PlusOutlined />
+                <PlusOutlined className="text-xs" />
                 创建今日日记
               </button>
             </div>

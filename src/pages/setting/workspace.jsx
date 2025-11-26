@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {message, Modal} from "antd";
-import {FolderOpenOutlined, SyncOutlined, FolderOutlined, ExclamationCircleOutlined} from "@ant-design/icons";
+import {FolderOpenOutlined, SyncOutlined, FolderOutlined, ExclamationCircleOutlined, WarningOutlined} from "@ant-design/icons";
 import {electronAPI} from "../../utils/electronAPI";
 import {logger} from "../../utils/logger";
 
@@ -70,6 +70,40 @@ const WorkspaceSetting = () => {
         }
     };
 
+    const handleFactoryReset = () => {
+        Modal.confirm({
+            title: '恢复出厂设置',
+            icon: <WarningOutlined style={{color: '#ff4d4f'}}/>,
+            content: (
+                <div>
+                    <p className="text-red-500 font-semibold">此操作将：</p>
+                    <ul className="mt-2 ml-4 list-disc text-sm text-notion-text-secondary">
+                        <li>清除工作空间配置</li>
+                        <li>重置应用设置</li>
+                        <li>重新显示欢迎页面</li>
+                    </ul>
+                    <p className="mt-3 text-xs text-notion-text-tertiary">
+                        注意：您的笔记文件不会被删除，只是需要重新选择工作空间。
+                    </p>
+                </div>
+            ),
+            okText: '确认重置',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk: async () => {
+                try {
+                    const result = await electronAPI.factoryReset();
+                    if (!result.success) {
+                        message.error(result.error || '恢复出厂设置失败');
+                    }
+                } catch (error) {
+                    logger.error('恢复出厂设置失败:', error);
+                    message.error('恢复出厂设置失败');
+                }
+            },
+        });
+    };
+
     return (
         <div className="space-y-6">
             {/* 当前工作空间 */}
@@ -135,6 +169,36 @@ const WorkspaceSetting = () => {
                 <div className="text-xs text-notion-text-secondary dark:text-notion-dark-text-secondary">
                     <strong className="text-notion-text-primary dark:text-notion-dark-text-primary">注意：</strong>
                     更改工作空间需要重启应用。确保已保存所有正在编辑的内容。
+                </div>
+            </div>
+
+            {/* 恢复出厂设置 */}
+            <div className="p-5 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/10">
+                <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                        <WarningOutlined className="text-lg text-red-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-red-600 dark:text-red-400">
+                            恢复出厂设置
+                        </h3>
+                        <p className="mt-1 text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
+                            清除所有配置，重新开始。您的笔记文件不会被删除。
+                        </p>
+                        <button
+                            onClick={handleFactoryReset}
+                            className="
+                                mt-4 flex items-center gap-2 px-4 py-2 rounded-md
+                                bg-red-500 text-white
+                                text-sm font-medium
+                                hover:bg-red-600
+                                transition-colors duration-fast
+                            "
+                        >
+                            <WarningOutlined />
+                            恢复出厂设置
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

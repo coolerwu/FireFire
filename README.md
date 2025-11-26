@@ -35,7 +35,7 @@ FireFire is a local-first knowledge management and note-taking application built
 
 #### 📁 File Management
 - Nested folder structure
-- File search
+- **Global Search** - Press `Cmd/Ctrl+K` to search all notes
 - Quick note creation
 - Auto-save (customizable interval)
 
@@ -137,7 +137,7 @@ FireFire 是一款本地优先的知识管理和笔记应用，基于 Electron �
 
 #### 📁 文件管理
 - 支持文件夹嵌套
-- 文件搜索
+- **全局搜索** - 按 `Cmd/Ctrl+K` 搜索所有笔记
 - 快速创建笔记
 - 自动保存（可自定义间隔）
 
@@ -212,6 +212,18 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-26 | **v0.6.21** - Added global search modal (Cmd/Ctrl+K); Improved journal styling (Logseq-style); Fixed workspace switching issue |
+| 2025-11-26 | **v0.6.20** - Fixed directory structure: journals folder now correctly located inside notebook/; Removed "所有笔记" sidebar entry; Added delete button in timeline view; New note opens in standalone editor; Added factory reset in settings |
+| 2025-11-26 | **v0.6.19** - "所有笔记" now shows all notes (not just journals); New notes use millisecond timestamp as filename; Notes auto-registered to database on creation |
+| 2025-11-26 | **v0.6.18** - Added editable title in note editor (click to rename file); Fixed journal path issue in timeline |
+| 2025-11-26 | **v0.6.17** - Fixed "New Note" button: now creates note with timestamp filename and auto-opens editor |
+| 2025-11-26 | **v0.6.16** - Fixed infinite loop bug in JournalView and Timeline components; Fixed component remounting issue |
+| 2025-11-26 | **v0.6.15** - Fixed journal title always using date format instead of content; Fixed duplicate tiptap extension warnings |
+| 2025-11-26 | **v0.6.14** - Fixed sidebar "New Note" button, unified journal and note editors (added slash commands, tags, internal links to journal) |
+| 2025-11-26 | **v0.6.13** - Fixed workspace init: ensure all subdirectories exist on every startup |
+| 2025-11-26 | **v0.6.12** - Fixed workspace init: always ensure all required subdirectories exist |
+| 2025-11-26 | **v0.6.11** - Fixed workspace selection: allow non-empty directories as workspace |
+| 2025-11-26 | **v0.6.10** - Fixed native module crash: downgraded better-sqlite3 to v9.6.0 (compatible with Electron 25), added asarUnpack config |
 | 2025-11-25 | **v0.6.9** - Force remove canvas before electron-rebuild |
 | 2025-11-25 | **v0.6.8** - Removed canvas from optionalDependencies |
 | 2025-11-25 | **v0.6.7** - Fixed electron-rebuild ignore flag (--ignore="canvas") |

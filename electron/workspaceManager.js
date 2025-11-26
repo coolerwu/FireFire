@@ -120,17 +120,14 @@ class WorkspaceManager {
       return { valid: false, reason: '没有写权限' };
     }
 
-    // 4. 检查是否是现有的 FireFire 工作空间或空目录
+    // 4. 检查是否是现有的 FireFire 工作空间
     const hasDB = fs.existsSync(path.join(workspacePath, 'firefire.db'));
     const hasNotebook = fs.existsSync(path.join(workspacePath, 'notebook'));
     const isEmpty = fs.readdirSync(workspacePath).length === 0;
 
-    if (hasDB || hasNotebook || isEmpty) {
-      return { valid: true, isEmpty: isEmpty };
-    }
-
-    // 目录不为空但不是 FireFire 工作空间
-    return { valid: false, reason: '目录不为空且不是有效的工作空间' };
+    // 允许任何有写权限的目录作为工作空间
+    // FireFire 会在其中创建 notebook、attachment、journals 子目录
+    return { valid: true, isEmpty: isEmpty, isExistingWorkspace: hasDB || hasNotebook };
   }
 
   /**
@@ -181,6 +178,7 @@ class WorkspaceManager {
 
     try {
       // 创建必要的子目录
+      // journals 与 notebook 平行
       const dirs = ['notebook', 'attachment', 'journals'];
 
       for (const dir of dirs) {
@@ -239,10 +237,8 @@ class WorkspaceManager {
       throw new Error(validityCheck.reason);
     }
 
-    // 如果是空目录，初始化工作空间
-    if (validityCheck.isEmpty) {
-      this.initWorkspace(workspacePath);
-    }
+    // 无论是否是现有工作空间，都确保所有必要的子目录存在
+    this.initWorkspace(workspacePath);
 
     // 保存配置
     this.saveGlobalConfig({ currentWorkspace: workspacePath });
@@ -261,6 +257,9 @@ class WorkspaceManager {
     }
 
     console.log('[WorkspaceManager] 检测到旧版本数据目录:', legacyPath);
+
+    // 确保所有必要的子目录存在
+    this.initWorkspace(legacyPath);
 
     // 自动创建全局配置，将旧路径设为工作空间
     this.saveGlobalConfig({ currentWorkspace: legacyPath });
@@ -282,6 +281,8 @@ class WorkspaceManager {
 
       if (validation.valid) {
         console.log('[WorkspaceManager] 使用配置的工作空间:', config.currentWorkspace);
+        // 确保所有必要的子目录存在（兼容旧版本）
+        this.initWorkspace(config.currentWorkspace);
         this.cachedWorkspacePath = config.currentWorkspace;
         return { status: 'ready', path: config.currentWorkspace };
       } else {

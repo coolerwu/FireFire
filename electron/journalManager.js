@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const dbManager = require('./dbManager');
 const { getCurSettingConfig } = require('./settingFile');
+const { confPath } = require('./env');
+const { tiptapToMarkdown } = require('./markdownConverter');
 
 /**
  * 日记管理器
@@ -31,10 +33,10 @@ class JournalManager {
 
   /**
    * 确保 journals 目录存在
+   * journals 与 notebook 平行，都在工作空间根目录下
    */
   ensureJournalsDir() {
-    const { notebookPath } = getCurSettingConfig();
-    const journalsDir = path.join(notebookPath, 'journals');
+    const journalsDir = path.join(confPath, 'journals');
 
     if (!fs.existsSync(journalsDir)) {
       fs.mkdirSync(journalsDir, { recursive: true });
@@ -91,18 +93,13 @@ class JournalManager {
     // 确保 journals 目录存在
     this.ensureJournalsDir();
 
-    const { notebookPath, notebookSuffix } = getCurSettingConfig();
-    const filePath = path.join(notebookPath, 'journals', `${dateStr}${notebookSuffix}`);
+    const { notebookSuffix } = getCurSettingConfig();
+    const filePath = path.join(confPath, 'journals', `${dateStr}${notebookSuffix}`);
 
-    // 创建初始内容
+    // 创建初始内容 - Logseq 风格：不需要标题，日期由 JournalEntry 组件显示
     const initialContent = {
       type: 'doc',
       content: [
-        {
-          type: 'heading',
-          attrs: { level: 1 },
-          content: [{ type: 'text', text: displayDate }]
-        },
         {
           type: 'paragraph',
           content: []
@@ -110,8 +107,9 @@ class JournalManager {
       ]
     };
 
-    // 写入文件
-    fs.writeFileSync(filePath, JSON.stringify(initialContent, null, 2), 'utf8');
+    // 转换为 Markdown 格式写入（与 notebookFile 保持一致）
+    const markdownContent = tiptapToMarkdown(initialContent);
+    fs.writeFileSync(filePath, markdownContent, 'utf8');
 
     // 保存到数据库
     dbManager.saveNote({

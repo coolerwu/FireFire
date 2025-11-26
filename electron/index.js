@@ -94,6 +94,9 @@ const initJournalOperation = () => {
 }
 
 exports.init = () => {
+    // 首先初始化数据库（必须在 workspaceManager.checkWorkspace() 之后调用）
+    dbManager.init();
+
     //文件操作函数初始化
     initFileOperation();
 

@@ -2,7 +2,6 @@ import React from 'react';
 import {
     CalendarOutlined,
     ClockCircleOutlined,
-    FolderOutlined,
     SettingOutlined,
     PlusOutlined,
     SearchOutlined,
@@ -44,11 +43,10 @@ const NavItem = ({ icon, label, isActive, onClick, collapsed }) => {
     return content;
 };
 
-const Sidebar = ({ activeKey, onNavigate, collapsed, onToggleCollapse }) => {
+const Sidebar = ({ activeKey, onNavigate, collapsed, onToggleCollapse, onCreateNote, onSearch }) => {
     const navItems = [
         { key: 'journal', label: '日记', icon: <CalendarOutlined /> },
         { key: 'timeline', label: '时间线', icon: <ClockCircleOutlined /> },
-        { key: 'folder', label: '所有笔记', icon: <FolderOutlined /> },
     ];
 
     return (
@@ -86,6 +84,7 @@ const Sidebar = ({ activeKey, onNavigate, collapsed, onToggleCollapse }) => {
             {!collapsed && (
                 <div className="flex-shrink-0 px-3 pb-2">
                     <div
+                        onClick={onSearch}
                         className="
                             flex items-center gap-2 px-3 py-1.5 rounded-md
                             bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary
@@ -123,6 +122,7 @@ const Sidebar = ({ activeKey, onNavigate, collapsed, onToggleCollapse }) => {
             {!collapsed && (
                 <div className="flex-shrink-0 px-3 pb-2">
                     <div
+                        onClick={onCreateNote}
                         className="
                             flex items-center gap-2 px-3 py-1.5 rounded-md
                             text-notion-text-secondary dark:text-notion-dark-text-secondary

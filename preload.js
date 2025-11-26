@@ -69,4 +69,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     restartApp: () => ipcRenderer.invoke('restart-app'),
     isFirstTimeSetup: () => ipcRenderer.invoke('is-first-time-setup'),
     completeFirstTimeSetup: () => ipcRenderer.invoke('complete-first-time-setup'),
+    factoryReset: () => ipcRenderer.invoke('factory-reset'),
 })

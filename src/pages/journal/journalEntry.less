@@ -1,84 +1,311 @@
+// Logseq 风格的日记条目样式
 .journal-entry {
-  background: var(--card-bg, #ffffff);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  transition: all 0.3s ease;
+  position: relative;
+  padding: 0 0 48px 0;
+  margin-bottom: 0;
 
-  &:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  }
-
-  &.loading {
-    opacity: 0.6;
-  }
-
+  // 日期标题 - Logseq 风格
   .journal-date-label {
     display: flex;
     align-items: baseline;
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid var(--border, #f0f0f0);
-    background: linear-gradient(to bottom, var(--card-bg, #ffffff), var(--bg-secondary, #fafafa));
+    gap: 12px;
+    margin-bottom: 8px;
+    padding-left: 0;
 
     h2 {
-      font-size: 20px;
-      font-weight: 600;
-      margin: 0 16px 0 0;
-      color: var(--text-primary, #171717);
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0;
+      color: #37352f;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+      transition: color 0.15s ease;
+      line-height: 1.3;
+
+      &:hover {
+        color: #2563eb;
+      }
     }
 
     .relative-date {
-      color: var(--text-secondary, #999);
+      color: #9b9a97;
       font-size: 14px;
       font-weight: 400;
-      padding: 4px 12px;
-      background: var(--bg-tertiary, #f5f5f5);
-      border-radius: 12px;
     }
   }
 
+  &.loading {
+    opacity: 0.5;
+  }
+
+  // 编辑器容器
   .journal-editor-container {
-    padding: 20px 24px;
-    min-height: 200px;
+    padding-left: 0;
+    min-height: 80px;
 
     .loading-placeholder {
       display: flex;
       align-items: center;
-      justify-content: center;
-      height: 180px;
-      color: var(--text-secondary, #999);
+      height: 80px;
+      color: #9b9a97;
       font-size: 14px;
     }
 
-    // 编辑器样式调整
+    // 编辑器样式
     .ProseMirror {
-      min-height: 160px;
+      min-height: 60px;
       outline: none;
+      font-size: 16px;
+      line-height: 1.75;
+      color: #37352f;
+      padding: 0;
 
       &:focus {
         outline: none;
       }
 
+      // 占位符
       p.is-editor-empty:first-child::before {
-        color: var(--text-placeholder, #bbb);
-        content: attr(data-placeholder);
+        color: #b4b4b4;
+        content: '输入 / 查看所有命令...';
         float: left;
         height: 0;
         pointer-events: none;
+        font-size: 16px;
+      }
+
+      // 段落样式
+      > p {
+        margin: 0 0 4px 0;
+        min-height: 1.75em;
+      }
+
+      // 标题样式
+      h1, h2, h3 {
+        margin: 24px 0 8px 0;
+        font-weight: 600;
+        color: #37352f;
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+
+      h1 {
+        font-size: 1.875em;
+        line-height: 1.3;
+      }
+
+      h2 {
+        font-size: 1.5em;
+        line-height: 1.35;
+      }
+
+      h3 {
+        font-size: 1.25em;
+        line-height: 1.4;
+      }
+
+      // 列表样式
+      ul, ol {
+        padding-left: 24px;
+        margin: 4px 0;
+      }
+
+      li {
+        margin: 2px 0;
+
+        > p {
+          margin: 0;
+        }
+      }
+
+      // 代码样式
+      code {
+        background: rgba(135, 131, 120, 0.15);
+        padding: 0.2em 0.4em;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-family: 'SF Mono', Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        color: #eb5757;
+      }
+
+      pre {
+        background: #f7f6f3;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin: 8px 0;
+
+        code {
+          background: none;
+          padding: 0;
+          color: #37352f;
+        }
+      }
+
+      // 引用块
+      blockquote {
+        border-left: 3px solid #e0e0e0;
+        margin: 8px 0;
+        padding-left: 16px;
+        color: #6b6b6b;
+      }
+
+      // 链接
+      a {
+        color: #2563eb;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      // 任务列表
+      ul[data-type="taskList"] {
+        list-style: none;
+        padding-left: 0;
+
+        li {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+
+          > label {
+            flex-shrink: 0;
+            margin-top: 4px;
+
+            input[type="checkbox"] {
+              width: 16px;
+              height: 16px;
+              cursor: pointer;
+              accent-color: #2563eb;
+            }
+          }
+
+          > div {
+            flex: 1;
+          }
+        }
+      }
+
+      // 分割线
+      hr {
+        border: none;
+        border-top: 1px solid rgba(55, 53, 47, 0.09);
+        margin: 16px 0;
+      }
+
+      // 图片
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 8px 0;
+      }
+
+      // 标签样式
+      .tag {
+        color: #2563eb;
+        background: rgba(37, 99, 235, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        cursor: pointer;
+
+        &:hover {
+          background: rgba(37, 99, 235, 0.2);
+        }
+      }
+
+      // 内部链接
+      .internal-link {
+        color: #2563eb;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }
 }
 
 // 暗黑模式
-@media (prefers-color-scheme: dark) {
-  .journal-entry {
-    --card-bg: #2a2a2a;
-    --bg-secondary: #252525;
-    --bg-tertiary: #333;
-    --border: #3a3a3a;
-    --text-primary: #e5e5e5;
-    --text-secondary: #aaa;
-    --text-placeholder: #666;
+.dark .journal-entry {
+  .journal-date-label {
+    h2 {
+      color: #e3e2e0;
+
+      &:hover {
+        color: #6d9cff;
+      }
+    }
+
+    .relative-date {
+      color: #6b6b6b;
+    }
+  }
+
+  .journal-editor-container {
+    .loading-placeholder {
+      color: #6b6b6b;
+    }
+
+    .ProseMirror {
+      color: #e3e2e0;
+
+      p.is-editor-empty:first-child::before {
+        color: #5a5a5a;
+      }
+
+      h1, h2, h3 {
+        color: #e3e2e0;
+      }
+
+      code {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ff7b7b;
+      }
+
+      pre {
+        background: #2f2f2f;
+
+        code {
+          color: #e3e2e0;
+        }
+      }
+
+      blockquote {
+        border-left-color: #4a4a4a;
+        color: #9b9a97;
+      }
+
+      a {
+        color: #6d9cff;
+      }
+
+      hr {
+        border-top-color: rgba(255, 255, 255, 0.094);
+      }
+
+      .tag {
+        color: #6d9cff;
+        background: rgba(109, 156, 255, 0.15);
+
+        &:hover {
+          background: rgba(109, 156, 255, 0.25);
+        }
+      }
+
+      .internal-link {
+        color: #6d9cff;
+      }
+
+      ul[data-type="taskList"] li > label input[type="checkbox"] {
+        accent-color: #6d9cff;
+      }
+    }
   }
 }

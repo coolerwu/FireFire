@@ -13,6 +13,26 @@ const {
     isFileSizeAllowed,
     getExtensionFromMimeType,
 } = require("./utils/pathValidator");
+const { confPath } = require("./env");
+
+/**
+ * 检查路径是否是日记路径
+ */
+const isJournalPath = (relativePath) => {
+    return relativePath && (relativePath.startsWith('journals/') || relativePath.startsWith('journals\\'));
+};
+
+/**
+ * 获取正确的根路径（journals 与 notebook 平行）
+ */
+const getRootPathForFile = (relativePath) => {
+    if (isJournalPath(relativePath)) {
+        // journals 直接在工作空间根目录下
+        return confPath;
+    }
+    // 普通笔记在 notebook 目录下
+    return getCurSettingConfig().notebookPath;
+};
 
 /**
  * 获取当前notebook完整path
@@ -255,11 +275,12 @@ exports.init = () => {
     });
     ipcMain.handle('readNotebookFile', (event, absPath) => {
         try {
-            const curNotebookFullPath = getCurNotebookFullPath();
+            // journals 与 notebook 平行，根据路径选择正确的根目录
+            const rootPath = getRootPathForFile(absPath);
             const curNotebookSuffix = getCurNotebookSuffix();
 
             // 路径验证
-            const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+            const validation = validateAndResolvePath(absPath, rootPath);
             if (!validation.valid) {
                 console.error('[NotebookFile] readNotebookFile 路径验证失败:', validation.error);
                 throw new Error(validation.error);
@@ -271,7 +292,7 @@ exports.init = () => {
             }
 
             // 再次验证添加后缀后的路径
-            if (!isPathWithinRoot(fileFullPath, curNotebookFullPath)) {
+            if (!isPathWithinRoot(fileFullPath, rootPath)) {
                 throw new Error('路径超出允许范围');
             }
 
@@ -299,11 +320,12 @@ exports.init = () => {
     });
     ipcMain.handle('writeNotebookFile', (event, absPath, content) => {
         try {
-            const curNotebookFullPath = getCurNotebookFullPath();
+            // journals 与 notebook 平行，根据路径选择正确的根目录
+            const rootPath = getRootPathForFile(absPath);
             const curNotebookSuffix = getCurNotebookSuffix();
 
             // 路径验证
-            const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+            const validation = validateAndResolvePath(absPath, rootPath);
             if (!validation.valid) {
                 console.error('[NotebookFile] writeNotebookFile 路径验证失败:', validation.error);
                 throw new Error(validation.error);
@@ -315,7 +337,7 @@ exports.init = () => {
             }
 
             // 再次验证添加后缀后的路径
-            if (!isPathWithinRoot(fileFullPath, curNotebookFullPath)) {
+            if (!isPathWithinRoot(fileFullPath, rootPath)) {
                 throw new Error('路径超出允许范围');
             }
 
@@ -360,12 +382,26 @@ exports.init = () => {
                 const noteId = path.basename(fileFullPath, curNotebookSuffix);
                 const tags = extractTags(contentObj);
                 const links = extractLinks(contentObj);
-                const title = extractTitle(contentObj);
                 const contentText = extractText(contentObj);
 
                 // 检查是否是日记（路径包含 journals/）
                 const isJournal = fileFullPath.includes('/journals/') || fileFullPath.includes('\\journals\\');
                 const journalDate = isJournal ? noteId : null;
+
+                // 日记使用格式化的日期作为标题，普通笔记从内容提取
+                let title;
+                if (isJournal && journalDate) {
+                    // 格式化日期：2025年11月26日 星期三
+                    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+                    const date = new Date(journalDate);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const weekday = weekdays[date.getDay()];
+                    title = `${year}年${month}月${day}日 ${weekday}`;
+                } else {
+                    title = extractTitle(contentObj);
+                }
 
                 console.log(`[NotebookFile] 保存笔记到数据库: id=${noteId}, isJournal=${isJournal}, journalDate=${journalDate}`);
 
@@ -425,11 +461,12 @@ exports.init = () => {
         }
     });
     ipcMain.handle('deleteNotebookFile', (event, absPath) => {
-        const curNotebookFullPath = getCurNotebookFullPath();
+        // journals 与 notebook 平行，根据路径选择正确的根目录
+        const rootPath = getRootPathForFile(absPath);
         const curNotebookSuffix = getCurNotebookSuffix();
 
         // 路径验证
-        const validation = validateAndResolvePath(absPath, curNotebookFullPath);
+        const validation = validateAndResolvePath(absPath, rootPath);
         if (!validation.valid) {
             console.error('[NotebookFile] deleteNotebookFile 路径验证失败:', validation.error);
             return false;
@@ -438,7 +475,7 @@ exports.init = () => {
         const fileFullPath = validation.fullPath + curNotebookSuffix;
 
         // 再次验证添加后缀后的路径
-        if (!isPathWithinRoot(fileFullPath, curNotebookFullPath)) {
+        if (!isPathWithinRoot(fileFullPath, rootPath)) {
             console.error('[NotebookFile] deleteNotebookFile 路径超出允许范围');
             return false;
         }

@@ -1,8 +1,9 @@
 const {confPath} = require("./env");
 const fs = require("fs");
 const fsPromises = require("fs").promises;
-const {ipcMain, nativeTheme} = require("electron");
+const {ipcMain, nativeTheme, app} = require("electron");
 const path = require("path");
+const workspaceManager = require("./workspaceManager");
 
 /**
  * 配置文件夹名称
@@ -140,6 +141,46 @@ exports.init = () => {
             return { success: true };
         } catch (error) {
             console.error('[SettingFile] 标记首次设置完成失败:', error);
+            return { success: false, error: error.message };
+        }
+    });
+
+    // 恢复出厂设置
+    ipcMain.handle('factory-reset', async () => {
+        try {
+            console.log('[SettingFile] 开始恢复出厂设置...');
+
+            // 1. 删除全局配置文件（workspace.json）
+            const globalConfigPath = workspaceManager.getGlobalConfigPath();
+            if (fs.existsSync(globalConfigPath)) {
+                await fsPromises.unlink(globalConfigPath);
+                console.log('[SettingFile] 已删除全局配置:', globalConfigPath);
+            }
+
+            // 2. 删除本地配置文件（setting.json）
+            if (fs.existsSync(settingFullPath)) {
+                await fsPromises.unlink(settingFullPath);
+                console.log('[SettingFile] 已删除本地配置:', settingFullPath);
+            }
+
+            // 3. 清除工作空间缓存
+            workspaceManager.clearCache();
+
+            // 4. 重置内存中的配置
+            curSettingConfig = { ...defaultSettingConfig };
+            isFirstTime = true;
+
+            console.log('[SettingFile] 恢复出厂设置完成，准备重启应用');
+
+            // 5. 重启应用
+            setTimeout(() => {
+                app.relaunch();
+                app.exit(0);
+            }, 500);
+
+            return { success: true };
+        } catch (error) {
+            console.error('[SettingFile] 恢复出厂设置失败:', error);
             return { success: false, error: error.message };
         }
     });

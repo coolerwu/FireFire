@@ -26,7 +26,11 @@ import {TagExtension} from './tagExtension';
 import {InternalLinkExtension} from './internalLinkExtension';
 
 const plugins = [
-    StarterKit, CharacterCount,
+    StarterKit.configure({
+        codeBlock: false,  // 使用 CodeBlockLowlight 替代
+        dropcursor: false, // 使用单独的 Dropcursor 扩展
+    }),
+    CharacterCount,
     Image.configure({
         inline: true,
         HTMLAttributes: {

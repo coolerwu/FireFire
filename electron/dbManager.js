@@ -11,13 +11,17 @@ const { confPath } = require('./env');
 class DatabaseManager {
   constructor() {
     this.db = null;
-    this.init();
+    this.initialized = false;
+    // 注意：不在构造函数中初始化，等待 workspaceManager 确定工作空间后再初始化
   }
 
   /**
-   * 初始化数据库
+   * 初始化数据库（需要在 workspaceManager.checkWorkspace() 之后调用）
    */
   init() {
+    if (this.initialized) {
+      return;
+    }
     const dbPath = path.join(confPath, 'firefire.db');
 
     // 确保目录存在
@@ -34,6 +38,7 @@ class DatabaseManager {
     // 创建表结构
     this.createTables();
 
+    this.initialized = true;
     console.log('[DatabaseManager] 数据库初始化完成:', dbPath);
   }
 
