@@ -372,11 +372,18 @@ class DatabaseManager {
       LIMIT ? OFFSET ?
     `).all(limit, offset);
 
+    // 预编译获取标签的语句
+    const getTagsStmt = this.db.prepare(`
+      SELECT t.name FROM tags t
+      JOIN note_tags nt ON t.id = nt.tag_id
+      WHERE nt.note_id = ?
+    `);
+
     return rows.map(row => ({
       id: row.id,
       title: row.title,
       path: row.path,
-      tags: [],  // TODO: 从文件内容中提取标签
+      tags: getTagsStmt.all(row.id).map(t => t.name),
       updatedAt: new Date(row.updated_at).toISOString(),
     }));
   }
@@ -515,6 +522,56 @@ class DatabaseManager {
     } catch (err) {
       console.error('[DatabaseManager] 数据库修复失败:', err);
       return { ok: false, message: `修复失败: ${err.message}` };
+    }
+  }
+
+  /**
+   * 获取知识图谱数据
+   * @returns {object} { nodes: Array, links: Array }
+   */
+  getGraphData() {
+    try {
+      // 获取所有笔记及其链接数量
+      const notesWithLinkCount = this.db.prepare(`
+        SELECT
+          notes.id,
+          notes.title,
+          notes.is_journal,
+          (SELECT COUNT(*) FROM links WHERE from_note_id = notes.id) +
+          (SELECT COUNT(*) FROM links WHERE to_note_id = notes.id) as link_count
+        FROM notes
+      `).all();
+
+      // 获取所有链接
+      const links = this.db.prepare(`
+        SELECT from_note_id as source, to_note_id as target
+        FROM links
+      `).all();
+
+      // 获取每个笔记的标签
+      const noteTagsStmt = this.db.prepare(`
+        SELECT tags.name
+        FROM tags
+        JOIN note_tags ON tags.id = note_tags.tag_id
+        WHERE note_tags.note_id = ?
+      `);
+
+      const nodes = notesWithLinkCount.map(note => {
+        const tags = noteTagsStmt.all(note.id).map(t => t.name);
+        return {
+          id: note.id,
+          name: note.title,
+          type: note.is_journal ? 'journal' : 'note',
+          tags: tags,
+          val: Math.max(1, note.link_count), // 至少为 1，用于节点大小
+        };
+      });
+
+      console.log(`[DatabaseManager] 获取图谱数据: ${nodes.length} 节点, ${links.length} 链接`);
+      return { nodes, links };
+    } catch (err) {
+      console.error('[DatabaseManager] 获取图谱数据失败:', err);
+      return { nodes: [], links: [] };
     }
   }
 

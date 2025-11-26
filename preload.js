@@ -77,4 +77,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     checkDbIntegrity: () => ipcRenderer.invoke('check-db-integrity'),
     repairDatabase: () => ipcRenderer.invoke('repair-database'),
     rebuildFtsIndex: () => ipcRenderer.invoke('rebuild-fts-index'),
+    //import/export functions
+    importMarkdown: (options) => ipcRenderer.invoke('import-markdown', options),
+    importFolder: () => ipcRenderer.invoke('import-folder'),
+    exportMarkdown: (noteId) => ipcRenderer.invoke('export-markdown', noteId),
+    exportHtml: (noteId) => ipcRenderer.invoke('export-html', noteId),
+    exportAll: (format) => ipcRenderer.invoke('export-all', format),
+    //knowledge graph functions
+    getGraphData: () => ipcRenderer.invoke('get-graph-data'),
 })

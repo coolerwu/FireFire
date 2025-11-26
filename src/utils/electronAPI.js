@@ -256,6 +256,40 @@ const mockAPI = {
         console.warn('[Mock Mode] rebuildFtsIndex called - not available in browser');
         return { ok: false, error: '浏览器模式不支持重建索引' };
     },
+    importMarkdown: async (options) => {
+        console.warn('[Mock Mode] importMarkdown called - not available in browser');
+        return { success: false, error: '浏览器模式不支持导入' };
+    },
+    importFolder: async () => {
+        console.warn('[Mock Mode] importFolder called - not available in browser');
+        return { success: false, error: '浏览器模式不支持导入' };
+    },
+    exportMarkdown: async (noteId) => {
+        console.warn('[Mock Mode] exportMarkdown called - not available in browser');
+        return { success: false, error: '浏览器模式不支持导出' };
+    },
+    exportHtml: async (noteId) => {
+        console.warn('[Mock Mode] exportHtml called - not available in browser');
+        return { success: false, error: '浏览器模式不支持导出' };
+    },
+    exportAll: async (format) => {
+        console.warn('[Mock Mode] exportAll called - not available in browser');
+        return { success: false, error: '浏览器模式不支持导出' };
+    },
+    getGraphData: async () => {
+        console.warn('[Mock Mode] getGraphData called');
+        return {
+            nodes: [
+                { id: 'note-1', name: '示例笔记1', type: 'note', tags: ['工作'], val: 3 },
+                { id: 'note-2', name: '示例笔记2', type: 'note', tags: ['学习'], val: 2 },
+                { id: 'note-3', name: '示例笔记3', type: 'note', tags: [], val: 1 },
+            ],
+            links: [
+                { source: 'note-1', target: 'note-2' },
+                { source: 'note-2', target: 'note-3' },
+            ]
+        };
+    },
 }
 
 // 导出 API（优先使用真实 API，否则使用 mock）

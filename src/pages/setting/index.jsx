@@ -35,7 +35,7 @@ const Setting = () => {
     const {refresh, setting} = useContext(Context);
 
     const updateValueByKeyFunc = (key, value) => {
-        if (!key || !value) {
+        if (!key || value === undefined) {
             message.error('配置的参数有误');
             return;
         }

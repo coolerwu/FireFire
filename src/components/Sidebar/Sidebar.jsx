@@ -7,7 +7,8 @@ import {
     SearchOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
-    RobotOutlined
+    RobotOutlined,
+    ApartmentOutlined
 } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 
@@ -48,6 +49,7 @@ const Sidebar = ({ activeKey, onNavigate, collapsed, onToggleCollapse, onCreateN
     const navItems = [
         { key: 'journal', label: '日记', icon: <CalendarOutlined /> },
         { key: 'timeline', label: '时间线', icon: <ClockCircleOutlined /> },
+        { key: 'graph', label: '知识图谱', icon: <ApartmentOutlined /> },
         { key: 'ai-chat', label: 'AI 对话', icon: <RobotOutlined /> },
     ];
 

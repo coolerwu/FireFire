@@ -2,6 +2,7 @@ const {init: initSettingFileOperation} = require('./settingFile');
 const {init: initNotebookFileOperation} = require('./notebookFile');
 const {init: initRootFileOperation} = require('./rootFile');
 const {init: initWebDAVSync} = require('./webdavSync');
+const {init: initImportExport} = require('./importExport');
 const {ipcMain} = require("electron");
 const dbManager = require('./dbManager');
 const journalManager = require('./journalManager');
@@ -69,6 +70,11 @@ const initDatabaseOperation = () => {
     ipcMain.handle('rebuild-fts-index', () => {
         return dbManager.rebuildFtsIndex();
     });
+
+    // 获取知识图谱数据
+    ipcMain.handle('get-graph-data', () => {
+        return dbManager.getGraphData();
+    });
 }
 
 /**
@@ -127,4 +133,7 @@ exports.init = () => {
 
     //初始化 WebDAV 同步
     initWebDAVSync();
+
+    //初始化导入导出
+    initImportExport();
 };

@@ -72,10 +72,17 @@ FireFire is a local-first knowledge management and note-taking application built
 - **Manual/Auto Sync** - Choose your sync mode
 - **Upload/Download** - Bidirectional sync
 
-### Planned Features
+#### 📊 Knowledge Graph
+- **Visual Graph** - Interactive force-directed graph showing note relationships
+- **Tag Filtering** - Filter nodes by tags
+- **Search & Highlight** - Search for notes in the graph
+- **Zoom & Pan** - Navigate large graphs easily
+- **Click to Navigate** - Click any node to open the note
 
-- [ ] Import/Export Markdown and HTML
-- [ ] Graph view for tags and links
+#### 📥 Import/Export
+- **Markdown Import** - Import single files or entire folders
+- **Batch Export** - Export all notes to Markdown or HTML
+- **Frontmatter Support** - Preserve title and metadata
 
 ### Installation
 
@@ -186,10 +193,17 @@ FireFire 是一款本地优先的知识管理和笔记应用，基于 Electron �
 - **手动/自动同步** - 灵活选择同步模式
 - **上传/下载** - 双向同步
 
-### 计划功能
+#### 📊 知识图谱
+- **可视化图谱** - 交互式力导向图展示笔记关系
+- **标签筛选** - 按标签过滤节点
+- **搜索高亮** - 在图谱中搜索笔记
+- **缩放平移** - 轻松浏览大型图谱
+- **点击导航** - 点击节点打开笔记
 
-- [ ] 导入/导出 Markdown 和 HTML
-- [ ] 标签和链接的关系图谱
+#### 📥 导入导出
+- **Markdown 导入** - 导入单个文件或整个文件夹
+- **批量导出** - 将所有笔记导出为 Markdown 或 HTML
+- **Frontmatter 支持** - 保留标题和元数据
 
 ### 安装
 
@@ -244,6 +258,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-26 | **v0.6.24** - Added Knowledge Graph view (force-directed graph for note relationships); Added Import/Export feature (Markdown import/export, HTML export, batch operations); New sidebar navigation for graph |
 | 2025-11-26 | **v0.6.23** - Added database maintenance tools (integrity check, repair, FTS rebuild); Fixed AI config sync issue; Fixed toolbar overflow; Added screenshots to README; Fixed auto-update yml upload in CI |
 | 2025-11-26 | **v0.6.22** - Added AI assistant (OpenAI/Claude/DeepSeek); Added WebDAV sync (Jianguoyun/Nextcloud); New icon setup |
 | 2025-11-26 | **v0.6.21** - Added global search modal (Cmd/Ctrl+K); Improved journal styling (Logseq-style); Fixed workspace switching issue |

@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {message, Modal, Switch} from "antd";
 import {Context} from "../../index";
-import {CheckCircleOutlined, SyncOutlined, SunOutlined, MoonOutlined, DesktopOutlined, DatabaseOutlined, ToolOutlined} from "@ant-design/icons";
+import {CheckCircleOutlined, SyncOutlined, SunOutlined, MoonOutlined, DesktopOutlined, DatabaseOutlined, ToolOutlined, ImportOutlined, ExportOutlined, FolderOpenOutlined} from "@ant-design/icons";
 import {electronAPI} from "../../utils/electronAPI";
 import DOMPurify from 'dompurify';
 
@@ -75,6 +75,10 @@ const BaseSetting = () => {
     const [dbStatus, setDbStatus] = useState(null); // null, 'checking', 'ok', 'error'
     const [repairing, setRepairing] = useState(false);
     const [rebuildingFts, setRebuildingFts] = useState(false);
+
+    // 导入导出状态
+    const [importing, setImporting] = useState(false);
+    const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
         if (setting?.themeSource) {
@@ -228,6 +232,63 @@ const BaseSetting = () => {
             message.error(`重建失败: ${err.message}`);
         } finally {
             setRebuildingFts(false);
+        }
+    };
+
+    // 导入 Markdown 文件
+    const handleImportMarkdown = async () => {
+        setImporting(true);
+        try {
+            const result = await electronAPI.importMarkdown({ multiple: true });
+            if (result.canceled) {
+                // 用户取消
+            } else if (result.success) {
+                message.success(`成功导入 ${result.imported.length} 个文件`);
+            } else {
+                message.error(`导入失败: ${result.error}`);
+            }
+        } catch (err) {
+            message.error(`导入失败: ${err.message}`);
+        } finally {
+            setImporting(false);
+        }
+    };
+
+    // 导入文件夹
+    const handleImportFolder = async () => {
+        setImporting(true);
+        try {
+            const result = await electronAPI.importFolder();
+            if (result.canceled) {
+                // 用户取消
+            } else if (result.success) {
+                message.success(`成功导入 ${result.total} 个文件`);
+            } else {
+                message.error(`导入失败: ${result.error}`);
+            }
+        } catch (err) {
+            message.error(`导入失败: ${err.message}`);
+        } finally {
+            setImporting(false);
+        }
+    };
+
+    // 导出所有笔记
+    const handleExportAll = async (format) => {
+        setExporting(true);
+        try {
+            const result = await electronAPI.exportAll(format);
+            if (result.canceled) {
+                // 用户取消
+            } else if (result.success) {
+                message.success(`成功导出 ${result.total} 个文件到 ${result.directory}`);
+            } else {
+                message.error(`导出失败: ${result.error}`);
+            }
+        } catch (err) {
+            message.error(`导出失败: ${err.message}`);
+        } finally {
+            setExporting(false);
         }
     };
 
@@ -416,6 +477,89 @@ const BaseSetting = () => {
                             </span>
                         )}
                     </button>
+                </SettingRow>
+            </SettingSection>
+
+            {/* 数据导入导出 */}
+            <SettingSection title="数据导入导出">
+                <SettingRow
+                    label="导入 Markdown"
+                    description="从 Markdown 文件导入笔记"
+                >
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleImportMarkdown}
+                            disabled={importing}
+                            className={`
+                                px-3 py-1.5 rounded-md text-xs font-medium
+                                transition-colors duration-fast
+                                ${importing
+                                    ? 'bg-notion-bg-tertiary text-notion-text-tertiary cursor-not-allowed'
+                                    : 'bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary text-notion-text-primary dark:text-notion-dark-text-primary hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover'
+                                }
+                            `}
+                        >
+                            <span className="flex items-center gap-1">
+                                <ImportOutlined /> 选择文件
+                            </span>
+                        </button>
+                        <button
+                            onClick={handleImportFolder}
+                            disabled={importing}
+                            className={`
+                                px-3 py-1.5 rounded-md text-xs font-medium
+                                transition-colors duration-fast
+                                ${importing
+                                    ? 'bg-notion-bg-tertiary text-notion-text-tertiary cursor-not-allowed'
+                                    : 'bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary text-notion-text-primary dark:text-notion-dark-text-primary hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover'
+                                }
+                            `}
+                        >
+                            <span className="flex items-center gap-1">
+                                <FolderOpenOutlined /> 选择文件夹
+                            </span>
+                        </button>
+                    </div>
+                </SettingRow>
+
+                <SettingRow
+                    label="导出所有笔记"
+                    description="将所有笔记导出为 Markdown 或 HTML 格式"
+                >
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => handleExportAll('markdown')}
+                            disabled={exporting}
+                            className={`
+                                px-3 py-1.5 rounded-md text-xs font-medium
+                                transition-colors duration-fast
+                                ${exporting
+                                    ? 'bg-notion-bg-tertiary text-notion-text-tertiary cursor-not-allowed'
+                                    : 'bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary text-notion-text-primary dark:text-notion-dark-text-primary hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover'
+                                }
+                            `}
+                        >
+                            <span className="flex items-center gap-1">
+                                <ExportOutlined /> Markdown
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => handleExportAll('html')}
+                            disabled={exporting}
+                            className={`
+                                px-3 py-1.5 rounded-md text-xs font-medium
+                                transition-colors duration-fast
+                                ${exporting
+                                    ? 'bg-notion-bg-tertiary text-notion-text-tertiary cursor-not-allowed'
+                                    : 'bg-notion-bg-tertiary dark:bg-notion-dark-bg-tertiary text-notion-text-primary dark:text-notion-dark-text-primary hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover'
+                                }
+                            `}
+                        >
+                            <span className="flex items-center gap-1">
+                                <ExportOutlined /> HTML
+                            </span>
+                        </button>
+                    </div>
                 </SettingRow>
             </SettingSection>
         </div>

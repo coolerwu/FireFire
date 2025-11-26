@@ -12,6 +12,7 @@ import JournalView from "./pages/journal/JournalView";
 import TimelineView from "./pages/timeline/TimelineView";
 import NoteEditorView from "./pages/editor/NoteEditorView";
 import AIChatView from "./pages/ai/AIChatView";
+import GraphView from "./pages/graph/GraphView";
 import Sidebar from "./components/Sidebar";
 import Welcome from "./pages/welcome/Welcome";
 import buildThemeStyleFunc from "./utils/theme";
@@ -286,7 +287,7 @@ const App = () => {
         <ErrorBoundary>
             <div className="app-container flex h-screen overflow-hidden bg-notion-bg-primary dark:bg-notion-dark-bg-primary">
                 <ConfigProvider theme={{token: theme.token}}>
-                    <Context.Provider value={{refresh, setActiveKey, setting, curDir, setCurDir, theme, loadData, refreshKey, triggerRefresh}}>
+                    <Context.Provider value={{refresh, setActiveKey, setting, curDir, setCurDir, theme, loadData, refreshKey, triggerRefresh, setEditingNote}}>
                         {/* 侧边栏 */}
                         <Sidebar
                             activeKey={activeKey}
@@ -315,6 +316,9 @@ const App = () => {
                                 </div>
                                 <div className={`h-full ${activeKey === 'ai-chat' ? 'block' : 'hidden'}`}>
                                     <AIChatView/>
+                                </div>
+                                <div className={`h-full ${activeKey === 'graph' ? 'block' : 'hidden'}`}>
+                                    <GraphView/>
                                 </div>
                                 <div className={`h-full ${activeKey === 'editor' ? 'block' : 'hidden'}`}>
                                     {editingNote && (
