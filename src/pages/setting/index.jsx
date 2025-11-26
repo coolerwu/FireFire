@@ -1,9 +1,11 @@
 import React, {useContext, useState} from "react";
 import {message} from "antd";
 import {Context} from "../../index";
-import {SettingOutlined, FolderOutlined} from "@ant-design/icons";
+import {SettingOutlined, FolderOutlined, RobotOutlined, CloudSyncOutlined} from "@ant-design/icons";
 import BaseSetting from "./base.jsx";
 import WorkspaceSetting from "./workspace.jsx";
+import AISetting from "./ai.jsx";
+import WebDAVSetting from "./webdav.jsx";
 import {electronAPI} from "../../utils/electronAPI";
 
 const menuItems = [
@@ -16,6 +18,16 @@ const menuItems = [
         label: '工作空间',
         key: 'workspace',
         icon: <FolderOutlined />,
+    },
+    {
+        label: 'AI 助手',
+        key: 'ai',
+        icon: <RobotOutlined />,
+    },
+    {
+        label: '同步',
+        key: 'sync',
+        icon: <CloudSyncOutlined />,
     },
 ];
 
@@ -77,6 +89,8 @@ const Setting = () => {
                     <div className="max-w-2xl mx-auto px-8 py-6">
                         {menuSelectedKey === 'base' && <BaseSetting />}
                         {menuSelectedKey === 'workspace' && <WorkspaceSetting />}
+                        {menuSelectedKey === 'ai' && <AISetting />}
+                        {menuSelectedKey === 'sync' && <WebDAVSetting />}
                     </div>
                 </div>
             </div>

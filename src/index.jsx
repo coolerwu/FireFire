@@ -11,6 +11,7 @@ import Setting from "./pages/setting";
 import JournalView from "./pages/journal/JournalView";
 import TimelineView from "./pages/timeline/TimelineView";
 import NoteEditorView from "./pages/editor/NoteEditorView";
+import AIChatView from "./pages/ai/AIChatView";
 import Sidebar from "./components/Sidebar";
 import Welcome from "./pages/welcome/Welcome";
 import buildThemeStyleFunc from "./utils/theme";
@@ -311,6 +312,9 @@ const App = () => {
                                 </div>
                                 <div className={`h-full ${activeKey === 'timeline' ? 'block' : 'hidden'}`}>
                                     <TimelineView/>
+                                </div>
+                                <div className={`h-full ${activeKey === 'ai-chat' ? 'block' : 'hidden'}`}>
+                                    <AIChatView/>
                                 </div>
                                 <div className={`h-full ${activeKey === 'editor' ? 'block' : 'hidden'}`}>
                                     {editingNote && (

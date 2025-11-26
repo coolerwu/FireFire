@@ -1,6 +1,6 @@
 {
   "name": "firefire",
-  "version": "0.6.21",
+  "version": "0.6.22",
   "private": true,
   "main": "main.js",
   "homepage": ".",
@@ -132,6 +132,7 @@
           ]
         }
       ],
+      "icon": "build/icon.icns",
       "category": "public.app-category.productivity",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
@@ -139,9 +140,11 @@
       "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icon.ico"
     },
     "linux": {
+      "icon": "build/icon.png",
       "target": "deb",
       "maintainer": "CoolerWu",
       "vendor": "CoolerWu",

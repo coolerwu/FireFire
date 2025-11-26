@@ -50,12 +50,24 @@ FireFire is a local-first knowledge management and note-taking application built
 - Download and install with one click
 - Update notifications
 
+#### 🤖 AI Assistant
+- **Multiple Providers** - OpenAI, Claude, DeepSeek support
+- **Text Polish** - Improve writing quality
+- **Translation** - Chinese/English translation
+- **Continue Writing** - AI-powered content generation
+- **Summarize** - Generate summaries
+- **Explain** - Explain selected content
+
+#### ☁️ WebDAV Sync
+- **Jianguoyun** - Built-in support for Jianguoyun (坚果云)
+- **Nextcloud/ownCloud** - Support for self-hosted solutions
+- **Manual/Auto Sync** - Choose your sync mode
+- **Upload/Download** - Bidirectional sync
+
 ### Planned Features
 
 - [ ] Import/Export Markdown and HTML
 - [ ] Graph view for tags and links
-- [ ] WebDAV sync support
-- [ ] ChatGPT integration
 
 ### Installation
 
@@ -152,12 +164,24 @@ FireFire 是一款本地优先的知识管理和笔记应用，基于 Electron �
 - 一键下载安装
 - 更新通知
 
+#### 🤖 AI 助手
+- **多服务商支持** - OpenAI、Claude、DeepSeek
+- **文字润色** - 改善文字表达
+- **翻译** - 中英文互译
+- **续写** - AI 辅助内容生成
+- **总结** - 生成摘要
+- **解释** - 解释选中内容
+
+#### ☁️ WebDAV 同步
+- **坚果云** - 内置坚果云支持
+- **Nextcloud/ownCloud** - 支持自建服务
+- **手动/自动同步** - 灵活选择同步模式
+- **上传/下载** - 双向同步
+
 ### 计划功能
 
 - [ ] 导入/导出 Markdown 和 HTML
 - [ ] 标签和链接的关系图谱
-- [ ] WebDAV 同步支持
-- [ ] ChatGPT 集成
 
 ### 安装
 
@@ -212,6 +236,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-26 | **v0.6.22** - Added AI assistant (OpenAI/Claude/DeepSeek); Added WebDAV sync (Jianguoyun/Nextcloud); New icon setup |
 | 2025-11-26 | **v0.6.21** - Added global search modal (Cmd/Ctrl+K); Improved journal styling (Logseq-style); Fixed workspace switching issue |
 | 2025-11-26 | **v0.6.20** - Fixed directory structure: journals folder now correctly located inside notebook/; Removed "所有笔记" sidebar entry; Added delete button in timeline view; New note opens in standalone editor; Added factory reset in settings |
 | 2025-11-26 | **v0.6.19** - "所有笔记" now shows all notes (not just journals); New notes use millisecond timestamp as filename; Notes auto-registered to database on creation |

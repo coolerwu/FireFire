@@ -382,11 +382,156 @@ class DatabaseManager {
   }
 
   /**
+   * 检查数据库完整性
+   * @returns {object} { ok: boolean, error?: string }
+   */
+  checkIntegrity() {
+    try {
+      const result = this.db.pragma('integrity_check');
+      const isOk = result.length === 1 && result[0].integrity_check === 'ok';
+      if (!isOk) {
+        console.error('[DatabaseManager] 完整性检查失败:', result);
+        return { ok: false, error: JSON.stringify(result) };
+      }
+      console.log('[DatabaseManager] 数据库完整性检查通过');
+      return { ok: true };
+    } catch (err) {
+      console.error('[DatabaseManager] 完整性检查异常:', err);
+      return { ok: false, error: err.message };
+    }
+  }
+
+  /**
+   * 重建 FTS5 索引（修复 FTS 相关问题）
+   */
+  rebuildFtsIndex() {
+    try {
+      console.log('[DatabaseManager] 开始重建 FTS5 索引...');
+      // 删除并重建 FTS 表
+      this.db.exec(`
+        DROP TABLE IF EXISTS notes_fts;
+        CREATE VIRTUAL TABLE notes_fts USING fts5(
+          title,
+          content_text,
+          content='notes',
+          content_rowid='rowid'
+        );
+        INSERT INTO notes_fts(notes_fts) VALUES('rebuild');
+      `);
+      console.log('[DatabaseManager] FTS5 索引重建完成');
+      return { ok: true };
+    } catch (err) {
+      console.error('[DatabaseManager] FTS5 索引重建失败:', err);
+      return { ok: false, error: err.message };
+    }
+  }
+
+  /**
+   * 尝试修复数据库
+   * @returns {object} { ok: boolean, message: string }
+   */
+  repair() {
+    const dbPath = path.join(confPath, 'firefire.db');
+    const backupPath = path.join(confPath, `firefire_backup_${Date.now()}.db`);
+
+    try {
+      // 1. 首先尝试检查完整性
+      const integrityResult = this.checkIntegrity();
+      if (integrityResult.ok) {
+        // 尝试重建 FTS 索引
+        const ftsResult = this.rebuildFtsIndex();
+        if (ftsResult.ok) {
+          return { ok: true, message: '数据库修复完成（重建了 FTS 索引）' };
+        }
+      }
+
+      // 2. 如果完整性检查失败，尝试导出数据并重建
+      console.log('[DatabaseManager] 尝试导出数据并重建数据库...');
+
+      // 备份当前数据库
+      if (fs.existsSync(dbPath)) {
+        fs.copyFileSync(dbPath, backupPath);
+        console.log('[DatabaseManager] 已备份旧数据库到:', backupPath);
+      }
+
+      // 尝试从损坏的数据库导出数据
+      let notes = [];
+      try {
+        notes = this.db.prepare('SELECT * FROM notes').all();
+        console.log(`[DatabaseManager] 成功导出 ${notes.length} 条笔记`);
+      } catch (err) {
+        console.error('[DatabaseManager] 无法从损坏数据库导出数据:', err);
+      }
+
+      // 关闭当前连接
+      this.close();
+
+      // 删除损坏的数据库文件（保留备份）
+      if (fs.existsSync(dbPath)) {
+        fs.unlinkSync(dbPath);
+      }
+      // 也删除 WAL 和 SHM 文件
+      if (fs.existsSync(dbPath + '-wal')) {
+        fs.unlinkSync(dbPath + '-wal');
+      }
+      if (fs.existsSync(dbPath + '-shm')) {
+        fs.unlinkSync(dbPath + '-shm');
+      }
+
+      // 重新初始化
+      this.initialized = false;
+      this.init();
+
+      // 恢复数据
+      if (notes.length > 0) {
+        const insertNote = this.db.prepare(`
+          INSERT INTO notes (id, title, path, content_text, created_at, updated_at, is_journal, journal_date)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+
+        const transaction = this.db.transaction(() => {
+          for (const note of notes) {
+            try {
+              insertNote.run(
+                note.id,
+                note.title,
+                note.path,
+                note.content_text,
+                note.created_at,
+                note.updated_at,
+                note.is_journal,
+                note.journal_date
+              );
+            } catch (err) {
+              console.error('[DatabaseManager] 恢复笔记失败:', note.id, err);
+            }
+          }
+        });
+        transaction();
+        console.log(`[DatabaseManager] 已恢复 ${notes.length} 条笔记`);
+      }
+
+      return { ok: true, message: `数据库已重建，恢复了 ${notes.length} 条笔记。旧数据库备份在: ${backupPath}` };
+    } catch (err) {
+      console.error('[DatabaseManager] 数据库修复失败:', err);
+      return { ok: false, message: `修复失败: ${err.message}` };
+    }
+  }
+
+  /**
    * 关闭数据库连接
    */
   close() {
     if (this.db) {
+      // 在关闭前执行 checkpoint，确保 WAL 写入主文件
+      try {
+        this.db.pragma('wal_checkpoint(TRUNCATE)');
+      } catch (err) {
+        console.error('[DatabaseManager] WAL checkpoint 失败:', err);
+      }
       this.db.close();
+      this.db = null;
+      this.initialized = false;
       console.log('[DatabaseManager] 数据库连接已关闭');
     }
   }

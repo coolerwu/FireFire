@@ -1,24 +1,43 @@
-import {Button, Tooltip} from "antd";
+import {Button, Tooltip, Dropdown, message, Spin} from "antd";
 import {
     AlignCenterOutlined,
     AlignLeftOutlined,
     AlignRightOutlined,
     DeleteOutlined,
     HighlightOutlined,
-    StrikethroughOutlined, UnderlineOutlined
+    StrikethroughOutlined,
+    UnderlineOutlined,
+    RobotOutlined,
+    EditOutlined,
+    TranslationOutlined,
+    FormOutlined,
+    FileTextOutlined,
+    QuestionCircleOutlined,
 } from "@ant-design/icons";
 import {NodeSelection, TextSelection} from "prosemirror-state";
 import {BubbleMenu} from "@tiptap/react";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useContext} from "react";
+import {isAIEnabled, executeAI, AI_ACTIONS} from "../../utils/aiService";
+import {Context} from "../../index";
 
 /**
  * @param editor 编辑器
  * @param persist 持久化操作
  */
 const Bubble = ({editor, persist}) => {
+    const {setting} = useContext(Context);
+
     //展示选项
     const [showText, setShowText] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiEnabled, setAiEnabled] = useState(false);
+
+    // 检查 AI 是否启用
+    useEffect(() => {
+        setAiEnabled(setting?.ai?.enabled && setting?.ai?.apiKey);
+    }, [setting?.ai]);
+
     const deleteFunc = () => {
         const tr = editor.state.tr;
         const selection = editor.state.selection;
@@ -34,6 +53,80 @@ const Bubble = ({editor, persist}) => {
             persist(editor);
         }
     }
+
+    // 执行 AI 操作
+    const handleAIAction = async (action) => {
+        if (!editor) return;
+
+        const selection = editor.state.selection;
+        if (!(selection instanceof TextSelection) || selection.empty) {
+            message.warning('请先选中文本');
+            return;
+        }
+
+        // 获取选中的文本
+        const {from, to} = selection;
+        const selectedText = editor.state.doc.textBetween(from, to, '\n');
+
+        if (!selectedText.trim()) {
+            message.warning('选中的文本为空');
+            return;
+        }
+
+        setAiLoading(true);
+
+        try {
+            const result = await executeAI(action, selectedText);
+
+            // 替换选中的文本
+            editor.chain()
+                .focus()
+                .deleteRange({from, to})
+                .insertContent(result)
+                .run();
+
+            persist(editor);
+            message.success('AI 处理完成');
+        } catch (err) {
+            message.error(`AI 处理失败: ${err.message}`);
+        } finally {
+            setAiLoading(false);
+        }
+    };
+
+    // AI 菜单项
+    const aiMenuItems = [
+        {
+            key: AI_ACTIONS.POLISH,
+            icon: <EditOutlined />,
+            label: '润色',
+            onClick: () => handleAIAction(AI_ACTIONS.POLISH),
+        },
+        {
+            key: AI_ACTIONS.TRANSLATE,
+            icon: <TranslationOutlined />,
+            label: '翻译',
+            onClick: () => handleAIAction(AI_ACTIONS.TRANSLATE),
+        },
+        {
+            key: AI_ACTIONS.CONTINUE,
+            icon: <FormOutlined />,
+            label: '续写',
+            onClick: () => handleAIAction(AI_ACTIONS.CONTINUE),
+        },
+        {
+            key: AI_ACTIONS.SUMMARIZE,
+            icon: <FileTextOutlined />,
+            label: '总结',
+            onClick: () => handleAIAction(AI_ACTIONS.SUMMARIZE),
+        },
+        {
+            key: AI_ACTIONS.EXPLAIN,
+            icon: <QuestionCircleOutlined />,
+            label: '解释',
+            onClick: () => handleAIAction(AI_ACTIONS.EXPLAIN),
+        },
+    ];
 
     //初始化
     useEffect(() => {
@@ -68,6 +161,25 @@ const Bubble = ({editor, persist}) => {
             <BubbleMenu className="bubble-menu" tippyOptions={{duration: 100}} editor={editor}>
                 {showText && (
                     <>
+                        {/* AI 助手按钮 */}
+                        {aiEnabled && (
+                            <Dropdown
+                                menu={{items: aiMenuItems}}
+                                trigger={['click']}
+                                placement="bottom"
+                                disabled={aiLoading}
+                            >
+                                <Tooltip title={'AI 助手 (Cmd+J)'}>
+                                    <Button
+                                        type={'link'}
+                                        icon={aiLoading ? <Spin size="small" /> : <RobotOutlined />}
+                                        className="ai-button"
+                                        style={{color: '#0f7b6c'}}
+                                    />
+                                </Tooltip>
+                            </Dropdown>
+                        )}
+                        <div className="bubble-divider" />
                         <Tooltip title={'下划线'}>
                             <Button type={'link'} icon={<UnderlineOutlined/>}
                                     onClick={() => editor.chain().focus().toggleUnderline().run()}

@@ -236,6 +236,26 @@ const mockAPI = {
         console.warn('[Mock Mode] factoryReset called - not available in browser');
         return { success: false, error: '浏览器模式不支持恢复出厂设置' };
     },
+    webdavTest: async (config) => {
+        console.warn('[Mock Mode] webdavTest called - limited in browser due to CORS');
+        return { success: false, error: '浏览器模式下无法直接测试 WebDAV' };
+    },
+    webdavSync: async (options) => {
+        console.warn('[Mock Mode] webdavSync called - not available in browser');
+        return { success: false, error: '浏览器模式不支持 WebDAV 同步' };
+    },
+    checkDbIntegrity: async () => {
+        console.warn('[Mock Mode] checkDbIntegrity called');
+        return { ok: true };
+    },
+    repairDatabase: async () => {
+        console.warn('[Mock Mode] repairDatabase called - not available in browser');
+        return { ok: false, message: '浏览器模式不支持数据库修复' };
+    },
+    rebuildFtsIndex: async () => {
+        console.warn('[Mock Mode] rebuildFtsIndex called - not available in browser');
+        return { ok: false, error: '浏览器模式不支持重建索引' };
+    },
 }
 
 // 导出 API（优先使用真实 API，否则使用 mock）

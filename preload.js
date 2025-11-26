@@ -70,4 +70,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     isFirstTimeSetup: () => ipcRenderer.invoke('is-first-time-setup'),
     completeFirstTimeSetup: () => ipcRenderer.invoke('complete-first-time-setup'),
     factoryReset: () => ipcRenderer.invoke('factory-reset'),
+    //webdav functions
+    webdavTest: (config) => ipcRenderer.invoke('webdav-test', config),
+    webdavSync: (options) => ipcRenderer.invoke('webdav-sync', options),
+    //database maintenance functions
+    checkDbIntegrity: () => ipcRenderer.invoke('check-db-integrity'),
+    repairDatabase: () => ipcRenderer.invoke('repair-database'),
+    rebuildFtsIndex: () => ipcRenderer.invoke('rebuild-fts-index'),
 })

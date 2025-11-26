@@ -52,6 +52,7 @@ const MenuBar = ({editor}) => {
             bg-notion-bg-primary/95 dark:bg-notion-dark-bg-primary/95
             backdrop-blur-sm
             border-b border-notion-border dark:border-notion-dark-border
+            overflow-x-auto
         ">
             {/* 文本格式 */}
             <ToolButton

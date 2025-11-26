@@ -1,6 +1,7 @@
 const {init: initSettingFileOperation} = require('./settingFile');
 const {init: initNotebookFileOperation} = require('./notebookFile');
 const {init: initRootFileOperation} = require('./rootFile');
+const {init: initWebDAVSync} = require('./webdavSync');
 const {ipcMain} = require("electron");
 const dbManager = require('./dbManager');
 const journalManager = require('./journalManager');
@@ -52,6 +53,21 @@ const initDatabaseOperation = () => {
     // 获取笔记的标签
     ipcMain.handle('get-note-tags', (event, noteId) => {
         return dbManager.getNoteTags(noteId);
+    });
+
+    // 检查数据库完整性
+    ipcMain.handle('check-db-integrity', () => {
+        return dbManager.checkIntegrity();
+    });
+
+    // 修复数据库
+    ipcMain.handle('repair-database', () => {
+        return dbManager.repair();
+    });
+
+    // 重建 FTS 索引
+    ipcMain.handle('rebuild-fts-index', () => {
+        return dbManager.rebuildFtsIndex();
     });
 }
 
@@ -108,4 +124,7 @@ exports.init = () => {
 
     //初始化日记管理器
     journalManager.init();
+
+    //初始化 WebDAV 同步
+    initWebDAVSync();
 };
