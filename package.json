@@ -1,6 +1,6 @@
 {
   "name": "firefire",
-  "version": "0.6.25",
+  "version": "0.6.26",
   "private": true,
   "main": "main.js",
   "homepage": ".",
@@ -127,6 +127,13 @@
       "target": [
         {
           "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
           "arch": [
             "x64",
             "arm64"

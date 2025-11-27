@@ -24,6 +24,7 @@ import {PDFEmbed} from './pdfEmbed';
 import {WebEmbed} from './webEmbed';
 import {TagExtension} from './tagExtension';
 import {InternalLinkExtension} from './internalLinkExtension';
+import {DatabaseNode} from './databaseNode';
 
 const plugins = [
     StarterKit.configure({
@@ -74,6 +75,7 @@ const plugins = [
     WebEmbed,
     TagExtension,
     InternalLinkExtension,
+    DatabaseNode,
 ];
 
 export default plugins;

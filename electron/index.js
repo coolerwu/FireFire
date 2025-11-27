@@ -172,6 +172,67 @@ const initTemplateOperation = () => {
 }
 
 /**
+ * 数据库视图操作函数初始化
+ */
+const initDatabaseViewOperation = () => {
+    // 创建数据库
+    ipcMain.handle('create-database-view', (event, title, properties) => {
+        return dbManager.createDatabase(title, properties);
+    });
+
+    // 获取数据库
+    ipcMain.handle('get-database-view', (event, id) => {
+        return dbManager.getDatabase(id);
+    });
+
+    // 获取所有数据库列表
+    ipcMain.handle('get-all-database-views', () => {
+        return dbManager.getAllDatabases();
+    });
+
+    // 更新数据库
+    ipcMain.handle('update-database-view', (event, id, updates) => {
+        return dbManager.updateDatabase(id, updates);
+    });
+
+    // 删除数据库
+    ipcMain.handle('delete-database-view', (event, id) => {
+        return dbManager.deleteDatabase(id);
+    });
+
+    // 创建数据库行
+    ipcMain.handle('create-database-row', (event, databaseId, properties) => {
+        return dbManager.createDatabaseRow(databaseId, properties);
+    });
+
+    // 获取数据库行
+    ipcMain.handle('get-database-row', (event, rowId) => {
+        return dbManager.getDatabaseRow(rowId);
+    });
+
+    // 获取数据库所有行
+    ipcMain.handle('get-database-rows', (event, databaseId, options) => {
+        return dbManager.getDatabaseRows(databaseId, options);
+    });
+
+    // 更新数据库行
+    ipcMain.handle('update-database-row', (event, rowId, updates) => {
+        return dbManager.updateDatabaseRow(rowId, updates);
+    });
+
+    // 删除数据库行
+    ipcMain.handle('delete-database-row', (event, rowId) => {
+        return dbManager.deleteDatabaseRow(rowId);
+    });
+
+    // 批量更新行顺序
+    ipcMain.handle('update-row-orders', (event, databaseId, rowOrders) => {
+        dbManager.updateRowOrders(databaseId, rowOrders);
+        return true;
+    });
+}
+
+/**
  * 日记操作函数初始化
  */
 const initJournalOperation = () => {
@@ -236,6 +297,9 @@ exports.init = () => {
 
     //模板操作函数初始化
     initTemplateOperation();
+
+    //数据库视图操作函数初始化
+    initDatabaseViewOperation();
 
     //初始化 WebDAV 同步
     initWebDAVSync();

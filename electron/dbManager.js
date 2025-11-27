@@ -100,6 +100,37 @@ class DatabaseManager {
       CREATE INDEX IF NOT EXISTS idx_journal_date ON notes(journal_date DESC) WHERE is_journal = 1;
     `);
 
+    // 数据库视图表（Notion 风格）
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS databases (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL DEFAULT '无标题数据库',
+        properties_config TEXT NOT NULL DEFAULT '[]',
+        view_config TEXT NOT NULL DEFAULT '{}',
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    `);
+
+    // 数据库行表
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS database_rows (
+        id TEXT PRIMARY KEY,
+        database_id TEXT NOT NULL,
+        properties TEXT NOT NULL DEFAULT '{}',
+        order_index INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        FOREIGN KEY (database_id) REFERENCES databases(id) ON DELETE CASCADE
+      )
+    `);
+
+    // 数据库相关索引
+    this.db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_database_rows_database_id ON database_rows(database_id);
+      CREATE INDEX IF NOT EXISTS idx_database_rows_order ON database_rows(database_id, order_index);
+    `);
+
     // 创建全文搜索虚拟表（FTS5）
     this.db.exec(`
       CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
@@ -573,6 +604,348 @@ class DatabaseManager {
       console.error('[DatabaseManager] 获取图谱数据失败:', err);
       return { nodes: [], links: [] };
     }
+  }
+
+  // ============ 数据库视图相关方法 ============
+
+  /**
+   * 创建数据库
+   * @param {string} title - 数据库标题
+   * @param {Array} properties - 属性配置数组
+   * @returns {object} 创建的数据库对象
+   */
+  createDatabase(title = '无标题数据库', properties = []) {
+    const id = `db_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const now = Date.now();
+
+    // 默认属性：标题列
+    const defaultProperties = [
+      {
+        id: 'title',
+        name: '名称',
+        type: 'text',
+        width: 200,
+      },
+      ...properties
+    ];
+
+    const defaultViewConfig = {
+      currentView: 'table',
+      views: {
+        table: { sorts: [], filters: [] },
+        board: { groupBy: null, sorts: [], filters: [] },
+        calendar: { dateProperty: null, filters: [] }
+      }
+    };
+
+    this.db.prepare(`
+      INSERT INTO databases (id, title, properties_config, view_config, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(id, title, JSON.stringify(defaultProperties), JSON.stringify(defaultViewConfig), now, now);
+
+    console.log(`[DatabaseManager] 创建数据库: ${title} (${id})`);
+    return {
+      id,
+      title,
+      propertiesConfig: defaultProperties,
+      viewConfig: defaultViewConfig,
+      createdAt: now,
+      updatedAt: now
+    };
+  }
+
+  /**
+   * 获取数据库
+   * @param {string} id - 数据库 ID
+   * @returns {object|null} 数据库对象
+   */
+  getDatabase(id) {
+    const row = this.db.prepare('SELECT * FROM databases WHERE id = ?').get(id);
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      title: row.title,
+      propertiesConfig: JSON.parse(row.properties_config),
+      viewConfig: JSON.parse(row.view_config),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    };
+  }
+
+  /**
+   * 获取所有数据库列表
+   * @returns {Array} 数据库列表
+   */
+  getAllDatabases() {
+    const rows = this.db.prepare(`
+      SELECT id, title, created_at, updated_at
+      FROM databases
+      ORDER BY updated_at DESC
+    `).all();
+
+    return rows.map(row => ({
+      id: row.id,
+      title: row.title,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    }));
+  }
+
+  /**
+   * 更新数据库
+   * @param {string} id - 数据库 ID
+   * @param {object} updates - 更新内容
+   * @returns {boolean} 是否成功
+   */
+  updateDatabase(id, updates) {
+    const { title, propertiesConfig, viewConfig } = updates;
+    const now = Date.now();
+
+    const fields = ['updated_at = ?'];
+    const values = [now];
+
+    if (title !== undefined) {
+      fields.push('title = ?');
+      values.push(title);
+    }
+    if (propertiesConfig !== undefined) {
+      fields.push('properties_config = ?');
+      values.push(JSON.stringify(propertiesConfig));
+    }
+    if (viewConfig !== undefined) {
+      fields.push('view_config = ?');
+      values.push(JSON.stringify(viewConfig));
+    }
+
+    values.push(id);
+    const result = this.db.prepare(`
+      UPDATE databases SET ${fields.join(', ')} WHERE id = ?
+    `).run(...values);
+
+    console.log(`[DatabaseManager] 更新数据库: ${id}`);
+    return result.changes > 0;
+  }
+
+  /**
+   * 删除数据库
+   * @param {string} id - 数据库 ID
+   * @returns {boolean} 是否成功
+   */
+  deleteDatabase(id) {
+    const result = this.db.prepare('DELETE FROM databases WHERE id = ?').run(id);
+    console.log(`[DatabaseManager] 删除数据库: ${id}`);
+    return result.changes > 0;
+  }
+
+  /**
+   * 创建数据库行
+   * @param {string} databaseId - 数据库 ID
+   * @param {object} properties - 行属性值
+   * @returns {object} 创建的行对象
+   */
+  createDatabaseRow(databaseId, properties = {}) {
+    const id = `row_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const now = Date.now();
+
+    // 获取当前最大 order_index
+    const maxOrder = this.db.prepare(`
+      SELECT MAX(order_index) as max_order FROM database_rows WHERE database_id = ?
+    `).get(databaseId);
+    const orderIndex = (maxOrder?.max_order ?? -1) + 1;
+
+    this.db.prepare(`
+      INSERT INTO database_rows (id, database_id, properties, order_index, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(id, databaseId, JSON.stringify(properties), orderIndex, now, now);
+
+    console.log(`[DatabaseManager] 创建数据库行: ${id} in ${databaseId}`);
+    return {
+      id,
+      databaseId,
+      properties,
+      orderIndex,
+      createdAt: now,
+      updatedAt: now
+    };
+  }
+
+  /**
+   * 获取数据库行
+   * @param {string} rowId - 行 ID
+   * @returns {object|null} 行对象
+   */
+  getDatabaseRow(rowId) {
+    const row = this.db.prepare('SELECT * FROM database_rows WHERE id = ?').get(rowId);
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      databaseId: row.database_id,
+      properties: JSON.parse(row.properties),
+      orderIndex: row.order_index,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    };
+  }
+
+  /**
+   * 获取数据库所有行
+   * @param {string} databaseId - 数据库 ID
+   * @param {object} options - 查询选项 { sorts, filters }
+   * @returns {Array} 行列表
+   */
+  getDatabaseRows(databaseId, options = {}) {
+    // 基础查询
+    let rows = this.db.prepare(`
+      SELECT * FROM database_rows WHERE database_id = ? ORDER BY order_index ASC
+    `).all(databaseId);
+
+    // 解析 properties
+    rows = rows.map(row => ({
+      id: row.id,
+      databaseId: row.database_id,
+      properties: JSON.parse(row.properties),
+      orderIndex: row.order_index,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    }));
+
+    // 应用筛选
+    if (options.filters && options.filters.length > 0) {
+      rows = this.applyFilters(rows, options.filters);
+    }
+
+    // 应用排序
+    if (options.sorts && options.sorts.length > 0) {
+      rows = this.applySorts(rows, options.sorts);
+    }
+
+    return rows;
+  }
+
+  /**
+   * 应用筛选条件
+   * @param {Array} rows - 行数据
+   * @param {Array} filters - 筛选条件 [{ propertyId, operator, value }]
+   * @returns {Array} 筛选后的行
+   */
+  applyFilters(rows, filters) {
+    return rows.filter(row => {
+      return filters.every(filter => {
+        const value = row.properties[filter.propertyId];
+        const filterValue = filter.value;
+
+        switch (filter.operator) {
+          case 'equals':
+            return value === filterValue;
+          case 'not_equals':
+            return value !== filterValue;
+          case 'contains':
+            return String(value || '').toLowerCase().includes(String(filterValue || '').toLowerCase());
+          case 'not_contains':
+            return !String(value || '').toLowerCase().includes(String(filterValue || '').toLowerCase());
+          case 'is_empty':
+            return value === null || value === undefined || value === '';
+          case 'is_not_empty':
+            return value !== null && value !== undefined && value !== '';
+          case 'greater_than':
+            return Number(value) > Number(filterValue);
+          case 'less_than':
+            return Number(value) < Number(filterValue);
+          case 'greater_or_equal':
+            return Number(value) >= Number(filterValue);
+          case 'less_or_equal':
+            return Number(value) <= Number(filterValue);
+          default:
+            return true;
+        }
+      });
+    });
+  }
+
+  /**
+   * 应用排序
+   * @param {Array} rows - 行数据
+   * @param {Array} sorts - 排序条件 [{ propertyId, direction }]
+   * @returns {Array} 排序后的行
+   */
+  applySorts(rows, sorts) {
+    return [...rows].sort((a, b) => {
+      for (const sort of sorts) {
+        const aValue = a.properties[sort.propertyId];
+        const bValue = b.properties[sort.propertyId];
+        const direction = sort.direction === 'desc' ? -1 : 1;
+
+        if (aValue === bValue) continue;
+        if (aValue === null || aValue === undefined) return 1 * direction;
+        if (bValue === null || bValue === undefined) return -1 * direction;
+
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return (aValue - bValue) * direction;
+        }
+
+        return String(aValue).localeCompare(String(bValue)) * direction;
+      }
+      return 0;
+    });
+  }
+
+  /**
+   * 更新数据库行
+   * @param {string} rowId - 行 ID
+   * @param {object} updates - 更新内容
+   * @returns {boolean} 是否成功
+   */
+  updateDatabaseRow(rowId, updates) {
+    const { properties, orderIndex } = updates;
+    const now = Date.now();
+
+    const fields = ['updated_at = ?'];
+    const values = [now];
+
+    if (properties !== undefined) {
+      fields.push('properties = ?');
+      values.push(JSON.stringify(properties));
+    }
+    if (orderIndex !== undefined) {
+      fields.push('order_index = ?');
+      values.push(orderIndex);
+    }
+
+    values.push(rowId);
+    const result = this.db.prepare(`
+      UPDATE database_rows SET ${fields.join(', ')} WHERE id = ?
+    `).run(...values);
+
+    return result.changes > 0;
+  }
+
+  /**
+   * 删除数据库行
+   * @param {string} rowId - 行 ID
+   * @returns {boolean} 是否成功
+   */
+  deleteDatabaseRow(rowId) {
+    const result = this.db.prepare('DELETE FROM database_rows WHERE id = ?').run(rowId);
+    console.log(`[DatabaseManager] 删除数据库行: ${rowId}`);
+    return result.changes > 0;
+  }
+
+  /**
+   * 批量更新行顺序
+   * @param {string} databaseId - 数据库 ID
+   * @param {Array} rowOrders - 行顺序 [{ id, orderIndex }]
+   */
+  updateRowOrders(databaseId, rowOrders) {
+    const stmt = this.db.prepare('UPDATE database_rows SET order_index = ? WHERE id = ? AND database_id = ?');
+    const transaction = this.db.transaction(() => {
+      for (const { id, orderIndex } of rowOrders) {
+        stmt.run(orderIndex, id, databaseId);
+      }
+    });
+    transaction();
+    console.log(`[DatabaseManager] 更新行顺序: ${databaseId}, ${rowOrders.length} 行`);
   }
 
   /**

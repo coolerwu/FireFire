@@ -370,6 +370,82 @@ const mockAPI = {
         console.warn('[Mock Mode] importTemplate called');
         return { id: `imported-${Date.now()}`, name: '导入的模板' };
     },
+    // 数据库视图 API
+    createDatabaseView: async (title, properties) => {
+        console.warn('[Mock Mode] createDatabaseView called', title);
+        const id = `db_${Date.now()}`;
+        return {
+            id,
+            title: title || '无标题数据库',
+            propertiesConfig: [{ id: 'title', name: '名称', type: 'text', width: 200 }],
+            viewConfig: { currentView: 'table', views: {} },
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+        };
+    },
+    getDatabaseView: async (id) => {
+        console.warn('[Mock Mode] getDatabaseView called', id);
+        return {
+            id,
+            title: '示例数据库',
+            propertiesConfig: [
+                { id: 'title', name: '名称', type: 'text', width: 200 },
+                { id: 'status', name: '状态', type: 'select', width: 120, options: ['待办', '进行中', '已完成'] },
+            ],
+            viewConfig: { currentView: 'table', views: {} },
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+        };
+    },
+    getAllDatabaseViews: async () => {
+        console.warn('[Mock Mode] getAllDatabaseViews called');
+        return [
+            { id: 'db_1', title: '任务列表', createdAt: Date.now(), updatedAt: Date.now() },
+            { id: 'db_2', title: '阅读清单', createdAt: Date.now(), updatedAt: Date.now() },
+        ];
+    },
+    updateDatabaseView: async (id, updates) => {
+        console.warn('[Mock Mode] updateDatabaseView called', id);
+        return true;
+    },
+    deleteDatabaseView: async (id) => {
+        console.warn('[Mock Mode] deleteDatabaseView called', id);
+        return true;
+    },
+    createDatabaseRow: async (databaseId, properties) => {
+        console.warn('[Mock Mode] createDatabaseRow called', databaseId);
+        return {
+            id: `row_${Date.now()}`,
+            databaseId,
+            properties: properties || {},
+            orderIndex: 0,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+        };
+    },
+    getDatabaseRow: async (rowId) => {
+        console.warn('[Mock Mode] getDatabaseRow called', rowId);
+        return { id: rowId, properties: { title: '示例行' }, orderIndex: 0 };
+    },
+    getDatabaseRows: async (databaseId, options) => {
+        console.warn('[Mock Mode] getDatabaseRows called', databaseId);
+        return [
+            { id: 'row_1', databaseId, properties: { title: '任务1', status: '待办' }, orderIndex: 0 },
+            { id: 'row_2', databaseId, properties: { title: '任务2', status: '进行中' }, orderIndex: 1 },
+        ];
+    },
+    updateDatabaseRow: async (rowId, updates) => {
+        console.warn('[Mock Mode] updateDatabaseRow called', rowId);
+        return true;
+    },
+    deleteDatabaseRow: async (rowId) => {
+        console.warn('[Mock Mode] deleteDatabaseRow called', rowId);
+        return true;
+    },
+    updateRowOrders: async (databaseId, rowOrders) => {
+        console.warn('[Mock Mode] updateRowOrders called', databaseId);
+        return true;
+    },
 }
 
 // 导出 API（优先使用真实 API，否则使用 mock）

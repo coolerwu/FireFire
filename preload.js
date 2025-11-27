@@ -103,4 +103,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     applyTemplate: (templateId, variables) => ipcRenderer.invoke('apply-template', templateId, variables),
     exportTemplate: (templateId) => ipcRenderer.invoke('export-template', templateId),
     importTemplate: (jsonString) => ipcRenderer.invoke('import-template', jsonString),
+    //database view functions
+    createDatabaseView: (title, properties) => ipcRenderer.invoke('create-database-view', title, properties),
+    getDatabaseView: (id) => ipcRenderer.invoke('get-database-view', id),
+    getAllDatabaseViews: () => ipcRenderer.invoke('get-all-database-views'),
+    updateDatabaseView: (id, updates) => ipcRenderer.invoke('update-database-view', id, updates),
+    deleteDatabaseView: (id) => ipcRenderer.invoke('delete-database-view', id),
+    createDatabaseRow: (databaseId, properties) => ipcRenderer.invoke('create-database-row', databaseId, properties),
+    getDatabaseRow: (rowId) => ipcRenderer.invoke('get-database-row', rowId),
+    getDatabaseRows: (databaseId, options) => ipcRenderer.invoke('get-database-rows', databaseId, options),
+    updateDatabaseRow: (rowId, updates) => ipcRenderer.invoke('update-database-row', rowId, updates),
+    deleteDatabaseRow: (rowId) => ipcRenderer.invoke('delete-database-row', rowId),
+    updateRowOrders: (databaseId, rowOrders) => ipcRenderer.invoke('update-row-orders', databaseId, rowOrders),
 })

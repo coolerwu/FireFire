@@ -102,6 +102,13 @@ FireFire is a local-first knowledge management and note-taking application built
 - **Batch Export** - Export all notes to Markdown or HTML
 - **Frontmatter Support** - Preserve title and metadata
 
+#### 📊 Database View (NEW)
+- **Table View** - Notion-style inline database with multiple column types
+- **Column Types** - Text, Number, Select, Multi-select, Date, Checkbox, URL
+- **Inline Editing** - Edit cells directly in the table
+- **Column Resize** - Drag to adjust column widths
+- **Slash Command** - Type `/database` to insert a new database
+
 ### Installation
 
 Download the latest release for your platform:
@@ -241,6 +248,13 @@ FireFire 是一款本地优先的知识管理和笔记应用，基于 Electron �
 - **批量导出** - 将所有笔记导出为 Markdown 或 HTML
 - **Frontmatter 支持** - 保留标题和元数据
 
+#### 📊 数据库视图（新功能）
+- **表格视图** - Notion 风格的内联数据库，支持多种列类型
+- **列类型** - 文本、数字、单选、多选、日期、复选框、URL
+- **内联编辑** - 直接在表格中编辑单元格
+- **列宽调整** - 拖拽调整列宽度
+- **斜杠命令** - 输入 `/database` 插入新数据库
+
 ### 安装
 
 下载适合你平台的最新版本：
@@ -294,7 +308,8 @@ MIT
 
 | Date | Changes |
 |------|---------|
-| 2025-11-27 | **v0.6.25** - Enhanced PDF viewer (zoom 50%-200%, fullscreen mode); Added Version History (auto-save every 5min, preview/restore); Added Note Templates (6 built-in templates, custom templates, variable substitution) |
+| 2025-11-27 | **v0.6.26** - Added Database View (Notion-style inline database with table view, 7 column types, filter/sort, property editor, slash command `/database`) |
+| 2025-11-27 | **v0.6.25** - Enhanced PDF viewer (zoom 50%-200%, fullscreen mode); Added Version History (auto-save every 5min, preview/restore); Added Note Templates (6 built-in templates, custom templates, variable substitution); Fixed macOS auto-update (added ZIP target for electron-updater) |
 | 2025-11-26 | **v0.6.24** - Added Knowledge Graph view (force-directed graph for note relationships); Added Import/Export feature (Markdown import/export, HTML export, batch operations); New sidebar navigation for graph |
 | 2025-11-26 | **v0.6.23** - Added database maintenance tools (integrity check, repair, FTS rebuild); Fixed AI config sync issue; Fixed toolbar overflow; Added screenshots to README; Fixed auto-update yml upload in CI |
 | 2025-11-26 | **v0.6.22** - Added AI assistant (OpenAI/Claude/DeepSeek); Added WebDAV sync (Jianguoyun/Nextcloud); New icon setup |

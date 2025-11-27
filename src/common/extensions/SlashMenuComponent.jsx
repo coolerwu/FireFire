@@ -168,6 +168,15 @@ const SlashMenuComponent = forwardRef((props, ref) => {
         }
       },
     },
+    {
+      icon: '📊',
+      title: '数据库',
+      description: '创建表格数据库',
+      category: '高级',
+      command: ({ editor, range }) => {
+        editor.chain().focus().deleteRange(range).setDatabaseNode().run()
+      },
+    },
   ]
 
   const filteredCommands = commands.filter((item) =>
