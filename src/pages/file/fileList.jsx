@@ -1,12 +1,13 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Button, Input, Modal, Tag, Collapse, message} from "antd";
-import {FileAddOutlined, HddOutlined, SearchOutlined, TagsOutlined, ThunderboltOutlined, ChevronRightIcon} from "@ant-design/icons";
+import {FileAddOutlined, HddOutlined, SearchOutlined, TagsOutlined, ThunderboltOutlined, AppstoreOutlined} from "@ant-design/icons";
 import {Context} from "../../index";
 import FileListItem from "./fileListItem";
 import {electronAPI} from "../../utils/electronAPI";
 import {handleAPIError} from "../../utils/errorHandler";
 import {logger} from "../../utils/logger";
 import {FILE_CONSTANTS, formatDateForFilename} from "../../utils/constants";
+import TemplateSelector from "../../components/TemplateSelector";
 
 const { Panel } = Collapse;
 
@@ -21,6 +22,9 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
     //标签相关状态
     const [tags, setTags] = useState([]);
     const [selectedTag, setSelectedTag] = useState(null);
+
+    //模板选择器状态
+    const [templateSelectorVisible, setTemplateSelectorVisible] = useState(false);
 
     //新建文件/文件夹ref
     const newFileOrDirectoryRef = useRef(null);
@@ -90,6 +94,34 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
             logger.info(`创建快速笔记: ${filePath}`);
         } catch (error) {
             logger.error('创建快速笔记失败:', error);
+        }
+    };
+
+    // 从模板创建笔记
+    const createNoteFromTemplate = async (content, templateName) => {
+        try {
+            // 确保 Quick Notes 文件夹存在
+            const quickNotesDir = FILE_CONSTANTS.QUICK_NOTES_DIR;
+            await electronAPI.createNotebookDir(quickNotesDir);
+
+            // 生成文件名
+            const fileName = `${templateName || '新笔记'}_${formatDateForFilename()}`;
+            const filePath = `${quickNotesDir}/${fileName}`;
+
+            // 创建文件
+            await electronAPI.createNotebookFile(filePath);
+
+            // 写入模板内容
+            await electronAPI.writeNotebookFile(`${filePath}.cwjson`, JSON.stringify(content));
+
+            // 刷新文件列表
+            refresh();
+
+            message.success('笔记创建成功');
+            logger.info(`从模板创建笔记: ${filePath}`);
+        } catch (error) {
+            logger.error('从模板创建笔记失败:', error);
+            message.error('创建失败');
         }
     };
 
@@ -202,6 +234,20 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                         title="创建文件"
                     >
                         <FileAddOutlined />
+                    </button>
+                    <button
+                        onClick={() => setTemplateSelectorVisible(true)}
+                        className="
+                            p-2.5 rounded-md
+                            border border-notion-border dark:border-notion-dark-border
+                            text-notion-text-secondary dark:text-notion-dark-text-secondary
+                            hover:bg-notion-bg-hover dark:hover:bg-notion-dark-bg-hover
+                            hover:text-notion-text-primary dark:hover:text-notion-dark-text-primary
+                            transition-colors duration-fast
+                        "
+                        title="从模板创建"
+                    >
+                        <AppstoreOutlined />
                     </button>
                 </div>
 
@@ -317,6 +363,13 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
                     </div>
                 )}
             </div>
+
+            {/* 模板选择器 */}
+            <TemplateSelector
+                visible={templateSelectorVisible}
+                onClose={() => setTemplateSelectorVisible(false)}
+                onSelect={createNoteFromTemplate}
+            />
         </div>
     );
 };

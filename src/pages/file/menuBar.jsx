@@ -9,6 +9,7 @@ import {
     DashOutlined,
     EnterOutlined,
     HighlightOutlined,
+    HistoryOutlined,
     ItalicOutlined,
     OrderedListOutlined,
     RedoOutlined,
@@ -40,7 +41,7 @@ const Divider = () => (
     <div className="w-px h-5 bg-notion-border dark:bg-notion-dark-border mx-1" />
 );
 
-const MenuBar = ({editor}) => {
+const MenuBar = ({editor, onShowVersionHistory}) => {
     if (!editor) {
         return null;
     }
@@ -181,6 +182,15 @@ const MenuBar = ({editor}) => {
                 title="重做"
                 onClick={() => editor.chain().focus().redo().run()}
                 icon={<RedoOutlined />}
+            />
+
+            <Divider />
+
+            {/* 历史版本 */}
+            <ToolButton
+                title="历史版本"
+                onClick={onShowVersionHistory}
+                icon={<HistoryOutlined />}
             />
 
             {/* 保存状态 */}

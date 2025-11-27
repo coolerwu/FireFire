@@ -6,6 +6,8 @@ const {init: initImportExport} = require('./importExport');
 const {ipcMain} = require("electron");
 const dbManager = require('./dbManager');
 const journalManager = require('./journalManager');
+const versionManager = require('./versionManager');
+const templateManager = require('./templateManager');
 const {getCurSettingConfig} = require('./settingFile');
 
 /**
@@ -78,6 +80,98 @@ const initDatabaseOperation = () => {
 }
 
 /**
+ * 版本历史操作函数初始化
+ */
+const initVersionOperation = () => {
+    // 保存版本
+    ipcMain.handle('save-version', (event, noteId, content, forceSave) => {
+        return versionManager.saveVersion(noteId, content, forceSave);
+    });
+
+    // 获取版本列表
+    ipcMain.handle('get-versions', (event, noteId, limit, offset) => {
+        return versionManager.getVersions(noteId, limit, offset);
+    });
+
+    // 获取版本总数
+    ipcMain.handle('get-version-count', (event, noteId) => {
+        return versionManager.getVersionCount(noteId);
+    });
+
+    // 获取特定版本
+    ipcMain.handle('get-version', (event, versionId) => {
+        return versionManager.getVersion(versionId);
+    });
+
+    // 删除版本
+    ipcMain.handle('delete-version', (event, versionId) => {
+        versionManager.deleteVersion(versionId);
+        return true;
+    });
+
+    // 删除笔记所有版本
+    ipcMain.handle('delete-all-versions', (event, noteId) => {
+        versionManager.deleteAllVersions(noteId);
+        return true;
+    });
+
+    // 比较版本
+    ipcMain.handle('compare-versions', (event, versionId1, versionId2) => {
+        return versionManager.compareVersions(versionId1, versionId2);
+    });
+
+    // 获取版本统计
+    ipcMain.handle('get-version-stats', () => {
+        return versionManager.getStats();
+    });
+}
+
+/**
+ * 模板操作函数初始化
+ */
+const initTemplateOperation = () => {
+    // 获取所有模板
+    ipcMain.handle('get-all-templates', () => {
+        return templateManager.getAllTemplates();
+    });
+
+    // 获取单个模板
+    ipcMain.handle('get-template', (event, templateId) => {
+        return templateManager.getTemplate(templateId);
+    });
+
+    // 创建用户模板
+    ipcMain.handle('create-template', (event, name, description, content, icon) => {
+        return templateManager.createTemplate(name, description, content, icon);
+    });
+
+    // 更新用户模板
+    ipcMain.handle('update-template', (event, templateId, updates) => {
+        return templateManager.updateTemplate(templateId, updates);
+    });
+
+    // 删除用户模板
+    ipcMain.handle('delete-template', (event, templateId) => {
+        return templateManager.deleteTemplate(templateId);
+    });
+
+    // 应用模板（替换变量）
+    ipcMain.handle('apply-template', (event, templateId, variables) => {
+        return templateManager.applyTemplate(templateId, variables);
+    });
+
+    // 导出模板
+    ipcMain.handle('export-template', (event, templateId) => {
+        return templateManager.exportTemplate(templateId);
+    });
+
+    // 导入模板
+    ipcMain.handle('import-template', (event, jsonString) => {
+        return templateManager.importTemplate(jsonString);
+    });
+}
+
+/**
  * 日记操作函数初始化
  */
 const initJournalOperation = () => {
@@ -130,6 +224,18 @@ exports.init = () => {
 
     //初始化日记管理器
     journalManager.init();
+
+    //初始化版本管理器（需要数据库实例）
+    versionManager.init(dbManager.db);
+
+    //版本历史操作函数初始化
+    initVersionOperation();
+
+    //初始化模板管理器
+    templateManager.init();
+
+    //模板操作函数初始化
+    initTemplateOperation();
 
     //初始化 WebDAV 同步
     initWebDAVSync();

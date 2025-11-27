@@ -290,6 +290,86 @@ const mockAPI = {
             ]
         };
     },
+    // 版本历史 API
+    saveVersion: async (noteId, content, forceSave) => {
+        console.warn('[Mock Mode] saveVersion called', noteId);
+        return Date.now();
+    },
+    getVersions: async (noteId, limit, offset) => {
+        console.warn('[Mock Mode] getVersions called', noteId);
+        return [
+            { id: 1, noteId, contentLength: 100, summary: '100 字符: 示例内容...', createdAt: new Date().toISOString() },
+            { id: 2, noteId, contentLength: 200, summary: '200 字符: 更多内容...', createdAt: new Date(Date.now() - 300000).toISOString() },
+        ];
+    },
+    getVersionCount: async (noteId) => {
+        console.warn('[Mock Mode] getVersionCount called', noteId);
+        return 2;
+    },
+    getVersion: async (versionId) => {
+        console.warn('[Mock Mode] getVersion called', versionId);
+        return {
+            id: versionId,
+            noteId: 'mock-note',
+            content: '{"type":"doc","content":[]}',
+            contentLength: 100,
+            summary: '100 字符',
+            createdAt: new Date().toISOString(),
+        };
+    },
+    deleteVersion: async (versionId) => {
+        console.warn('[Mock Mode] deleteVersion called', versionId);
+        return true;
+    },
+    deleteAllVersions: async (noteId) => {
+        console.warn('[Mock Mode] deleteAllVersions called', noteId);
+        return true;
+    },
+    compareVersions: async (versionId1, versionId2) => {
+        console.warn('[Mock Mode] compareVersions called', versionId1, versionId2);
+        return { version1: { id: versionId1 }, version2: { id: versionId2 }, lengthDiff: 50 };
+    },
+    getVersionStats: async () => {
+        console.warn('[Mock Mode] getVersionStats called');
+        return { totalVersions: 10, notesWithVersions: 5, totalSize: 10240, totalSizeMB: '0.01' };
+    },
+    // 模板 API
+    getAllTemplates: async () => {
+        console.warn('[Mock Mode] getAllTemplates called');
+        return [
+            { id: 'builtin-meeting', name: '会议记录', description: '记录会议要点', category: 'builtin', icon: '📋', isBuiltin: true },
+            { id: 'builtin-reading', name: '读书笔记', description: '记录书籍要点', category: 'builtin', icon: '📚', isBuiltin: true },
+            { id: 'builtin-blank', name: '空白笔记', description: '从空白开始', category: 'builtin', icon: '📄', isBuiltin: true },
+        ];
+    },
+    getTemplate: async (templateId) => {
+        console.warn('[Mock Mode] getTemplate called', templateId);
+        return { id: templateId, name: '模板', content: { type: 'doc', content: [] } };
+    },
+    createTemplate: async (name, description, content, icon) => {
+        console.warn('[Mock Mode] createTemplate called', name);
+        return { id: `user-${Date.now()}`, name, description, content, icon, category: 'user' };
+    },
+    updateTemplate: async (templateId, updates) => {
+        console.warn('[Mock Mode] updateTemplate called', templateId);
+        return { id: templateId, ...updates };
+    },
+    deleteTemplate: async (templateId) => {
+        console.warn('[Mock Mode] deleteTemplate called', templateId);
+        return true;
+    },
+    applyTemplate: async (templateId, variables) => {
+        console.warn('[Mock Mode] applyTemplate called', templateId, variables);
+        return { type: 'doc', content: [{ type: 'heading', attrs: { level: 1 }, content: [{ type: 'text', text: '新笔记' }] }] };
+    },
+    exportTemplate: async (templateId) => {
+        console.warn('[Mock Mode] exportTemplate called', templateId);
+        return '{}';
+    },
+    importTemplate: async (jsonString) => {
+        console.warn('[Mock Mode] importTemplate called');
+        return { id: `imported-${Date.now()}`, name: '导入的模板' };
+    },
 }
 
 // 导出 API（优先使用真实 API，否则使用 mock）

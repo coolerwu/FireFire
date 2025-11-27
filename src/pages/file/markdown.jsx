@@ -1,6 +1,6 @@
 import './markdown.less'
 import {EditorContent, useEditor} from '@tiptap/react';
-import React, {useContext, useState, useRef, useEffect} from 'react';
+import React, {useContext, useState, useRef, useEffect, useCallback} from 'react';
 import MenuBar from "./menuBar";
 import {message} from "antd";
 import Bubble from "./bubble";
@@ -10,6 +10,7 @@ import {Context} from "../../index";
 import {electronAPI} from "../../utils/electronAPI";
 import {handleAPIError} from "../../utils/errorHandler";
 import {logger} from "../../utils/logger";
+import VersionHistory from "../../components/VersionHistory";
 
 const Markdown = ({cwjson}) => {
     // 标题状态 - 从文件名中提取（去掉后缀）
@@ -17,6 +18,9 @@ const Markdown = ({cwjson}) => {
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const titleInputRef = useRef(null);
     const originalTitleRef = useRef('');
+
+    // 版本历史状态
+    const [versionHistoryVisible, setVersionHistoryVisible] = useState(false);
 
     // 初始化标题
     useEffect(() => {
@@ -155,6 +159,19 @@ const Markdown = ({cwjson}) => {
 
     const isDark = setting?.themeSource === 'dark';
 
+    // 恢复版本
+    const handleVersionRestore = useCallback((content) => {
+        if (editor && content) {
+            try {
+                const parsed = JSON.parse(content);
+                editor.commands.setContent(parsed);
+            } catch (err) {
+                logger.error('[Markdown] 恢复版本失败:', err);
+                message.error('恢复版本失败');
+            }
+        }
+    }, [editor]);
+
     return (
         <div className="h-full flex flex-col bg-notion-bg-primary dark:bg-notion-dark-bg-primary">
             {editor && <Bubble editor={editor} persist={persist}/>}
@@ -172,7 +189,10 @@ const Markdown = ({cwjson}) => {
                     '--bubble-fg': '#fff',
                 }}
             >
-                <MenuBar editor={editor}/>
+                <MenuBar
+                    editor={editor}
+                    onShowVersionHistory={() => setVersionHistoryVisible(true)}
+                />
                 {/* 可编辑标题 */}
                 <div className="max-w-[var(--doc-width)] mx-auto px-4 pt-8 pb-2">
                     {isEditingTitle ? (
@@ -209,6 +229,15 @@ const Markdown = ({cwjson}) => {
                 </div>
                 <EditorContent editor={editor}/>
             </div>
+
+            {/* 版本历史面板 */}
+            <VersionHistory
+                noteId={cwjson?.id}
+                visible={versionHistoryVisible}
+                onClose={() => setVersionHistoryVisible(false)}
+                onRestore={handleVersionRestore}
+                editor={editor}
+            />
         </div>
     );
 }

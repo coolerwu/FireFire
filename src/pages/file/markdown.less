@@ -543,10 +543,82 @@
     }
   }
 
-  .pdf-page-info {
+  .pdf-page-info,
+  .pdf-zoom-info {
     color: var(--muted);
     font-size: 0.875rem;
+    min-width: 60px;
+    text-align: center;
   }
+
+  .pdf-controls-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pdf-document-wrapper {
+    transition: transform 0.2s ease;
+    overflow: auto;
+    max-height: 600px;
+  }
+
+  .pdf-fullscreen-button {
+    margin-left: 1rem;
+    font-size: 1.2rem;
+  }
+
+  &.pdf-fullscreen {
+    background: rgba(0, 0, 0, 0.95);
+    padding: 2rem;
+    border-radius: 0;
+    max-width: 100%;
+    max-height: 100%;
+
+    .pdf-document-wrapper {
+      max-height: calc(100vh - 150px);
+      overflow: auto;
+    }
+
+    .pdf-controls {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 1rem;
+      border-radius: var(--radius-lg, 8px);
+      border: none;
+      margin-top: 1rem;
+    }
+
+    .pdf-control-button {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: white;
+
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: var(--primary);
+      }
+    }
+
+    .pdf-page-info,
+    .pdf-zoom-info {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+/* PDF 全屏遮罩 */
+.pdf-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
 }
 
 /* 网页预览 */

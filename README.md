@@ -79,6 +79,24 @@ FireFire is a local-first knowledge management and note-taking application built
 - **Zoom & Pan** - Navigate large graphs easily
 - **Click to Navigate** - Click any node to open the note
 
+#### 📄 Enhanced PDF Support
+- **Inline Preview** - Embed PDF documents in notes
+- **Page Navigation** - Browse pages with prev/next buttons
+- **Zoom Control** - Scale from 50% to 200%
+- **Fullscreen Mode** - Press fullscreen for immersive reading
+
+#### 📜 Version History
+- **Auto-save Versions** - Automatically save versions every 5 minutes or on significant changes
+- **Browse History** - View all saved versions with timestamps and summaries
+- **Preview & Compare** - Preview any historical version
+- **One-click Restore** - Restore to any previous version instantly
+
+#### 📋 Note Templates
+- **Built-in Templates** - Meeting notes, reading notes, daily reports, project plans, study notes
+- **Custom Templates** - Save any note as a reusable template
+- **Template Variables** - Auto-fill `{{date}}`, `{{time}}` and more
+- **Quick Create** - Create notes from templates with one click
+
 #### 📥 Import/Export
 - **Markdown Import** - Import single files or entire folders
 - **Batch Export** - Export all notes to Markdown or HTML
@@ -199,6 +217,24 @@ FireFire 是一款本地优先的知识管理和笔记应用，基于 Electron �
 - **搜索高亮** - 在图谱中搜索笔记
 - **缩放平移** - 轻松浏览大型图谱
 - **点击导航** - 点击节点打开笔记
+
+#### 📄 PDF 增强支持
+- **内嵌预览** - 在笔记中嵌入 PDF 文档
+- **翻页浏览** - 上一页/下一页快速切换
+- **缩放控制** - 支持 50%-200% 缩放
+- **全屏模式** - 沉浸式阅读体验
+
+#### 📜 版本历史
+- **自动保存版本** - 每 5 分钟或内容变化显著时自动保存
+- **浏览历史** - 查看所有历史版本及摘要
+- **预览对比** - 预览任意历史版本
+- **一键恢复** - 即时恢复到任意历史版本
+
+#### 📋 笔记模板
+- **内置模板** - 会议记录、读书笔记、日报周报、项目计划、学习笔记
+- **自定义模板** - 将任意笔记保存为模板
+- **模板变量** - 自动填充 `{{date}}`、`{{time}}` 等
+- **快速创建** - 一键从模板创建笔记
 
 #### 📥 导入导出
 - **Markdown 导入** - 导入单个文件或整个文件夹

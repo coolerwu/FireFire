@@ -151,3 +151,5 @@ Editor updates trigger `persist()` function in `src/utils/cwjsonFileOp.js`, whic
 - 中文回复
 - 每一次变动都需要更新readme
 - 只在 git push 到远程时才更新版本号（package.json、Welcome.jsx、README changelog）
+- 每次代码修改、方案提出，都要自我检查三个问题：这么做是合理的吗？这么做是否有漏洞？这么做是否符合业内常识？
+- 除非我要求，禁止提交代码，但是可以给出可执行的git命令

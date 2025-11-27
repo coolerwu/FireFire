@@ -85,4 +85,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
     exportAll: (format) => ipcRenderer.invoke('export-all', format),
     //knowledge graph functions
     getGraphData: () => ipcRenderer.invoke('get-graph-data'),
+    //version history functions
+    saveVersion: (noteId, content, forceSave) => ipcRenderer.invoke('save-version', noteId, content, forceSave),
+    getVersions: (noteId, limit, offset) => ipcRenderer.invoke('get-versions', noteId, limit, offset),
+    getVersionCount: (noteId) => ipcRenderer.invoke('get-version-count', noteId),
+    getVersion: (versionId) => ipcRenderer.invoke('get-version', versionId),
+    deleteVersion: (versionId) => ipcRenderer.invoke('delete-version', versionId),
+    deleteAllVersions: (noteId) => ipcRenderer.invoke('delete-all-versions', noteId),
+    compareVersions: (versionId1, versionId2) => ipcRenderer.invoke('compare-versions', versionId1, versionId2),
+    getVersionStats: () => ipcRenderer.invoke('get-version-stats'),
+    //template functions
+    getAllTemplates: () => ipcRenderer.invoke('get-all-templates'),
+    getTemplate: (templateId) => ipcRenderer.invoke('get-template', templateId),
+    createTemplate: (name, description, content, icon) => ipcRenderer.invoke('create-template', name, description, content, icon),
+    updateTemplate: (templateId, updates) => ipcRenderer.invoke('update-template', templateId, updates),
+    deleteTemplate: (templateId) => ipcRenderer.invoke('delete-template', templateId),
+    applyTemplate: (templateId, variables) => ipcRenderer.invoke('apply-template', templateId, variables),
+    exportTemplate: (templateId) => ipcRenderer.invoke('export-template', templateId),
+    importTemplate: (jsonString) => ipcRenderer.invoke('import-template', jsonString),
 })

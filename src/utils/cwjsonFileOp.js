@@ -118,6 +118,14 @@ export const persist = (editor, cwjson, delay = 1000) => {
             logger.debug('[persist] 保存成功:', cwjson.filename);
             notifyStatusChange(SaveStatus.SAVED, cwjson.filename);
 
+            // 尝试保存版本历史（异步，不阻塞主保存流程）
+            try {
+                const noteId = cwjson.id || cwjson.filename.replace(/\.[^/.]+$/, '');
+                await electronAPI.saveVersion(noteId, content, false);
+            } catch (versionError) {
+                logger.debug('[persist] 版本保存跳过或失败:', versionError);
+            }
+
             // 3秒后恢复空闲状态
             setTimeout(() => {
                 if (currentSaveStatus === SaveStatus.SAVED) {
