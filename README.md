@@ -294,6 +294,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-27 | **v0.6.25** - Enhanced PDF viewer (zoom 50%-200%, fullscreen mode); Added Version History (auto-save every 5min, preview/restore); Added Note Templates (6 built-in templates, custom templates, variable substitution) |
 | 2025-11-26 | **v0.6.24** - Added Knowledge Graph view (force-directed graph for note relationships); Added Import/Export feature (Markdown import/export, HTML export, batch operations); New sidebar navigation for graph |
 | 2025-11-26 | **v0.6.23** - Added database maintenance tools (integrity check, repair, FTS rebuild); Fixed AI config sync issue; Fixed toolbar overflow; Added screenshots to README; Fixed auto-update yml upload in CI |
 | 2025-11-26 | **v0.6.22** - Added AI assistant (OpenAI/Claude/DeepSeek); Added WebDAV sync (Jianguoyun/Nextcloud); New icon setup |
