@@ -265,6 +265,11 @@ const initJournalOperation = () => {
         return journalManager.getJournalCount();
     });
 
+    // 删除日记
+    ipcMain.handle('delete-journal', async (event, dateStr) => {
+        return await journalManager.deleteJournal(dateStr);
+    });
+
     // 获取最近更新的笔记（时间线视图）
     ipcMain.handle('get-recent-notes', (event, limit, offset) => {
         return dbManager.getRecentNotes(limit, offset);

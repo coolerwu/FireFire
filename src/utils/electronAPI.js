@@ -189,6 +189,10 @@ const mockAPI = {
         console.warn('[Mock Mode] getJournalCount called');
         return 10;
     },
+    deleteJournal: async (dateStr) => {
+        console.warn('[Mock Mode] deleteJournal called', dateStr);
+        return true;
+    },
     getRecentNotes: async (limit, offset) => {
         console.warn('[Mock Mode] getRecentNotes called', limit, offset);
         return [

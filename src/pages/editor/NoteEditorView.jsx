@@ -24,6 +24,9 @@ const NoteEditorView = ({ note, onBack }) => {
     const titleInputRef = useRef(null);
     const originalTitleRef = useRef('');
 
+    // 是否是日记
+    const isJournal = note?.isJournal || note?.type === 'journal';
+
     // 内容状态
     const [content, setContent] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -37,21 +40,31 @@ const NoteEditorView = ({ note, onBack }) => {
             try {
                 const jsonContent = await electronAPI.readNotebookFile(note.id);
                 setContent(jsonContent);
-                setTitle(note.id);
-                originalTitleRef.current = note.id;
+
+                // 日记使用专门的标题，普通笔记使用文件名
+                if (isJournal && note.title) {
+                    setTitle(note.title);
+                    originalTitleRef.current = note.title;
+                } else {
+                    // 提取不带路径的文件名
+                    const displayTitle = note.id.includes('/') ? note.id.split('/').pop() : note.id;
+                    setTitle(displayTitle);
+                    originalTitleRef.current = displayTitle;
+                }
             } catch (error) {
                 logger.error('[NoteEditorView] 读取笔记失败:', error);
                 // 新笔记，使用空内容
                 setContent(JSON.stringify({ type: 'doc', content: [{ type: 'paragraph' }] }));
-                setTitle(note.id);
-                originalTitleRef.current = note.id;
+                const displayTitle = note.id.includes('/') ? note.id.split('/').pop() : note.id;
+                setTitle(displayTitle);
+                originalTitleRef.current = displayTitle;
             } finally {
                 setIsLoading(false);
             }
         };
 
         loadContent();
-    }, [note?.id]);
+    }, [note?.id, isJournal, note?.title]);
 
     // 聚焦标题输入框
     useEffect(() => {
@@ -190,9 +203,9 @@ const NoteEditorView = ({ note, onBack }) => {
                         返回
                     </Button>
 
-                    {/* 可编辑标题 */}
+                    {/* 标题 - 日记不可编辑 */}
                     <div className="flex-1">
-                        {isEditingTitle ? (
+                        {isEditingTitle && !isJournal ? (
                             <input
                                 ref={titleInputRef}
                                 type="text"
@@ -209,14 +222,14 @@ const NoteEditorView = ({ note, onBack }) => {
                             />
                         ) : (
                             <h1
-                                onClick={() => setIsEditingTitle(true)}
-                                className="
-                                    text-xl font-semibold cursor-pointer
+                                onClick={() => !isJournal && setIsEditingTitle(true)}
+                                className={`
+                                    text-xl font-semibold
                                     text-notion-text-primary dark:text-notion-dark-text-primary
-                                    hover:text-notion-accent-blue
+                                    ${isJournal ? '' : 'cursor-pointer hover:text-notion-accent-blue'}
                                     transition-colors
-                                "
-                                title="点击编辑标题"
+                                `}
+                                title={isJournal ? undefined : '点击编辑标题'}
                             >
                                 {title || '无标题'}
                             </h1>

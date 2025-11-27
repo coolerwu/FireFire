@@ -155,6 +155,12 @@ const JournalView = () => {
     logger.debug('[JournalView] 日记已更新:', journalId);
   };
 
+  // 处理日记删除
+  const handleJournalDelete = (journalId) => {
+    setJournals(prev => prev.filter(j => j.id !== journalId));
+    logger.debug('[JournalView] 日记已删除:', journalId);
+  };
+
   const handleCreateToday = async () => {
     await electronAPI.createJournal();
     // 重置状态
@@ -204,6 +210,7 @@ const JournalView = () => {
               <JournalEntry
                 journal={journal}
                 onUpdate={handleJournalUpdate}
+                onDelete={handleJournalDelete}
               />
             </div>
           ))}

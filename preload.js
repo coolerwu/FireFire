@@ -60,6 +60,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getJournals: (limit, offset) => ipcRenderer.invoke('get-journals', limit, offset),
     journalExists: (date) => ipcRenderer.invoke('journal-exists', date),
     getJournalCount: () => ipcRenderer.invoke('get-journal-count'),
+    deleteJournal: (dateStr) => ipcRenderer.invoke('delete-journal', dateStr),
     //timeline functions
     getRecentNotes: (limit, offset) => ipcRenderer.invoke('get-recent-notes', limit, offset),
     //workspace functions

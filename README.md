@@ -39,6 +39,8 @@ FireFire is a local-first knowledge management and note-taking application built
   - Link validation
   - Backlinks support
 - **Daily Journal** - Logseq-style daily notes with infinite scroll
+  - Hover actions: open in editor, copy link, delete
+  - Delete with inline confirmation (no modal popup)
 - **Timeline View** - Browse all notes by edit time
 
 #### 📁 File Management
@@ -191,6 +193,8 @@ FireFire 是一款本地优先的知识管理和笔记应用，基于 Electron �
   - 链接验证
   - 反向链接支持
 - **每日日记** - Logseq 风格的日记视图，支持无限滚动
+  - 悬停操作：打开编辑器、复制链接、删除
+  - 内联确认删除（无弹窗打扰）
 - **时间线视图** - 按编辑时间浏览所有文章
 
 #### 📁 文件管理
@@ -320,6 +324,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-27 | **v0.6.29** - Enhanced journal interaction: hover actions (open in editor, copy link, delete), inline delete confirmation, journal opens in standalone editor with date title |
 | 2025-11-27 | **v0.6.28** - Fixed macOS auto-update 404 error (upload ZIP files and generate multi-arch latest-mac.yml for electron-updater) |
 | 2025-11-27 | **v0.6.27** - Added optional Network Proxy support (HTTP/HTTPS/SOCKS5); AI service and auto-update automatically use proxy when enabled |
 | 2025-11-27 | **v0.6.26** - Added Database View (Notion-style inline database with table view, 7 column types, filter/sort, property editor, slash command `/database`) |

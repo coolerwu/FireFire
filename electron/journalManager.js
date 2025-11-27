@@ -190,6 +190,33 @@ class JournalManager {
   journalExists(date) {
     return dbManager.journalExists(date);
   }
+
+  /**
+   * 删除日记
+   * @param {string} dateStr - 日期字符串 (YYYY-MM-DD)
+   * @returns {Promise<boolean>} 是否成功
+   */
+  async deleteJournal(dateStr) {
+    try {
+      // 1. 删除文件
+      const { notebookSuffix } = getCurSettingConfig();
+      const filePath = path.join(confPath, 'journals', `${dateStr}${notebookSuffix}`);
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log('[JournalManager] 删除日记文件:', filePath);
+      }
+
+      // 2. 删除数据库记录
+      const result = dbManager.deleteJournal(dateStr);
+
+      console.log('[JournalManager] 删除日记完成:', dateStr);
+      return result;
+    } catch (error) {
+      console.error('[JournalManager] 删除日记失败:', error);
+      return false;
+    }
+  }
 }
 
 // 导出单例

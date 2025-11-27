@@ -392,6 +392,19 @@ class DatabaseManager {
   }
 
   /**
+   * 删除日记
+   * @param {string} dateStr - 日期字符串 (YYYY-MM-DD)
+   * @returns {boolean} 是否成功
+   */
+  deleteJournal(dateStr) {
+    const result = this.db.prepare(`
+      DELETE FROM notes WHERE is_journal = 1 AND journal_date = ?
+    `).run(dateStr);
+    console.log(`[DatabaseManager] 删除日记: ${dateStr}, 影响行数: ${result.changes}`);
+    return result.changes > 0;
+  }
+
+  /**
    * 获取最近更新的笔记（按更新时间倒序，不包括日记）
    */
   getRecentNotes(limit = 30, offset = 0) {

@@ -1,16 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
+import { Dropdown, message } from 'antd';
+import { ExpandOutlined, MoreOutlined, DeleteOutlined, LinkOutlined } from '@ant-design/icons';
 import { formatDisplayDate, getRelativeDate } from './dateUtils';
 import { electronAPI } from '../../utils/electronAPI';
 import { logger } from '../../utils/logger';
+import { Context } from '../../index';
 import journalExtensions from './journalExtensions';
 import './journalEntry.less';
 
 /**
  * 单个日记条目组件
  */
-const JournalEntry = ({ journal, onUpdate }) => {
+const JournalEntry = ({ journal, onUpdate, onDelete }) => {
+  const { setActiveKey, setEditingNote, setting } = useContext(Context);
   const [loading, setLoading] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const confirmTimeoutRef = useRef(null);
   const saveTimeoutRef = useRef(null);
   const autoSaveIntervalRef = useRef(null);
   const journalIdRef = useRef(journal.id);
@@ -94,6 +101,107 @@ const JournalEntry = ({ journal, onUpdate }) => {
     journalIdRef.current = journal.id;
   }, [journal.id]);
 
+  // 清理确认删除超时
+  useEffect(() => {
+    return () => {
+      if (confirmTimeoutRef.current) {
+        clearTimeout(confirmTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // 打开日记编辑器
+  const handleOpenJournal = () => {
+    const suffix = setting?.notebookSuffix || '.md';
+    const noteInfo = {
+      id: `journals/${journal.id}`,
+      filename: `${journal.id}${suffix}`,
+      type: 'journal',
+      notebookPath: `journals/${journal.id}${suffix}`,
+      attachmentPath: `attachment/journals/${journal.id}`,
+      isJournal: true,
+      journalDate: journal.journalDate,
+      title: journal.title,
+    };
+    setEditingNote(noteInfo);
+    setActiveKey('editor');
+  };
+
+  // 复制链接
+  const handleCopyLink = () => {
+    const link = `firefire://journal/${journal.id}`;
+    navigator.clipboard.writeText(link).then(() => {
+      message.success('已复制链接');
+    }).catch(() => {
+      message.error('复制失败');
+    });
+  };
+
+  // 删除日记
+  const handleDelete = async () => {
+    if (!confirmDelete) {
+      // 第一次点击，进入确认状态
+      setConfirmDelete(true);
+      // 3 秒后自动恢复
+      confirmTimeoutRef.current = setTimeout(() => {
+        setConfirmDelete(false);
+      }, 3000);
+      return;
+    }
+
+    // 第二次点击，执行删除
+    try {
+      const result = await electronAPI.deleteJournal(journal.id);
+      if (result) {
+        message.success('已删除日记');
+        if (onDelete) {
+          onDelete(journal.id);
+        }
+      } else {
+        message.error('删除失败');
+      }
+    } catch (error) {
+      logger.error('[JournalEntry] 删除日记失败:', error);
+      message.error('删除失败');
+    }
+    setConfirmDelete(false);
+  };
+
+  // 重置确认状态（鼠标离开菜单时）
+  const handleMenuOpenChange = (open) => {
+    if (!open) {
+      setConfirmDelete(false);
+      if (confirmTimeoutRef.current) {
+        clearTimeout(confirmTimeoutRef.current);
+      }
+    }
+  };
+
+  // 下拉菜单项
+  const menuItems = [
+    {
+      key: 'open',
+      icon: <ExpandOutlined />,
+      label: '打开',
+      onClick: handleOpenJournal,
+    },
+    {
+      key: 'copy-link',
+      icon: <LinkOutlined />,
+      label: '复制链接',
+      onClick: handleCopyLink,
+    },
+    { type: 'divider' },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: confirmDelete ? '确认删除？' : '删除',
+      danger: true,
+      onClick: handleDelete,
+      className: confirmDelete ? 'confirm-delete' : '',
+    },
+  ];
+
   // 定期自动保存（类似 Obsidian）
   useEffect(() => {
     if (!editor) return;
@@ -158,10 +266,34 @@ const JournalEntry = ({ journal, onUpdate }) => {
   }
 
   return (
-    <div className="journal-entry">
+    <div
+      className="journal-entry"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="journal-date-label">
-        <h2>{displayDate}</h2>
+        <h2 onClick={handleOpenJournal}>{displayDate}</h2>
         <span className="relative-date">{relativeDate}</span>
+
+        {/* 操作按钮组 - 悬停显示 */}
+        <div className={`journal-actions ${isHovered ? 'visible' : ''}`}>
+          <button
+            className="action-btn"
+            onClick={handleOpenJournal}
+            title="打开"
+          >
+            <ExpandOutlined />
+          </button>
+          <Dropdown
+            menu={{ items: menuItems }}
+            trigger={['click']}
+            onOpenChange={handleMenuOpenChange}
+          >
+            <button className="action-btn" title="更多">
+              <MoreOutlined />
+            </button>
+          </Dropdown>
+        </div>
       </div>
       <div className="journal-editor-container">
         <EditorContent editor={editor} />
