@@ -446,6 +446,30 @@ const mockAPI = {
         console.warn('[Mock Mode] updateRowOrders called', databaseId);
         return true;
     },
+    // 代理 API
+    getProxyConfig: async () => {
+        console.warn('[Mock Mode] getProxyConfig called');
+        return {
+            enabled: false,
+            type: 'http',
+            host: '',
+            port: '',
+            username: '',
+            password: '',
+        };
+    },
+    setProxyConfig: async (config) => {
+        console.warn('[Mock Mode] setProxyConfig called', config);
+        return { success: true };
+    },
+    testProxyConnection: async (config) => {
+        console.warn('[Mock Mode] testProxyConnection called - not available in browser');
+        return { success: false, message: '浏览器模式不支持代理测试' };
+    },
+    callAIAPI: async (config, messages) => {
+        console.warn('[Mock Mode] callAIAPI called - will use browser fetch');
+        return { success: false, error: '浏览器模式请使用直接 API 调用' };
+    },
 }
 
 // 导出 API（优先使用真实 API，否则使用 mock）

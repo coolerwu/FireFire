@@ -1,6 +1,7 @@
 const { autoUpdater } = require('electron-updater');
-const { app } = require('electron');
+const { app, session } = require('electron');
 const log = require('electron-log');
+const proxyManager = require('./proxyManager');
 
 class UpdateManager {
   constructor() {
@@ -99,6 +100,14 @@ class UpdateManager {
     }
 
     try {
+      // 检查代理状态
+      const proxyConfig = proxyManager.getProxyConfig();
+      if (proxyConfig.enabled && proxyConfig.host && proxyConfig.port) {
+        log.info(`[Updater] 使用代理: ${proxyConfig.type}://${proxyConfig.host}:${proxyConfig.port}`);
+      } else {
+        log.info('[Updater] 直连模式（未使用代理）');
+      }
+
       autoUpdater.checkForUpdates();
     } catch (error) {
       log.error('[Updater] Check for updates failed:', error);

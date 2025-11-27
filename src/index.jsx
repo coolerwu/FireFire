@@ -102,6 +102,13 @@ const App = () => {
                 // 配置
                 setSetting(res);
                 setTheme(buildThemeStyleFunc(res));
+
+                // 同步到 localStorage（供 aiService.js 等读取 AI 和代理配置）
+                try {
+                    localStorage.setItem('firefire-settings', JSON.stringify(res));
+                } catch (e) {
+                    console.error('Failed to sync settings to localStorage:', e);
+                }
             })
             .catch(err => {
                 logger.error('[App] 加载数据失败:', err);

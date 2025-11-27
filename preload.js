@@ -115,4 +115,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     updateDatabaseRow: (rowId, updates) => ipcRenderer.invoke('update-database-row', rowId, updates),
     deleteDatabaseRow: (rowId) => ipcRenderer.invoke('delete-database-row', rowId),
     updateRowOrders: (databaseId, rowOrders) => ipcRenderer.invoke('update-row-orders', databaseId, rowOrders),
+    //proxy functions
+    getProxyConfig: () => ipcRenderer.invoke('get-proxy-config'),
+    setProxyConfig: (config) => ipcRenderer.invoke('set-proxy-config', config),
+    testProxyConnection: (config) => ipcRenderer.invoke('test-proxy-connection', config),
+    callAIAPI: (config, messages) => ipcRenderer.invoke('call-ai-api', config, messages),
 })

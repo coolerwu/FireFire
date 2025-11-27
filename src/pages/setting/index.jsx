@@ -1,11 +1,12 @@
 import React, {useContext, useState} from "react";
 import {message} from "antd";
 import {Context} from "../../index";
-import {SettingOutlined, FolderOutlined, RobotOutlined, CloudSyncOutlined} from "@ant-design/icons";
+import {SettingOutlined, FolderOutlined, RobotOutlined, CloudSyncOutlined, GlobalOutlined} from "@ant-design/icons";
 import BaseSetting from "./base.jsx";
 import WorkspaceSetting from "./workspace.jsx";
 import AISetting from "./ai.jsx";
 import WebDAVSetting from "./webdav.jsx";
+import ProxySetting from "./proxy.jsx";
 import {electronAPI} from "../../utils/electronAPI";
 
 const menuItems = [
@@ -28,6 +29,11 @@ const menuItems = [
         label: '同步',
         key: 'sync',
         icon: <CloudSyncOutlined />,
+    },
+    {
+        label: '网络代理',
+        key: 'proxy',
+        icon: <GlobalOutlined />,
     },
 ];
 
@@ -91,6 +97,7 @@ const Setting = () => {
                         {menuSelectedKey === 'workspace' && <WorkspaceSetting />}
                         {menuSelectedKey === 'ai' && <AISetting />}
                         {menuSelectedKey === 'sync' && <WebDAVSetting />}
+                        {menuSelectedKey === 'proxy' && <ProxySetting />}
                     </div>
                 </div>
             </div>

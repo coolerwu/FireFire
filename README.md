@@ -102,7 +102,13 @@ FireFire is a local-first knowledge management and note-taking application built
 - **Batch Export** - Export all notes to Markdown or HTML
 - **Frontmatter Support** - Preserve title and metadata
 
-#### 📊 Database View (NEW)
+#### 🌐 Network Proxy (Optional)
+- **Global Proxy** - Optional HTTP/HTTPS/SOCKS5 proxy configuration
+- **AI Service Support** - AI API calls automatically use proxy when enabled
+- **Auto-Update Support** - Update checks use proxy when enabled
+- **Connection Test** - Test proxy connectivity before saving
+
+#### 📊 Database View
 - **Table View** - Notion-style inline database with multiple column types
 - **Column Types** - Text, Number, Select, Multi-select, Date, Checkbox, URL
 - **Inline Editing** - Edit cells directly in the table
@@ -248,7 +254,13 @@ FireFire 是一款本地优先的知识管理和笔记应用，基于 Electron �
 - **批量导出** - 将所有笔记导出为 Markdown 或 HTML
 - **Frontmatter 支持** - 保留标题和元数据
 
-#### 📊 数据库视图（新功能）
+#### 🌐 网络代理（可选）
+- **全局代理** - 可选配置 HTTP/HTTPS/SOCKS5 代理
+- **AI 服务支持** - 启用后 AI API 调用自动走代理
+- **自动更新支持** - 启用后更新检查自动走代理
+- **连接测试** - 保存前可测试代理连通性
+
+#### 📊 数据库视图
 - **表格视图** - Notion 风格的内联数据库，支持多种列类型
 - **列类型** - 文本、数字、单选、多选、日期、复选框、URL
 - **内联编辑** - 直接在表格中编辑单元格
@@ -308,6 +320,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-27 | **v0.6.27** - Added optional Network Proxy support (HTTP/HTTPS/SOCKS5); AI service and auto-update automatically use proxy when enabled |
 | 2025-11-27 | **v0.6.26** - Added Database View (Notion-style inline database with table view, 7 column types, filter/sort, property editor, slash command `/database`) |
 | 2025-11-27 | **v0.6.25** - Enhanced PDF viewer (zoom 50%-200%, fullscreen mode); Added Version History (auto-save every 5min, preview/restore); Added Note Templates (6 built-in templates, custom templates, variable substitution); Fixed macOS auto-update (added ZIP target for electron-updater) |
 | 2025-11-26 | **v0.6.24** - Added Knowledge Graph view (force-directed graph for note relationships); Added Import/Export feature (Markdown import/export, HTML export, batch operations); New sidebar navigation for graph |

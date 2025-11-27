@@ -1,7 +1,10 @@
 /**
  * AI 服务模块
  * 支持 OpenAI、Claude、DeepSeek 等 AI 服务
+ * 支持代理配置（通过主进程发送请求）
  */
+
+import { electronAPI } from './electronAPI';
 
 // AI 操作类型
 export const AI_ACTIONS = {
@@ -59,6 +62,22 @@ export const getAIConfig = () => {
         console.error('Failed to get AI config:', e);
     }
     return null;
+};
+
+/**
+ * 检查是否启用了代理
+ */
+export const isProxyEnabled = () => {
+    try {
+        const stored = localStorage.getItem('firefire-settings');
+        if (stored) {
+            const settings = JSON.parse(stored);
+            return settings.proxy?.enabled && settings.proxy?.host && settings.proxy?.port;
+        }
+    } catch (e) {
+        console.error('Failed to check proxy config:', e);
+    }
+    return false;
 };
 
 /**
@@ -216,6 +235,24 @@ const handleClaudeStreamResponse = async (response, onStream) => {
 };
 
 /**
+ * 通过主进程调用 AI API（支持代理）
+ */
+const callAIViaMainProcess = async (config, messages) => {
+    const result = await electronAPI.callAIAPI({
+        provider: config.provider,
+        apiKey: config.apiKey,
+        model: config.model,
+        baseUrl: config.baseUrl,
+    }, messages);
+
+    if (result.success) {
+        return result.data;
+    } else {
+        throw new Error(result.error || 'AI API 调用失败');
+    }
+};
+
+/**
  * 执行 AI 操作
  * @param {string} action - AI 操作类型
  * @param {string} text - 输入文本
@@ -252,11 +289,25 @@ export const executeAI = async (action, text, options = {}) => {
         { role: 'user', content: userPrefix + text },
     ];
 
-    // 根据 provider 调用不同 API
-    if (config.provider === 'claude') {
-        return callClaudeAPI(config, messages, onStream);
+    // 检查是否启用了代理
+    const useProxy = isProxyEnabled();
+
+    if (useProxy) {
+        // 使用主进程发送请求（支持代理，但不支持流式输出）
+        console.log('[AI Service] 使用代理模式（通过主进程）');
+        const result = await callAIViaMainProcess(config, messages);
+        // 如果有流式回调，模拟流式输出
+        if (onStream) {
+            onStream(result, result);
+        }
+        return result;
     } else {
-        return callOpenAIAPI(config, messages, onStream);
+        // 直接使用浏览器 fetch（支持流式输出）
+        if (config.provider === 'claude') {
+            return callClaudeAPI(config, messages, onStream);
+        } else {
+            return callOpenAIAPI(config, messages, onStream);
+        }
     }
 };
 

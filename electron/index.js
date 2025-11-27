@@ -8,6 +8,7 @@ const dbManager = require('./dbManager');
 const journalManager = require('./journalManager');
 const versionManager = require('./versionManager');
 const templateManager = require('./templateManager');
+const proxyManager = require('./proxyManager');
 const {getCurSettingConfig} = require('./settingFile');
 
 /**
@@ -306,4 +307,13 @@ exports.init = () => {
 
     //初始化导入导出
     initImportExport();
+
+    //初始化代理管理器
+    proxyManager.init();
+
+    //从设置加载代理配置
+    const settings = getCurSettingConfig();
+    if (settings?.proxy) {
+        proxyManager.loadFromSettings(settings);
+    }
 };
