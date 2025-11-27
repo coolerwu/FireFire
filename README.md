@@ -320,7 +320,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
-| 2025-11-27 | **v0.6.27** - Added optional Network Proxy support (HTTP/HTTPS/SOCKS5); AI service and auto-update automatically use proxy when enabled |
+| 2025-11-27 | **v0.6.27** - Added optional Network Proxy support (HTTP/HTTPS/SOCKS5); AI service and auto-update automatically use proxy when enabled; Fixed macOS auto-update 404 error (now correctly uploads ZIP files and generates multi-arch latest-mac.yml) |
 | 2025-11-27 | **v0.6.26** - Added Database View (Notion-style inline database with table view, 7 column types, filter/sort, property editor, slash command `/database`) |
 | 2025-11-27 | **v0.6.25** - Enhanced PDF viewer (zoom 50%-200%, fullscreen mode); Added Version History (auto-save every 5min, preview/restore); Added Note Templates (6 built-in templates, custom templates, variable substitution); Fixed macOS auto-update (added ZIP target for electron-updater) |
 | 2025-11-26 | **v0.6.24** - Added Knowledge Graph view (force-directed graph for note relationships); Added Import/Export feature (Markdown import/export, HTML export, batch operations); New sidebar navigation for graph |

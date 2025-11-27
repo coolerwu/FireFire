@@ -133,6 +133,26 @@ jobs:
       with:
         name: firefire-${{steps.version.outputs.value}}-x64.dmg
         path: ./target/firefire-${{steps.version.outputs.value}}-x64.dmg
+    - name: Find and rename ZIP
+      run: |
+        echo "Looking for ZIP files in ./target:"
+        ls -la ./target/*.zip || echo "No zip files found"
+        VERSION="${{steps.version.outputs.value}}"
+        # Try different possible filenames
+        if [ -f "./target/firefire-${VERSION}-x64-mac.zip" ]; then
+          mv "./target/firefire-${VERSION}-x64-mac.zip" "./target/firefire-${VERSION}-x64.zip"
+        elif [ -f "./target/firefire-${VERSION}-mac.zip" ]; then
+          mv "./target/firefire-${VERSION}-mac.zip" "./target/firefire-${VERSION}-x64.zip"
+        elif [ -f "./target/firefire-${VERSION}.zip" ]; then
+          mv "./target/firefire-${VERSION}.zip" "./target/firefire-${VERSION}-x64.zip"
+        fi
+        echo "After rename:"
+        ls -la ./target/*.zip || echo "No zip files"
+    - name: Upload ZIP
+      uses: actions/upload-artifact@v4
+      with:
+        name: firefire-${{steps.version.outputs.value}}-x64.zip
+        path: ./target/firefire-${{steps.version.outputs.value}}-x64.zip
     - name: Upload latest-mac.yml
       uses: actions/upload-artifact@v4
       with:
@@ -191,6 +211,26 @@ jobs:
       with:
         name: firefire-${{steps.version.outputs.value}}-arm64.dmg
         path: ./target/firefire-${{steps.version.outputs.value}}-arm64.dmg
+    - name: Find and rename ZIP
+      run: |
+        echo "Looking for ZIP files in ./target:"
+        ls -la ./target/*.zip || echo "No zip files found"
+        VERSION="${{steps.version.outputs.value}}"
+        # Try different possible filenames
+        if [ -f "./target/firefire-${VERSION}-arm64-mac.zip" ]; then
+          mv "./target/firefire-${VERSION}-arm64-mac.zip" "./target/firefire-${VERSION}-arm64.zip"
+        elif [ -f "./target/firefire-${VERSION}-mac.zip" ]; then
+          mv "./target/firefire-${VERSION}-mac.zip" "./target/firefire-${VERSION}-arm64.zip"
+        elif [ -f "./target/firefire-${VERSION}.zip" ]; then
+          mv "./target/firefire-${VERSION}.zip" "./target/firefire-${VERSION}-arm64.zip"
+        fi
+        echo "After rename:"
+        ls -la ./target/*.zip || echo "No zip files"
+    - name: Upload ZIP
+      uses: actions/upload-artifact@v4
+      with:
+        name: firefire-${{steps.version.outputs.value}}-arm64.zip
+        path: ./target/firefire-${{steps.version.outputs.value}}-arm64.zip
     - name: Upload latest-mac.yml
       uses: actions/upload-artifact@v4
       with:
@@ -251,6 +291,34 @@ jobs:
           asset_path: ./firefire-${{steps.version.outputs.value}}-arm64.dmg
           asset_name: firefire-${{steps.version.outputs.value}}-arm64.dmg
           asset_content_type: application/octet-stream
+      # Upload macOS x64 ZIP for auto-update
+      - name: Download mac x64 zip
+        uses: actions/download-artifact@v4
+        with:
+          name: firefire-${{steps.version.outputs.value}}-x64.zip
+      - name: Upload Release mac x64 zip
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.create_release.outputs.upload_url}}
+          asset_path: ./firefire-${{steps.version.outputs.value}}-x64.zip
+          asset_name: firefire-${{steps.version.outputs.value}}-x64.zip
+          asset_content_type: application/zip
+      # Upload macOS arm64 ZIP for auto-update
+      - name: Download mac arm64 zip
+        uses: actions/download-artifact@v4
+        with:
+          name: firefire-${{steps.version.outputs.value}}-arm64.zip
+      - name: Upload Release mac arm64 zip
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.create_release.outputs.upload_url}}
+          asset_path: ./firefire-${{steps.version.outputs.value}}-arm64.zip
+          asset_name: firefire-${{steps.version.outputs.value}}-arm64.zip
+          asset_content_type: application/zip
       # Upload Windows
       - name: Download win
         uses: actions/download-artifact@v4
@@ -279,11 +347,67 @@ jobs:
           asset_path: ./firefire-${{steps.version.outputs.value}}.deb
           asset_name: firefire-${{steps.version.outputs.value}}.deb
           asset_content_type: application/octet-stream
-      # Upload latest-mac.yml for auto-update (use arm64 build's yml)
-      - name: Download latest-mac.yml
+      # Generate combined latest-mac.yml for auto-update with both architectures
+      - name: Download latest-mac-arm64.yml
         uses: actions/download-artifact@v4
         with:
           name: latest-mac-arm64.yml
+          path: ./yml-arm64
+      - name: Download latest-mac-x64.yml
+        uses: actions/download-artifact@v4
+        with:
+          name: latest-mac-x64.yml
+          path: ./yml-x64
+      - name: Generate combined latest-mac.yml
+        run: |
+          VERSION=${{steps.version.outputs.value}}
+          ARM64_ZIP="firefire-${VERSION}-arm64.zip"
+          X64_ZIP="firefire-${VERSION}-x64.zip"
+
+          echo "Parsing yml files..."
+          echo "ARM64 yml content:"
+          cat ./yml-arm64/latest-mac.yml
+          echo ""
+          echo "X64 yml content:"
+          cat ./yml-x64/latest-mac.yml
+
+          # Extract sha512 (it's the value after 'sha512:' key)
+          ARM64_SHA512=$(grep '^sha512:' ./yml-arm64/latest-mac.yml | head -1 | sed 's/sha512: //')
+          X64_SHA512=$(grep '^sha512:' ./yml-x64/latest-mac.yml | head -1 | sed 's/sha512: //')
+
+          # Extract size from files section
+          ARM64_SIZE=$(grep '  size:' ./yml-arm64/latest-mac.yml | head -1 | sed 's/.*size: //')
+          X64_SIZE=$(grep '  size:' ./yml-x64/latest-mac.yml | head -1 | sed 's/.*size: //')
+
+          RELEASE_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+
+          echo "Extracted values:"
+          echo "ARM64_SHA512: ${ARM64_SHA512}"
+          echo "X64_SHA512: ${X64_SHA512}"
+          echo "ARM64_SIZE: ${ARM64_SIZE}"
+          echo "X64_SIZE: ${X64_SIZE}"
+
+          cat > latest-mac.yml << EOFYML
+          version: ${VERSION}
+          files:
+            - url: ${ARM64_ZIP}
+              sha512: ${ARM64_SHA512}
+              size: ${ARM64_SIZE}
+              arch: arm64
+            - url: ${X64_ZIP}
+              sha512: ${X64_SHA512}
+              size: ${X64_SIZE}
+              arch: x64
+          path: ${ARM64_ZIP}
+          sha512: ${ARM64_SHA512}
+          releaseDate: '${RELEASE_DATE}'
+          EOFYML
+
+          # Remove leading spaces from YAML (heredoc indentation issue)
+          sed -i 's/^          //' latest-mac.yml
+
+          echo "Generated latest-mac.yml:"
+          cat latest-mac.yml
       - name: Upload latest-mac.yml
         uses: actions/upload-release-asset@v1.0.1
         env:
