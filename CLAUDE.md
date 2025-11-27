@@ -75,35 +75,63 @@ npm run package-linux    # Build Linux deb package
 
 Located in `electron/` directory:
 
+**Core Modules:**
 - **env.js**: Defines config path (`~/.firefire`)
 - **rootFile.js**: Creates config directory
-- **settingFile.js**: Manages `~/.firefire/setting.json` with:
-  - `notebookPath`: Where `.cwjson` files are stored
-  - `attachmentPath`: Where images/attachments are stored
-  - `notebookSuffix`: File extension (default `.cwjson`)
-  - `themeSource`: Theme setting (system/light/dark)
-  - `autoSave`: Auto-save interval in seconds
+- **settingFile.js**: Manages `~/.firefire/setting.json` (notebookPath, attachmentPath, themeSource, autoSave, etc.)
 - **notebookFile.js**: Handles all notebook file operations (CRUD, attachment copying)
 - **index.js**: Orchestrates initialization of all IPC handlers
+
+**Database & Indexing:**
+- **dbManager.js**: SQLite database for note indexing, tags, and full-text search (FTS5)
+- **indexManager.js**: Manages note indexing, tag extraction, internal links
+
+**Feature Modules:**
+- **workspaceManager.js**: Workspace initialization and directory structure
+- **journalManager.js**: Daily journal management (Logseq-style)
+- **versionManager.js**: Version history (auto-save snapshots, restore)
+- **templateManager.js**: Note templates (built-in + custom templates)
+- **markdownConverter.js**: Convert between cwjson and Markdown formats
+- **importExport.js**: Import/Export notes (Markdown, HTML, batch operations)
+
+**External Services:**
+- **webdavSync.js**: WebDAV sync (Jianguoyun/坚果云, Nextcloud support)
+- **updater.js**: Auto-update via electron-updater (GitHub releases)
+- **proxyManager.js**: Network proxy configuration (HTTP/HTTPS/SOCKS5)
 
 ### React Application Structure
 
 **Entry Point (src/index.jsx)**
 - Creates Context for global state (refresh, settings, curDir, theme)
-- Main component with two tabs: File (文章) and Setting (设置)
-- Loads settings and file list on mount/refresh
+- Sidebar navigation with multiple views
+- Loads settings and initializes workspace on mount
+
+**Page Components (src/pages/):**
+
+- **welcome/**: First-time setup wizard, workspace selection
+- **file/**: File browser with tree navigation, tag sidebar
+- **editor/**: Standalone note editor view (NoteEditorView.jsx)
+- **journal/**: Daily journal (Logseq-style infinite scroll)
+- **timeline/**: Browse all notes by edit time
+- **graph/**: Knowledge graph visualization (force-directed D3.js)
+- **ai/**: AI chat assistant interface
+- **setting/**: Settings pages (base, ai, webdav, workspace, proxy)
 
 **File Editor (src/pages/file/)**
 - `file.jsx`: Main container with file list and markdown editor
 - `fileList.jsx`: Directory/file tree navigation
+- `TagSidebar.jsx`: Tag filtering sidebar
 - `markdown.jsx`: Tiptap editor wrapper with auto-save
 - `menuBar.jsx`: Editor toolbar with formatting controls
 - `bubble.jsx`: Floating bubble menu for text selection
 
 **Tiptap Editor Configuration (src/common/extensions/)**
 - `index.js`: Exports all configured Tiptap extensions
-- `codeBlockComponent.jsx`: Custom code block renderer with syntax highlighting (lowlight)
+- `codeBlockComponent.jsx`: Custom code block with syntax highlighting (lowlight)
 - `biliBiliNode.js`: Custom node for embedding BiliBili videos
+- `TagNode.js`: Inline tag nodes (#tag)
+- `InternalLinkNode.js`: Internal links ([[note name]])
+- `DatabaseNode.js`: Notion-style inline database tables
 
 **Key Features**
 - Files stored as JSON (Tiptap document format) with `.cwjson` extension
@@ -111,12 +139,23 @@ Located in `electron/` directory:
 - Image paste/drop: Copies to attachment directory and uses `file://` URLs
 - Theme system: Dynamically applies CSS variables based on settings
 - Directory navigation: Supports nested folders within notebook path
+- Slash commands: Type `/` to insert content blocks
+- Global search: Cmd/Ctrl+K to search all notes
 
 ### File Storage Model
 
-- **Notebook files**: `~/.firefire/notebook/**/*.cwjson` (JSON format, Tiptap document structure)
-- **Attachments**: `~/.firefire/attachment/**/*` (mirrors notebook directory structure)
-- When pasting images, they're copied to corresponding attachment path with UUID filenames
+**Workspace Structure** (`{workspacePath}/`):
+- **notebook/**: Note files (`*.cwjson` - JSON format, Tiptap document structure)
+- **journals/**: Daily journal files (YYYY-MM-DD.cwjson)
+- **attachment/**: Images and attachments (mirrors notebook structure, UUID filenames)
+- **templates/**: Custom note templates
+- **versions/**: Version history snapshots
+- **.firefire/**: Workspace metadata
+  - `index.db`: SQLite database (note index, tags, FTS)
+  - `setting.json`: Workspace settings
+
+**Global Config** (`~/.firefire/`):
+- `setting.json`: Global settings (last workspace path, theme, etc.)
 
 ### Webpack Customization
 
