@@ -364,30 +364,36 @@ jobs:
           ARM64_ZIP="firefire-${VERSION}-arm64.zip"
           X64_ZIP="firefire-${VERSION}-x64.zip"
 
-          echo "Parsing yml files..."
+          echo "=== Parsing yml files ==="
           echo "ARM64 yml content:"
           cat ./yml-arm64/latest-mac.yml
           echo ""
           echo "X64 yml content:"
           cat ./yml-x64/latest-mac.yml
 
-          # Extract sha512 (it's the value after 'sha512:' key)
-          ARM64_SHA512=$(grep '^sha512:' ./yml-arm64/latest-mac.yml | head -1 | sed 's/sha512: //')
-          X64_SHA512=$(grep '^sha512:' ./yml-x64/latest-mac.yml | head -1 | sed 's/sha512: //')
+          # Extract sha512 - try multiple patterns for robustness
+          ARM64_SHA512=$(grep -E '^sha512:|^  sha512:' ./yml-arm64/latest-mac.yml | head -1 | sed 's/.*sha512: *//')
+          X64_SHA512=$(grep -E '^sha512:|^  sha512:' ./yml-x64/latest-mac.yml | head -1 | sed 's/.*sha512: *//')
 
           # Extract size from files section
-          ARM64_SIZE=$(grep '  size:' ./yml-arm64/latest-mac.yml | head -1 | sed 's/.*size: //')
-          X64_SIZE=$(grep '  size:' ./yml-x64/latest-mac.yml | head -1 | sed 's/.*size: //')
+          ARM64_SIZE=$(grep -E 'size:' ./yml-arm64/latest-mac.yml | head -1 | sed 's/.*size: *//')
+          X64_SIZE=$(grep -E 'size:' ./yml-x64/latest-mac.yml | head -1 | sed 's/.*size: *//')
 
           RELEASE_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
 
-          echo "Extracted values:"
+          echo "=== Extracted values ==="
           echo "ARM64_SHA512: ${ARM64_SHA512}"
           echo "X64_SHA512: ${X64_SHA512}"
           echo "ARM64_SIZE: ${ARM64_SIZE}"
           echo "X64_SIZE: ${X64_SIZE}"
 
-          cat > latest-mac.yml << EOFYML
+          # Validate extracted values
+          if [ -z "$ARM64_SHA512" ] || [ -z "$X64_SHA512" ]; then
+            echo "ERROR: Failed to extract sha512 values!"
+            exit 1
+          fi
+
+          cat > latest-mac.yml << EOF
           version: ${VERSION}
           files:
             - url: ${ARM64_ZIP}
@@ -401,12 +407,12 @@ jobs:
           path: ${ARM64_ZIP}
           sha512: ${ARM64_SHA512}
           releaseDate: '${RELEASE_DATE}'
-          EOFYML
+          EOF
 
           # Remove leading spaces from YAML (heredoc indentation issue)
           sed -i 's/^          //' latest-mac.yml
 
-          echo "Generated latest-mac.yml:"
+          echo "=== Generated latest-mac.yml ==="
           cat latest-mac.yml
       - name: Upload latest-mac.yml
         uses: actions/upload-release-asset@v1.0.1
