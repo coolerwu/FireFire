@@ -55,6 +55,12 @@ const SearchModal = ({ visible, onClose, onSelectNote }) => {
     }
   }, [visible]);
 
+  // 选择笔记
+  const handleSelect = useCallback((note) => {
+    onSelectNote(note);
+    onClose();
+  }, [onSelectNote, onClose]);
+
   // 键盘导航
   const handleKeyDown = useCallback((e) => {
     if (!visible) return;
@@ -81,13 +87,7 @@ const SearchModal = ({ visible, onClose, onSelectNote }) => {
       default:
         break;
     }
-  }, [visible, results, selectedIndex, onClose]);
-
-  // 选择笔记
-  const handleSelect = useCallback((note) => {
-    onSelectNote(note);
-    onClose();
-  }, [onSelectNote, onClose]);
+  }, [visible, results, selectedIndex, onClose, handleSelect]);
 
   // 滚动选中项到可见区域
   useEffect(() => {

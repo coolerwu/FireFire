@@ -11,7 +11,7 @@ import { electronAPI } from 'utils/electronAPI';
  */
 const DatabaseNodeComponent = ({ node, updateAttributes, deleteNode, selected }) => {
   const [loading, setLoading] = useState(false);
-  const { databaseId, title } = node.attrs;
+  const { databaseId } = node.attrs;
 
   // 如果没有 databaseId，创建新数据库
   useEffect(() => {

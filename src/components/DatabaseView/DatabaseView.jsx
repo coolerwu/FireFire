@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Segmented, message } from 'antd';
+import { Segmented } from 'antd';
 import {
   TableOutlined,
   AppstoreOutlined,

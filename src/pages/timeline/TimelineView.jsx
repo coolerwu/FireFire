@@ -3,7 +3,7 @@ import { Spin, Modal, message } from 'antd';
 import { ClockCircleOutlined, FileTextOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { electronAPI } from '../../utils/electronAPI';
 import { logger } from '../../utils/logger';
-import { formatDisplayDate, getRelativeDate } from '../journal/dateUtils';
+import { formatDisplayDate } from '../journal/dateUtils';
 import Markdown from '../file/markdown';
 import { Context } from '../../index';
 

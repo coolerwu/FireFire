@@ -122,6 +122,8 @@ const WebDAVSetting = () => {
             case 'remotePath':
                 setRemotePath(value);
                 break;
+            default:
+                break;
         }
         setTestResult(null);
     };

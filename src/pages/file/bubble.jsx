@@ -17,7 +17,7 @@ import {
 import {NodeSelection, TextSelection} from "prosemirror-state";
 import {BubbleMenu} from "@tiptap/react";
 import React, {useEffect, useState, useContext} from "react";
-import {isAIEnabled, executeAI, AI_ACTIONS} from "../../utils/aiService";
+import {executeAI, AI_ACTIONS} from "../../utils/aiService";
 import {Context} from "../../index";
 
 /**

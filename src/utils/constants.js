@@ -91,10 +91,12 @@ export const formatDateForFilename = (date = new Date()) => {
     return `${year}${month}${day}-${hours}${minutes}`;
 };
 
-export default {
+const constants = {
     DATE_FORMATS,
     FILE_CONSTANTS,
     UI_CONSTANTS,
     SECURITY_CONSTANTS,
     formatDateForFilename,
 };
+
+export default constants;

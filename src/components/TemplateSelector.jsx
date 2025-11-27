@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Card, Input, Empty, Spin, message, Tabs, Tooltip, Popconfirm } from 'antd';
-import { FileAddOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
+import { FileAddOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import { electronAPI } from '../utils/electronAPI';
 
 /**

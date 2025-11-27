@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Button, Input, Modal, Tag, Collapse, message} from "antd";
+import {Input, Modal, Collapse, message} from "antd";
 import {FileAddOutlined, HddOutlined, SearchOutlined, TagsOutlined, ThunderboltOutlined, AppstoreOutlined} from "@ant-design/icons";
 import {Context} from "../../index";
 import FileListItem from "./fileListItem";
@@ -17,7 +17,7 @@ const { Panel } = Collapse;
  */
 const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
     //上下文
-    const {refresh, curDir, theme} = useContext(Context);
+    const {refresh, curDir} = useContext(Context);
 
     //标签相关状态
     const [tags, setTags] = useState([]);
@@ -122,22 +122,6 @@ const FileList = ({cwjsonList, chooseCwjsonCallback}) => {
         } catch (error) {
             logger.error('从模板创建笔记失败:', error);
             message.error('创建失败');
-        }
-    };
-
-    // 打开今日日记
-    const openTodayJournal = async () => {
-        try {
-            // 创建今日日记（如果不存在）
-            const journalPath = await electronAPI.createJournal();
-
-            // 刷新文件列表
-            refresh();
-
-            // 选中并打开日记
-            logger.info(`打开今日日记: ${journalPath}`);
-        } catch (error) {
-            logger.error('打开日记失败:', error);
         }
     };
 

@@ -31,7 +31,7 @@ const getTagColor = (tag, tagColorMap) => {
 };
 
 const GraphView = () => {
-    const { setActiveKey, setting, setEditingNote } = useContext(Context);
+    const { setActiveKey, setEditingNote } = useContext(Context);
     const graphRef = useRef();
     const containerRef = useRef();
     const [graphData, setGraphData] = useState({ nodes: [], links: [] });

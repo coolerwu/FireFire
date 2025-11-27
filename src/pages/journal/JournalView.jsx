@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { DatePicker, Spin } from 'antd';
-import { CalendarOutlined, UpOutlined, PlusOutlined } from '@ant-design/icons';
+import { UpOutlined, PlusOutlined } from '@ant-design/icons';
 import JournalEntry from './JournalEntry';
 import { formatDate } from './dateUtils';
 import { electronAPI } from '../../utils/electronAPI';

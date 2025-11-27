@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import { Context } from '../../index';
 import { electronAPI } from '../../utils/electronAPI';
-import { getAIConfig, isAIEnabled } from '../../utils/aiService';
+import { getAIConfig } from '../../utils/aiService';
 
 const { TextArea } = Input;
 

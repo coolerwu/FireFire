@@ -81,12 +81,6 @@ const App = () => {
         checkFirstTimeSetup();
     }, []);
 
-    // 欢迎页面完成回调
-    const handleWelcomeComplete = useCallback(() => {
-        setIsFirstTime(false);
-        loadData();
-    }, []);
-
     // 数据加载函数（只加载设置）
     const loadData = useCallback(() => {
         const currentRequestId = ++requestIdRef.current;
@@ -121,6 +115,12 @@ const App = () => {
                 }
             });
     }, []);
+
+    // 欢迎页面完成回调
+    const handleWelcomeComplete = useCallback(() => {
+        setIsFirstTime(false);
+        loadData();
+    }, [loadData]);
 
     const refresh = useCallback((values) => {
         if (values?.curDir) {

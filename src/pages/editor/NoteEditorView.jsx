@@ -16,7 +16,7 @@ import '../file/markdown.less';
  * 用于新建笔记时显示独立的编辑页面
  */
 const NoteEditorView = ({ note, onBack }) => {
-    const { setting } = useContext(Context);
+    useContext(Context);
 
     // 标题状态
     const [title, setTitle] = useState('');

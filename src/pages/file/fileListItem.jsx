@@ -1,5 +1,5 @@
 import {Input, message, Modal} from "antd";
-import {DeleteOutlined, EditOutlined, FolderOutlined, FileTextOutlined, MoreOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, FolderOutlined, FileTextOutlined} from "@ant-design/icons";
 import moment from "moment/moment";
 import {Context} from "../../index";
 import {useContext, useRef, useState} from "react";
