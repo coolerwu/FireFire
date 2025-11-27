@@ -109,7 +109,23 @@ jobs:
       with:
         path: ./package.json
         property: version
-    - run: npm run package-mac-x64
+    - name: Kill processes that may lock DMG
+      run: |
+        # Kill Finder to prevent it from locking DMG mount
+        killall Finder || true
+        # Detach any existing DMG mounts
+        hdiutil detach /Volumes/firefire* -force 2>/dev/null || true
+        # Wait for cleanup
+        sleep 2
+    - name: Build DMG with retry
+      run: |
+        for i in 1 2 3; do
+          echo "Attempt $i..."
+          npm run package-mac-x64 && break
+          echo "Build failed, cleaning up and retrying..."
+          hdiutil detach /Volumes/firefire* -force 2>/dev/null || true
+          sleep 5
+        done
     - name: Rename DMG
       run: mv "./target/firefire-${{steps.version.outputs.value}}.dmg" "./target/firefire-${{steps.version.outputs.value}}-x64.dmg" || mv "./target/firefire-${{steps.version.outputs.value}}-x64.dmg" "./target/firefire-${{steps.version.outputs.value}}-x64.dmg"
     - name: Upload DMG
@@ -151,7 +167,23 @@ jobs:
       with:
         path: ./package.json
         property: version
-    - run: npm run package-mac-arm64
+    - name: Kill processes that may lock DMG
+      run: |
+        # Kill Finder to prevent it from locking DMG mount
+        killall Finder || true
+        # Detach any existing DMG mounts
+        hdiutil detach /Volumes/firefire* -force 2>/dev/null || true
+        # Wait for cleanup
+        sleep 2
+    - name: Build DMG with retry
+      run: |
+        for i in 1 2 3; do
+          echo "Attempt $i..."
+          npm run package-mac-arm64 && break
+          echo "Build failed, cleaning up and retrying..."
+          hdiutil detach /Volumes/firefire* -force 2>/dev/null || true
+          sleep 5
+        done
     - name: Rename DMG
       run: mv "./target/firefire-${{steps.version.outputs.value}}.dmg" "./target/firefire-${{steps.version.outputs.value}}-arm64.dmg" || mv "./target/firefire-${{steps.version.outputs.value}}-arm64.dmg" "./target/firefire-${{steps.version.outputs.value}}-arm64.dmg"
     - name: Upload DMG
