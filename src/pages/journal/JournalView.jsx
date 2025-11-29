@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { DatePicker, Spin } from 'antd';
 import { UpOutlined, PlusOutlined } from '@ant-design/icons';
 import JournalEntry from './JournalEntry';
-import { formatDate } from './dateUtils';
-import { electronAPI } from '../../utils/electronAPI';
-import { logger } from '../../utils/logger';
+import { formatDate } from '@/utils/dateUtils';
+import { journalService } from '@/services';
+import { logger } from '@/utils/logger';
 import { Context } from '../../index';
 
 const JOURNALS_PER_PAGE = 10;
@@ -46,7 +46,7 @@ const JournalView = () => {
       const currentOffset = reset ? 0 : state.offset;
       logger.debug(`[JournalView] 加载日记: reset=${reset}, offset=${currentOffset}`);
 
-      const newJournals = await electronAPI.getJournals(JOURNALS_PER_PAGE, currentOffset);
+      const newJournals = await journalService.getList(JOURNALS_PER_PAGE, currentOffset);
 
       if (reset) {
         setJournals(newJournals);
@@ -131,11 +131,11 @@ const JournalView = () => {
   const jumpToDate = async (date) => {
     if (!date) return;
 
-    const targetDate = formatDate(date.toDate());
-    const exists = await electronAPI.journalExists(targetDate);
+    const targetDate = formatDate(date.toDate(), 'YYYY-MM-DD');
+    const exists = await journalService.exists(targetDate);
 
     if (!exists) {
-      await electronAPI.createJournal(targetDate);
+      await journalService.create(targetDate);
     }
 
     // 重置状态
@@ -162,7 +162,7 @@ const JournalView = () => {
   };
 
   const handleCreateToday = async () => {
-    await electronAPI.createJournal();
+    await journalService.create();
     // 重置状态
     stateRef.current.offset = 0;
     stateRef.current.hasMore = true;

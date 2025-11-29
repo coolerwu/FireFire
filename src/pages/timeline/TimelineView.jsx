@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
 import { Spin, Modal, message } from 'antd';
 import { ClockCircleOutlined, FileTextOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { electronAPI } from '../../utils/electronAPI';
-import { logger } from '../../utils/logger';
-import { formatDisplayDate } from '../journal/dateUtils';
+import { noteService } from '@/services';
+import { logger } from '@/utils/logger';
+import { formatDateCN, getWeekday } from '@/utils/dateUtils';
 import Markdown from '../file/markdown';
 import { Context } from '../../index';
+
+// 格式化显示日期（兼容 Date 对象）
+const formatDisplayDate = (date) => `${formatDateCN(date)} ${getWeekday(date)}`;
 
 const ARTICLES_PER_PAGE = 20;
 
@@ -34,7 +37,7 @@ const TimelineView = () => {
       setLoading(true);
       const currentOffset = reset ? 0 : offset;
 
-      const newArticles = await electronAPI.getRecentNotes(ARTICLES_PER_PAGE, currentOffset);
+      const newArticles = await noteService.getRecent(ARTICLES_PER_PAGE, currentOffset);
 
       if (reset) {
         setArticles(newArticles);
@@ -119,7 +122,7 @@ const TimelineView = () => {
       cancelText: '取消',
       onOk: async () => {
         try {
-          await electronAPI.deleteNotebookFile(article.id);
+          await noteService.delete(article.id);
           message.success('删除成功');
 
           // 从列表中移除

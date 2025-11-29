@@ -1,6 +1,6 @@
 {
   "name": "firefire",
-  "version": "0.6.29",
+  "version": "0.6.30",
   "private": true,
   "main": "main.js",
   "homepage": ".",
@@ -74,7 +74,10 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --reporters=default --reporters=jest-junit",
     "eject": "react-scripts eject",
     "estart": "electron .",
     "all": "npm run build && npm run estart",
@@ -182,7 +185,10 @@
   "license": "ISC",
   "devDependencies": {
     "@electron/rebuild": "^3.7.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
     "electron": "^25.9.8",
-    "electron-builder": "^24.6.4"
+    "electron-builder": "^24.6.4",
+    "identity-obj-proxy": "^3.0.0"
   }
 }

@@ -324,6 +324,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-29 | **v0.6.30** - Architecture refactoring: modular Settings pages (AISettings/, BaseSettings/, WebDAVSettings/); Added testing infrastructure (Jest + React Testing Library); Added database migrations system; Service layer abstraction |
 | 2025-11-27 | **v0.6.29** - Enhanced journal interaction: hover actions (open in editor, copy link, delete), inline delete confirmation, journal opens in standalone editor with date title |
 | 2025-11-27 | **v0.6.28** - Fixed macOS auto-update 404 error (upload ZIP files and generate multi-arch latest-mac.yml for electron-updater) |
 | 2025-11-27 | **v0.6.27** - Added optional Network Proxy support (HTTP/HTTPS/SOCKS5); AI service and auto-update automatically use proxy when enabled |

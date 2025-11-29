@@ -1,0 +1,57 @@
+# Test workflow for FireFire
+# Runs tests on pull requests and pushes
+
+name: test
+
+on:
+  push:
+    branches: [ "master", "develop" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 18.x ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --omit=optional --no-audit
+
+      - name: Run ESLint
+        run: npx eslint src/ --ext .js,.jsx --max-warnings 0 || true
+        continue-on-error: true
+
+      - name: Run tests with coverage
+        run: npm run test:coverage -- --ci --reporters=default
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+      - name: Check coverage threshold
+        run: |
+          # 读取覆盖率摘要
+          if [ -f coverage/coverage-summary.json ]; then
+            LINES=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+            echo "Line coverage: ${LINES}%"
+            # 暂时不强制门禁，只报告
+            # if (( $(echo "$LINES < 30" | bc -l) )); then
+            #   echo "Coverage below threshold (30%)"
+            #   exit 1
+            # fi
+          fi

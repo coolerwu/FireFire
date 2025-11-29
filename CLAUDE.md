@@ -31,7 +31,8 @@ FireFire is a local knowledge-building note-taking application built with Electr
 ```bash
 npm start                 # Start React dev server on http://localhost:3000
 npm run build            # Build React app to ./build directory
-npm test                 # Run tests
+npm test                 # Run Jest tests
+npm run test:watch       # Run tests in watch mode
 ```
 
 **Important**: When running `npm start` (browser-only mode), the app uses mock Electron APIs defined in `src/utils/electronAPI.js`. This allows UI development without Electron. All file operations will log warnings and return mock data.
@@ -85,6 +86,9 @@ Located in `electron/` directory:
 **Database & Indexing:**
 - **dbManager.js**: SQLite database for note indexing, tags, and full-text search (FTS5)
 - **indexManager.js**: Manages note indexing, tag extraction, internal links
+- **migrations/**: Database migration framework
+  - `migrationRunner.js`: Runs pending migrations, tracks applied migrations
+  - `001_initial_schema.js`: Initial database schema (example migration)
 
 **Feature Modules:**
 - **workspaceManager.js**: Workspace initialization and directory structure
@@ -115,7 +119,10 @@ Located in `electron/` directory:
 - **timeline/**: Browse all notes by edit time
 - **graph/**: Knowledge graph visualization (force-directed D3.js)
 - **ai/**: AI chat assistant interface
-- **setting/**: Settings pages (base, ai, webdav, workspace, proxy)
+- **setting/**: Settings pages (modular structure)
+  - `BaseSettings/`: Base settings (appearance, update, database, import/export)
+  - `AISettings/`: AI configuration (provider, model, API key)
+  - `WebDAVSettings/`: WebDAV sync configuration (server, credentials, sync mode)
 
 **File Editor (src/pages/file/)**
 - `file.jsx`: Main container with file list and markdown editor
@@ -132,6 +139,19 @@ Located in `electron/` directory:
 - `TagNode.js`: Inline tag nodes (#tag)
 - `InternalLinkNode.js`: Internal links ([[note name]])
 - `DatabaseNode.js`: Notion-style inline database tables
+
+**Service Layer (src/services/)**
+- `noteService.js`: Note CRUD operations abstraction
+- `journalService.js`: Journal operations abstraction
+- `searchService.js`: Search and tag query abstraction
+- `settingService.js`: Settings access abstraction
+- `versionService.js`: Version history abstraction
+
+**Utilities (src/utils/)**
+- `dateUtils.js`: Centralized date formatting (formatDate, formatDateCN, getRelativeTime, etc.)
+- `aiService.js`: AI API calls (OpenAI, Claude, DeepSeek with proxy support)
+- `electronAPI.js`: Electron IPC bridge with browser fallbacks
+- `theme.js`: Theme configuration and CSS variable generation
 
 **Key Features**
 - Files stored as JSON (Tiptap document format) with `.cwjson` extension
@@ -182,6 +202,18 @@ Theme configuration in `src/utils/theme.js` generates Ant Design tokens and cust
 
 ### Auto-save Mechanism
 Editor updates trigger `persist()` function in `src/utils/cwjsonFileOp.js`, which debounces writes based on `autoSave` setting.
+
+### Testing Infrastructure
+
+**Test Setup (`__tests__/`)**
+- `setup.js`: Global test setup with electronAPI mocks
+- Tests for electron modules (env, settingFile, notebookFile)
+- Tests for React utilities (dateUtils)
+
+**Configuration (`jest.config.js`)**
+- Uses jsdom test environment
+- Module aliases matching webpack config
+- Conditional database tests (skipped if better-sqlite3 not available)
 
 ### Security Considerations
 - `webSecurity: false` is enabled for loading local file:// images

@@ -2,6 +2,7 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 const { confPath } = require('./env');
+const { runMigrations } = require('./migrations');
 
 /**
  * SQLite 数据库管理器
@@ -37,6 +38,16 @@ class DatabaseManager {
 
     // 创建表结构
     this.createTables();
+
+    // 运行数据库迁移
+    try {
+      const migrationResult = runMigrations(this.db);
+      if (migrationResult.applied > 0) {
+        console.log(`[DatabaseManager] 已应用 ${migrationResult.applied} 个数据库迁移`);
+      }
+    } catch (err) {
+      console.error('[DatabaseManager] 数据库迁移失败:', err);
+    }
 
     this.initialized = true;
     console.log('[DatabaseManager] 数据库初始化完成:', dbPath);

@@ -207,7 +207,7 @@ const Welcome = ({ onComplete }) => {
         {/* 底部信息 */}
         <div className="mt-8 text-center">
           <p className="text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary">
-            FireFire v0.6.29 · 本地优先 · 隐私安全
+            FireFire v0.6.30 · 本地优先 · 隐私安全
           </p>
         </div>
       </div>
