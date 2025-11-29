@@ -324,6 +324,7 @@ MIT
 
 | Date | Changes |
 |------|---------|
+| 2025-11-30 | **v0.6.31** - Added Database Board View (Kanban-style with drag & drop); Timeline uses filename as title (Obsidian-style); Fixed rename file (updates database index, migrates version history); Fixed tag recognition in editor; Compact knowledge graph layout; Journal delete uses Modal.confirm; macOS update fallback for unsigned apps |
 | 2025-11-29 | **v0.6.30** - Architecture refactoring: modular Settings pages (AISettings/, BaseSettings/, WebDAVSettings/); Added testing infrastructure (Jest + React Testing Library); Added database migrations system; Service layer abstraction |
 | 2025-11-27 | **v0.6.29** - Enhanced journal interaction: hover actions (open in editor, copy link, delete), inline delete confirmation, journal opens in standalone editor with date title |
 | 2025-11-27 | **v0.6.28** - Fixed macOS auto-update 404 error (upload ZIP files and generate multi-arch latest-mac.yml for electron-updater) |

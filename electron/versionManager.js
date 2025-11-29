@@ -297,6 +297,34 @@ class VersionManager {
       totalSizeMB: ((stats.totalSize || 0) / (1024 * 1024)).toFixed(2),
     };
   }
+
+  /**
+   * 迁移版本历史（用于重命名笔记）
+   * @param {string} oldNoteId - 旧笔记 ID
+   * @param {string} newNoteId - 新笔记 ID
+   * @returns {number} 迁移的版本数量
+   */
+  migrateVersions(oldNoteId, newNoteId) {
+    if (!this.db) return 0;
+
+    try {
+      const result = this.db.prepare(`
+        UPDATE note_versions SET note_id = ? WHERE note_id = ?
+      `).run(newNoteId, oldNoteId);
+
+      // 更新内存中的最后保存信息
+      if (this.lastSaveInfo.has(oldNoteId)) {
+        this.lastSaveInfo.set(newNoteId, this.lastSaveInfo.get(oldNoteId));
+        this.lastSaveInfo.delete(oldNoteId);
+      }
+
+      console.log(`[VersionManager] 迁移版本: ${oldNoteId} -> ${newNoteId} (${result.changes} 个版本)`);
+      return result.changes;
+    } catch (error) {
+      console.error('[VersionManager] 迁移版本失败:', error);
+      return 0;
+    }
+  }
 }
 
 // 导出单例

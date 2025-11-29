@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
-import { Dropdown, message } from 'antd';
-import { ExpandOutlined, MoreOutlined, DeleteOutlined, LinkOutlined } from '@ant-design/icons';
+import { Dropdown, message, Modal } from 'antd';
+import { ExpandOutlined, MoreOutlined, DeleteOutlined, LinkOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { formatDisplayDate, getRelativeDate } from './dateUtils';
 import { electronAPI } from '../../utils/electronAPI';
 import { logger } from '../../utils/logger';
@@ -16,8 +16,6 @@ const JournalEntry = ({ journal, onUpdate, onDelete }) => {
   const { setActiveKey, setEditingNote, setting } = useContext(Context);
   const [loading, setLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const confirmTimeoutRef = useRef(null);
   const saveTimeoutRef = useRef(null);
   const autoSaveIntervalRef = useRef(null);
   const journalIdRef = useRef(journal.id);
@@ -101,14 +99,6 @@ const JournalEntry = ({ journal, onUpdate, onDelete }) => {
     journalIdRef.current = journal.id;
   }, [journal.id]);
 
-  // 清理确认删除超时
-  useEffect(() => {
-    return () => {
-      if (confirmTimeoutRef.current) {
-        clearTimeout(confirmTimeoutRef.current);
-      }
-    };
-  }, []);
 
   // 打开日记编辑器
   const handleOpenJournal = () => {
@@ -138,44 +128,33 @@ const JournalEntry = ({ journal, onUpdate, onDelete }) => {
   };
 
   // 删除日记
-  const handleDelete = async () => {
-    if (!confirmDelete) {
-      // 第一次点击，进入确认状态
-      setConfirmDelete(true);
-      // 3 秒后自动恢复
-      confirmTimeoutRef.current = setTimeout(() => {
-        setConfirmDelete(false);
-      }, 3000);
-      return;
-    }
-
-    // 第二次点击，执行删除
-    try {
-      const result = await electronAPI.deleteJournal(journal.id);
-      if (result) {
-        message.success('已删除日记');
-        if (onDelete) {
-          onDelete(journal.id);
+  const handleDelete = () => {
+    Modal.confirm({
+      title: '删除日记',
+      icon: <ExclamationCircleOutlined />,
+      content: `确定要删除 ${formatDisplayDate(new Date(journal.journalDate))} 的日记吗？此操作不可恢复。`,
+      okText: '删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          const result = await electronAPI.deleteJournal(journal.id);
+          if (result) {
+            message.success('已删除日记');
+            if (onDelete) {
+              onDelete(journal.id);
+            }
+          } else {
+            message.error('删除失败');
+          }
+        } catch (error) {
+          logger.error('[JournalEntry] 删除日记失败:', error);
+          message.error('删除失败');
         }
-      } else {
-        message.error('删除失败');
-      }
-    } catch (error) {
-      logger.error('[JournalEntry] 删除日记失败:', error);
-      message.error('删除失败');
-    }
-    setConfirmDelete(false);
+      },
+    });
   };
 
-  // 重置确认状态（鼠标离开菜单时）
-  const handleMenuOpenChange = (open) => {
-    if (!open) {
-      setConfirmDelete(false);
-      if (confirmTimeoutRef.current) {
-        clearTimeout(confirmTimeoutRef.current);
-      }
-    }
-  };
 
   // 下拉菜单项
   const menuItems = [
@@ -195,10 +174,9 @@ const JournalEntry = ({ journal, onUpdate, onDelete }) => {
     {
       key: 'delete',
       icon: <DeleteOutlined />,
-      label: confirmDelete ? '确认删除？' : '删除',
+      label: '删除',
       danger: true,
       onClick: handleDelete,
-      className: confirmDelete ? 'confirm-delete' : '',
     },
   ];
 
@@ -284,10 +262,16 @@ const JournalEntry = ({ journal, onUpdate, onDelete }) => {
           >
             <ExpandOutlined />
           </button>
+          <button
+            className="action-btn danger"
+            onClick={handleDelete}
+            title="删除"
+          >
+            <DeleteOutlined />
+          </button>
           <Dropdown
             menu={{ items: menuItems }}
             trigger={['click']}
-            onOpenChange={handleMenuOpenChange}
           >
             <button className="action-btn" title="更多">
               <MoreOutlined />

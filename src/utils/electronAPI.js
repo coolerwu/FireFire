@@ -416,6 +416,18 @@ const mockAPI = {
         console.warn('[Mock Mode] deleteDatabaseView called', id);
         return true;
     },
+    duplicateDatabaseView: async (sourceId, newTitle) => {
+        console.warn('[Mock Mode] duplicateDatabaseView called', sourceId, newTitle);
+        const id = `db_${Date.now()}`;
+        return {
+            id,
+            title: newTitle || '数据库副本',
+            propertiesConfig: [{ id: 'title', name: '名称', type: 'text', width: 200 }],
+            viewConfig: { currentView: 'table', views: {} },
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+        };
+    },
     createDatabaseRow: async (databaseId, properties) => {
         console.warn('[Mock Mode] createDatabaseRow called', databaseId);
         return {

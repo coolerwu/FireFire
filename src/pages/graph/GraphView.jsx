@@ -339,8 +339,21 @@ const GraphView = () => {
                     linkDirectionalArrowLength={4}
                     linkDirectionalArrowRelPos={1}
                     cooldownTicks={100}
-                    onEngineStop={() => graphRef.current?.zoomToFit(400, 50)}
+                    onEngineStop={() => graphRef.current?.zoomToFit(400, 100)}
                     backgroundColor="transparent"
+                    // 力导向图参数 - 让节点更紧凑
+                    d3AlphaDecay={0.02}
+                    d3VelocityDecay={0.3}
+                    d3Force={forceConfig => {
+                        // 调整节点间斥力，让节点更紧凑
+                        forceConfig('charge')?.strength(-50);
+                        // 调整链接距离
+                        forceConfig('link')?.distance(30);
+                        // 添加向中心聚集的力
+                        forceConfig('center')?.strength(0.1);
+                    }}
+                    minZoom={0.5}
+                    maxZoom={10}
                 />
 
                 {/* 悬浮信息 */}

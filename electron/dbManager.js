@@ -763,6 +763,74 @@ class DatabaseManager {
   }
 
   /**
+   * 复制数据库（包含所有行）
+   * @param {string} sourceId - 源数据库 ID
+   * @param {string} newTitle - 新数据库标题（可选，默认添加"副本"后缀）
+   * @returns {object|null} 新创建的数据库对象
+   */
+  duplicateDatabase(sourceId, newTitle = null) {
+    const source = this.getDatabase(sourceId);
+    if (!source) {
+      console.error(`[DatabaseManager] 复制失败: 源数据库不存在 ${sourceId}`);
+      return null;
+    }
+
+    const newId = `db_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const now = Date.now();
+    const title = newTitle || `${source.title} 副本`;
+
+    // 使用事务确保数据一致性
+    const transaction = this.db.transaction(() => {
+      // 复制数据库元信息
+      this.db.prepare(`
+        INSERT INTO databases (id, title, properties_config, view_config, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(
+        newId,
+        title,
+        JSON.stringify(source.propertiesConfig),
+        JSON.stringify(source.viewConfig),
+        now,
+        now
+      );
+
+      // 复制所有行
+      const rows = this.getDatabaseRows(sourceId);
+      const insertRow = this.db.prepare(`
+        INSERT INTO database_rows (id, database_id, properties, order_index, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `);
+
+      for (const row of rows) {
+        const newRowId = `row_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        insertRow.run(
+          newRowId,
+          newId,
+          JSON.stringify(row.properties),
+          row.orderIndex,
+          now,
+          now
+        );
+      }
+    });
+
+    transaction();
+
+    // 获取复制后的行数用于日志
+    const copiedRows = this.getDatabaseRows(newId);
+    console.log(`[DatabaseManager] 复制数据库: ${sourceId} -> ${newId} (${copiedRows.length} 行)`);
+
+    return {
+      id: newId,
+      title,
+      propertiesConfig: source.propertiesConfig,
+      viewConfig: source.viewConfig,
+      createdAt: now,
+      updatedAt: now
+    };
+  }
+
+  /**
    * 创建数据库行
    * @param {string} databaseId - 数据库 ID
    * @param {object} properties - 行属性值

@@ -7,6 +7,7 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import TableView from './TableView';
+import BoardView from './BoardView';
 import { electronAPI } from 'utils/electronAPI';
 
 /**
@@ -50,7 +51,7 @@ const DatabaseView = ({ databaseId, node, updateAttributes }) => {
 
   const viewOptions = [
     { value: 'table', icon: <TableOutlined />, label: '表格' },
-    { value: 'board', icon: <AppstoreOutlined />, label: '看板', disabled: true },
+    { value: 'board', icon: <AppstoreOutlined />, label: '看板' },
     { value: 'list', icon: <UnorderedListOutlined />, label: '列表', disabled: true },
     { value: 'calendar', icon: <CalendarOutlined />, label: '日历', disabled: true },
   ];
@@ -82,9 +83,7 @@ const DatabaseView = ({ databaseId, node, updateAttributes }) => {
           <TableView databaseId={databaseId} onTitleChange={handleTitleChange} />
         )}
         {currentView === 'board' && (
-          <div className="p-8 text-center text-gray-400">
-            看板视图开发中...
-          </div>
+          <BoardView databaseId={databaseId} onTitleChange={handleTitleChange} />
         )}
         {currentView === 'list' && (
           <div className="p-8 text-center text-gray-400">

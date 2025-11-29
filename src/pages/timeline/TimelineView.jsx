@@ -96,15 +96,30 @@ const TimelineView = () => {
 
   // 打开文章
   const openArticle = (article) => {
-    logger.debug('[TimelineView] 打开文章:', article.id);
+    logger.debug('[TimelineView] 打开文章:', article.id, article.title, article.path);
+
+    // article.path 可能是绝对路径或相对路径
+    // 绝对路径如: "/Users/wulang/Desktop/personal/notebook/1764430902053.md"
+    // 相对路径如: "notebook/1764430902053.md"
+    const articlePath = article.path || '';
+
+    // 从 path 中提取文件名（不含后缀）
+    const lastSlashIndex = articlePath.lastIndexOf('/');
+    const fullFileName = lastSlashIndex >= 0 ? articlePath.substring(lastSlashIndex + 1) : articlePath;
+    const lastDotIndex = fullFileName.lastIndexOf('.');
+    const fileNameFromPath = lastDotIndex > 0 ? fullFileName.substring(0, lastDotIndex) : (fullFileName || article.id);
+    const actualSuffix = lastDotIndex > 0 ? fullFileName.substring(lastDotIndex) : (setting?.notebookSuffix || '.md');
 
     // 构建笔记对象
+    // id 使用文件名作为标题（类似 Obsidian）
+    // filename 只用文件名，readNotebookFile 会基于 notebook 目录解析路径
     const noteInfo = {
-      id: article.id,
-      filename: article.id + (setting?.notebookSuffix || '.md'),
+      id: fileNameFromPath,  // 使用文件名作为标题
+      fileId: fileNameFromPath,  // 实际文件名（不含后缀），用于重命名操作
+      filename: fileNameFromPath + actualSuffix,  // 只用文件名，如 "dassad.md"
       type: 'file',
-      notebookPath: article.path,
-      attachmentPath: article.path ? article.path.replace(/\.(cwjson|md)$/, '').replace(/notebook/, 'attachment') : '',
+      notebookPath: articlePath,
+      attachmentPath: `attachment/${fileNameFromPath}`,
     };
 
     setSelectedArticle(noteInfo);
@@ -114,9 +129,16 @@ const TimelineView = () => {
   const handleDelete = (e, article) => {
     e.stopPropagation();
 
+    // 从 path 提取文件名
+    const articlePath = article.path || '';
+    const lastSlash = articlePath.lastIndexOf('/');
+    const fullFileName = lastSlash >= 0 ? articlePath.substring(lastSlash + 1) : articlePath;
+    const lastDot = fullFileName.lastIndexOf('.');
+    const displayName = lastDot > 0 ? fullFileName.substring(0, lastDot) : (fullFileName || article.id);
+
     Modal.confirm({
       title: '确认删除',
-      content: `确定要删除笔记「${article.title || article.id}」吗？此操作不可撤销。`,
+      content: `确定要删除笔记「${displayName}」吗？此操作不可撤销。`,
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
@@ -129,7 +151,7 @@ const TimelineView = () => {
           setArticles(prev => prev.filter(a => a.id !== article.id));
 
           // 如果删除的是当前选中的文章，清除选中状态
-          if (selectedArticle?.id === article.id) {
+          if (selectedArticle?.notebookPath === article.path) {
             setSelectedArticle(null);
           }
         } catch (error) {
@@ -179,7 +201,15 @@ const TimelineView = () => {
               const showDateDivider = !prevDate ||
                 updateDate.toDateString() !== prevDate.toDateString();
 
-              const isSelected = selectedArticle?.id === article.id;
+              // 使用 path 比较选中状态，因为 selectedArticle.id 是文件名，article.id 是数据库 ID
+              const isSelected = selectedArticle?.notebookPath === article.path;
+
+              // 从 path 提取文件名作为显示标题（类似 Obsidian）
+              const articlePath = article.path || '';
+              const lastSlash = articlePath.lastIndexOf('/');
+              const fullFileName = lastSlash >= 0 ? articlePath.substring(lastSlash + 1) : articlePath;
+              const lastDot = fullFileName.lastIndexOf('.');
+              const displayTitle = lastDot > 0 ? fullFileName.substring(0, lastDot) : (fullFileName || article.id);
 
               return (
                 <React.Fragment key={article.id}>
@@ -218,7 +248,7 @@ const TimelineView = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className={`text-sm font-medium truncate ${isSelected ? 'text-notion-accent-blue' : 'text-notion-text-primary dark:text-notion-dark-text-primary'}`}>
-                          {article.title || article.id}
+                          {displayTitle}
                         </h3>
                         <div className="text-xs text-notion-text-tertiary dark:text-notion-dark-text-tertiary mt-0.5">
                           {updateDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}

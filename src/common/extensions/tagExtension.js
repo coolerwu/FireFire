@@ -104,16 +104,22 @@ export const TagExtension = Node.create({
         const { selection } = state;
         const { $from } = selection;
 
-        // 获取当前行的文本
-        const textBefore = $from.parent.textBetween(
-          Math.max(0, $from.parentOffset - 20),
-          $from.parentOffset,
-          null,
-          '\ufffc'
-        );
+        // 只处理光标在文本中的情况
+        if ($from.textOffset === 0) {
+          return false;
+        }
 
-        // 检查是否匹配 #标签 模式
-        const match = textBefore.match(/#([a-zA-Z0-9\u4e00-\u9fa5_-]+)$/);
+        // 获取当前位置所在的文本节点
+        const node = $from.nodeBefore;
+        if (!node || !node.isText) {
+          return false;
+        }
+
+        // 获取文本内容
+        const text = node.text || '';
+
+        // 检查是否以 #标签 结尾
+        const match = text.match(/#([a-zA-Z0-9\u4e00-\u9fa5_-]+)$/);
 
         if (match) {
           const tagName = match[1];

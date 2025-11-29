@@ -4,6 +4,7 @@ const {getCurSettingConfig} = require("./settingFile");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const dbManager = require("./dbManager");
+const versionManager = require("./versionManager");
 const { tiptapToMarkdown, markdownToTiptap, extractMetadata } = require("./markdownConverter");
 const {
     validateAndResolvePath,
@@ -455,6 +456,26 @@ exports.init = () => {
 
         if (fs.existsSync(oldFileFullPath) && !fs.existsSync(newFileFullPath)) {
             fs.renameSync(oldFileFullPath, newFileFullPath);
+
+            // 更新数据库索引
+            const oldNoteId = path.basename(oldFileFullPath, curNotebookSuffix);
+            const newNoteId = path.basename(newFileFullPath, curNotebookSuffix);
+
+            try {
+                // 1. 先索引新文件（创建新笔记记录）
+                const content = fs.readFileSync(newFileFullPath, 'utf-8');
+                dbManager.indexNote(newNoteId, newFileFullPath, content);
+
+                // 2. 迁移版本历史（在删除旧记录之前）
+                versionManager.migrateVersions(oldNoteId, newNoteId);
+
+                // 3. 删除旧笔记记录（版本已迁移，不会被级联删除）
+                dbManager.deleteNote(oldNoteId);
+            } catch (indexError) {
+                console.error('[NotebookFile] renameNotebookFile 更新索引失败:', indexError);
+                // 索引失败不影响重命名结果
+            }
+
             return true;
         } else {
             return false;

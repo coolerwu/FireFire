@@ -5,8 +5,9 @@ import dayjs from 'dayjs';
 /**
  * PropertyCell - 数据库单元格渲染组件
  * 根据属性类型渲染不同的编辑器
+ * @param {boolean} compact - 紧凑模式（用于看板卡片预览）
  */
-const PropertyCell = ({ property, value, onChange, readonly = false }) => {
+const PropertyCell = ({ property, value, onChange, readonly = false, compact = false }) => {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
   const inputRef = useRef(null);
@@ -37,6 +38,48 @@ const PropertyCell = ({ property, value, onChange, readonly = false }) => {
       setEditing(false);
     }
   };
+
+  // 紧凑模式：只显示值的简洁预览
+  if (compact) {
+    const colors = ['blue', 'green', 'orange', 'red', 'purple', 'cyan', 'magenta'];
+
+    switch (property.type) {
+      case 'text':
+      case 'url':
+        return <span className="truncate">{value || '-'}</span>;
+      case 'number':
+        return <span>{value ?? '-'}</span>;
+      case 'select':
+        if (!value) return <span className="text-gray-400">-</span>;
+        return (
+          <Tag
+            color={colors[(property.options || []).indexOf(value) % colors.length]}
+            className="text-xs"
+          >
+            {value}
+          </Tag>
+        );
+      case 'multi_select':
+        const vals = Array.isArray(value) ? value : [];
+        if (vals.length === 0) return <span className="text-gray-400">-</span>;
+        return (
+          <span className="flex flex-wrap gap-0.5">
+            {vals.slice(0, 2).map((v, i) => (
+              <Tag key={v} color={colors[(property.options || []).indexOf(v) % colors.length]} className="text-xs">
+                {v}
+              </Tag>
+            ))}
+            {vals.length > 2 && <span className="text-xs text-gray-400">+{vals.length - 2}</span>}
+          </span>
+        );
+      case 'date':
+        return <span>{value ? dayjs(value).format('MM-DD') : '-'}</span>;
+      case 'checkbox':
+        return <Checkbox checked={!!value} disabled className="pointer-events-none" />;
+      default:
+        return <span>{value?.toString() || '-'}</span>;
+    }
+  }
 
   // 文本类型
   if (property.type === 'text') {

@@ -50,7 +50,8 @@ const Markdown = ({cwjson}) => {
 
         try {
             // 构建旧路径和新路径
-            const oldPath = cwjson.id;
+            // fileId 是实际文件名，id 可能是显示标题
+            const oldPath = cwjson.fileId || cwjson.id;
             const newPath = newTitle;
 
             const success = await electronAPI.renameNotebookFile(oldPath, newPath);
@@ -60,7 +61,14 @@ const Markdown = ({cwjson}) => {
                 originalTitleRef.current = newTitle;
                 // 更新 cwjson 对象
                 cwjson.id = newTitle;
-                cwjson.filename = newTitle + (cwjson.filename.substring(cwjson.filename.lastIndexOf('.')));
+                cwjson.fileId = newTitle;  // 更新实际文件名
+                // 提取后缀并更新文件名
+                const suffix = cwjson.filename.substring(cwjson.filename.lastIndexOf('.'));
+                cwjson.filename = newTitle + suffix;
+                // 更新 notebookPath
+                cwjson.notebookPath = cwjson.notebookPath?.replace(/[^/]+$/, newTitle + suffix);
+                // 刷新列表
+                triggerRefresh?.();
             } else {
                 message.error('重命名失败，文件可能已存在');
                 setTitle(originalTitleRef.current);
@@ -83,7 +91,7 @@ const Markdown = ({cwjson}) => {
         }
     };
     //上下文
-    const {curDir, setting} = useContext(Context);
+    const {curDir, setting, triggerRefresh} = useContext(Context);
 
     //初始化编辑器
     const editor = useEditor({
@@ -232,7 +240,7 @@ const Markdown = ({cwjson}) => {
 
             {/* 版本历史面板 */}
             <VersionHistory
-                noteId={cwjson?.id}
+                noteId={cwjson?.fileId || cwjson?.id}
                 visible={versionHistoryVisible}
                 onClose={() => setVersionHistoryVisible(false)}
                 onRestore={handleVersionRestore}

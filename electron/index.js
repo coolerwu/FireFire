@@ -201,6 +201,11 @@ const initDatabaseViewOperation = () => {
         return dbManager.deleteDatabase(id);
     });
 
+    // 复制数据库（包含所有行）
+    ipcMain.handle('duplicate-database-view', (event, sourceId, newTitle) => {
+        return dbManager.duplicateDatabase(sourceId, newTitle);
+    });
+
     // 创建数据库行
     ipcMain.handle('create-database-row', (event, databaseId, properties) => {
         return dbManager.createDatabaseRow(databaseId, properties);

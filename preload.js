@@ -110,6 +110,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getAllDatabaseViews: () => ipcRenderer.invoke('get-all-database-views'),
     updateDatabaseView: (id, updates) => ipcRenderer.invoke('update-database-view', id, updates),
     deleteDatabaseView: (id) => ipcRenderer.invoke('delete-database-view', id),
+    duplicateDatabaseView: (sourceId, newTitle) => ipcRenderer.invoke('duplicate-database-view', sourceId, newTitle),
     createDatabaseRow: (databaseId, properties) => ipcRenderer.invoke('create-database-row', databaseId, properties),
     getDatabaseRow: (rowId) => ipcRenderer.invoke('get-database-row', rowId),
     getDatabaseRows: (databaseId, options) => ipcRenderer.invoke('get-database-rows', databaseId, options),

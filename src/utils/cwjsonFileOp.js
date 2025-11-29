@@ -120,7 +120,8 @@ export const persist = (editor, cwjson, delay = 1000) => {
 
             // 尝试保存版本历史（异步，不阻塞主保存流程）
             try {
-                const noteId = cwjson.id || cwjson.filename.replace(/\.[^/.]+$/, '');
+                // fileId 是实际文件名（数据库中的 id），id 可能是显示标题
+                const noteId = cwjson.fileId || cwjson.id || cwjson.filename.replace(/\.[^/.]+$/, '');
                 await electronAPI.saveVersion(noteId, content, false);
             } catch (versionError) {
                 logger.debug('[persist] 版本保存跳过或失败:', versionError);
